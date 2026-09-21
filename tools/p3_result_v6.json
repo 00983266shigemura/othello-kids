@@ -1,0 +1,1245 @@
+{
+ "games": 200,
+ "opening": 4,
+ "results": [
+  {
+   "a": "L2",
+   "b": "L1",
+   "games": 200,
+   "opening": 4,
+   "seed": 101,
+   "aWin": 133,
+   "bWin": 56,
+   "draw": 11,
+   "aScore": 0.6925,
+   "aAsBlack": {
+    "n": 100,
+    "win": 63
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 70
+   },
+   "ms": 30965,
+   "kind": "pair"
+  },
+  {
+   "a": "L3",
+   "b": "L2",
+   "games": 200,
+   "opening": 4,
+   "seed": 102,
+   "aWin": 129,
+   "bWin": 62,
+   "draw": 9,
+   "aScore": 0.6675,
+   "aAsBlack": {
+    "n": 100,
+    "win": 55
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 74
+   },
+   "ms": 24498,
+   "kind": "pair"
+  },
+  {
+   "a": "L4",
+   "b": "L3",
+   "games": 200,
+   "opening": 4,
+   "seed": 103,
+   "aWin": 123,
+   "bWin": 74,
+   "draw": 3,
+   "aScore": 0.6225,
+   "aAsBlack": {
+    "n": 100,
+    "win": 60
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 63
+   },
+   "ms": 23672,
+   "kind": "pair"
+  },
+  {
+   "a": "L5",
+   "b": "L4",
+   "games": 200,
+   "opening": 4,
+   "seed": 104,
+   "aWin": 102,
+   "bWin": 89,
+   "draw": 9,
+   "aScore": 0.5325,
+   "aAsBlack": {
+    "n": 100,
+    "win": 49
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 53
+   },
+   "ms": 20016,
+   "kind": "pair"
+  },
+  {
+   "a": "L6",
+   "b": "L5",
+   "games": 200,
+   "opening": 4,
+   "seed": 105,
+   "aWin": 110,
+   "bWin": 84,
+   "draw": 6,
+   "aScore": 0.565,
+   "aAsBlack": {
+    "n": 100,
+    "win": 51
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 59
+   },
+   "ms": 11991,
+   "kind": "pair"
+  },
+  {
+   "a": "L7",
+   "b": "L6",
+   "games": 200,
+   "opening": 4,
+   "seed": 106,
+   "aWin": 109,
+   "bWin": 84,
+   "draw": 7,
+   "aScore": 0.5625,
+   "aAsBlack": {
+    "n": 100,
+    "win": 49
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 60
+   },
+   "ms": 8685,
+   "kind": "pair"
+  },
+  {
+   "a": "L8",
+   "b": "L7",
+   "games": 200,
+   "opening": 4,
+   "seed": 107,
+   "aWin": 127,
+   "bWin": 68,
+   "draw": 5,
+   "aScore": 0.6475,
+   "aAsBlack": {
+    "n": 100,
+    "win": 65
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 62
+   },
+   "ms": 3192,
+   "kind": "pair"
+  },
+  {
+   "a": "L9",
+   "b": "L8",
+   "games": 200,
+   "opening": 4,
+   "seed": 108,
+   "aWin": 129,
+   "bWin": 67,
+   "draw": 4,
+   "aScore": 0.655,
+   "aAsBlack": {
+    "n": 100,
+    "win": 56
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 73
+   },
+   "ms": 8601,
+   "kind": "pair"
+  },
+  {
+   "a": "L10",
+   "b": "L9",
+   "games": 200,
+   "opening": 4,
+   "seed": 109,
+   "aWin": 100,
+   "bWin": 94,
+   "draw": 6,
+   "aScore": 0.515,
+   "aAsBlack": {
+    "n": 100,
+    "win": 50
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 50
+   },
+   "ms": 36466,
+   "kind": "pair"
+  },
+  {
+   "a": "L11",
+   "b": "L10",
+   "games": 200,
+   "opening": 4,
+   "seed": 110,
+   "aWin": 109,
+   "bWin": 82,
+   "draw": 9,
+   "aScore": 0.5675,
+   "aAsBlack": {
+    "n": 100,
+    "win": 51
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 58
+   },
+   "ms": 86308,
+   "kind": "pair"
+  },
+  {
+   "a": "L12",
+   "b": "L11",
+   "games": 200,
+   "opening": 4,
+   "seed": 111,
+   "aWin": 114,
+   "bWin": 80,
+   "draw": 6,
+   "aScore": 0.585,
+   "aAsBlack": {
+    "n": 100,
+    "win": 62
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 52
+   },
+   "ms": 145710,
+   "kind": "pair"
+  },
+  {
+   "a": "L13",
+   "b": "L12",
+   "games": 200,
+   "opening": 4,
+   "seed": 112,
+   "aWin": 102,
+   "bWin": 92,
+   "draw": 6,
+   "aScore": 0.525,
+   "aAsBlack": {
+    "n": 100,
+    "win": 52
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 50
+   },
+   "ms": 188705,
+   "kind": "pair"
+  },
+  {
+   "a": "L14",
+   "b": "L13",
+   "games": 200,
+   "opening": 4,
+   "seed": 113,
+   "aWin": 120,
+   "bWin": 71,
+   "draw": 9,
+   "aScore": 0.6225,
+   "aAsBlack": {
+    "n": 100,
+    "win": 56
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 64
+   },
+   "ms": 210866,
+   "kind": "pair"
+  },
+  {
+   "a": "L15",
+   "b": "L14",
+   "games": 200,
+   "opening": 4,
+   "seed": 114,
+   "aWin": 115,
+   "bWin": 78,
+   "draw": 7,
+   "aScore": 0.5925,
+   "aAsBlack": {
+    "n": 100,
+    "win": 57
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 58
+   },
+   "ms": 298100,
+   "kind": "pair"
+  },
+  {
+   "a": "L16",
+   "b": "L15",
+   "games": 200,
+   "opening": 4,
+   "seed": 115,
+   "aWin": 118,
+   "bWin": 74,
+   "draw": 8,
+   "aScore": 0.61,
+   "aAsBlack": {
+    "n": 100,
+    "win": 61
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 57
+   },
+   "ms": 341395,
+   "kind": "pair"
+  },
+  {
+   "a": "L17",
+   "b": "L16",
+   "games": 200,
+   "opening": 4,
+   "seed": 116,
+   "aWin": 123,
+   "bWin": 71,
+   "draw": 6,
+   "aScore": 0.63,
+   "aAsBlack": {
+    "n": 100,
+    "win": 62
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 61
+   },
+   "ms": 382986,
+   "kind": "pair"
+  },
+  {
+   "a": "L18",
+   "b": "L17",
+   "games": 200,
+   "opening": 4,
+   "seed": 117,
+   "aWin": 122,
+   "bWin": 71,
+   "draw": 7,
+   "aScore": 0.6275,
+   "aAsBlack": {
+    "n": 100,
+    "win": 68
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 54
+   },
+   "ms": 416372,
+   "kind": "pair"
+  },
+  {
+   "a": "L19",
+   "b": "L18",
+   "games": 200,
+   "opening": 4,
+   "seed": 118,
+   "aWin": 122,
+   "bWin": 70,
+   "draw": 8,
+   "aScore": 0.63,
+   "aAsBlack": {
+    "n": 100,
+    "win": 61
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 61
+   },
+   "ms": 462246,
+   "kind": "pair"
+  },
+  {
+   "a": "L20",
+   "b": "L19",
+   "games": 200,
+   "opening": 4,
+   "seed": 119,
+   "aWin": 142,
+   "bWin": 57,
+   "draw": 1,
+   "aScore": 0.7125,
+   "aAsBlack": {
+    "n": 100,
+    "win": 68
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 74
+   },
+   "ms": 434156,
+   "kind": "pair"
+  },
+  {
+   "a": "Pgreedy",
+   "b": "L1",
+   "games": 200,
+   "opening": 4,
+   "seed": 501,
+   "aWin": 193,
+   "bWin": 4,
+   "draw": 3,
+   "aScore": 0.9725,
+   "aAsBlack": {
+    "n": 100,
+    "win": 97
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 96
+   },
+   "ms": 21328,
+   "kind": "proxy"
+  },
+  {
+   "a": "Pgreedy",
+   "b": "L2",
+   "games": 200,
+   "opening": 4,
+   "seed": 502,
+   "aWin": 192,
+   "bWin": 6,
+   "draw": 2,
+   "aScore": 0.965,
+   "aAsBlack": {
+    "n": 100,
+    "win": 96
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 96
+   },
+   "ms": 20091,
+   "kind": "proxy"
+  },
+  {
+   "a": "Pgreedy",
+   "b": "L3",
+   "games": 200,
+   "opening": 4,
+   "seed": 503,
+   "aWin": 183,
+   "bWin": 15,
+   "draw": 2,
+   "aScore": 0.92,
+   "aAsBlack": {
+    "n": 100,
+    "win": 90
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 93
+   },
+   "ms": 17172,
+   "kind": "proxy"
+  },
+  {
+   "a": "Pgreedy",
+   "b": "L4",
+   "games": 200,
+   "opening": 4,
+   "seed": 504,
+   "aWin": 170,
+   "bWin": 28,
+   "draw": 2,
+   "aScore": 0.855,
+   "aAsBlack": {
+    "n": 100,
+    "win": 85
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 85
+   },
+   "ms": 13449,
+   "kind": "proxy"
+  },
+  {
+   "a": "Pgreedy",
+   "b": "L5",
+   "games": 200,
+   "opening": 4,
+   "seed": 505,
+   "aWin": 157,
+   "bWin": 40,
+   "draw": 3,
+   "aScore": 0.7925,
+   "aAsBlack": {
+    "n": 100,
+    "win": 76
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 81
+   },
+   "ms": 9420,
+   "kind": "proxy"
+  },
+  {
+   "a": "Pgreedy",
+   "b": "L6",
+   "games": 200,
+   "opening": 4,
+   "seed": 506,
+   "aWin": 149,
+   "bWin": 44,
+   "draw": 7,
+   "aScore": 0.7625,
+   "aAsBlack": {
+    "n": 100,
+    "win": 72
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 77
+   },
+   "ms": 5738,
+   "kind": "proxy"
+  },
+  {
+   "a": "Pgreedy",
+   "b": "L7",
+   "games": 200,
+   "opening": 4,
+   "seed": 507,
+   "aWin": 154,
+   "bWin": 42,
+   "draw": 4,
+   "aScore": 0.78,
+   "aAsBlack": {
+    "n": 100,
+    "win": 73
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 81
+   },
+   "ms": 3377,
+   "kind": "proxy"
+  },
+  {
+   "a": "Pgreedy",
+   "b": "L8",
+   "games": 200,
+   "opening": 4,
+   "seed": 508,
+   "aWin": 120,
+   "bWin": 75,
+   "draw": 5,
+   "aScore": 0.6125,
+   "aAsBlack": {
+    "n": 100,
+    "win": 67
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 53
+   },
+   "ms": 100,
+   "kind": "proxy"
+  },
+  {
+   "a": "Pgreedy",
+   "b": "L9",
+   "games": 200,
+   "opening": 4,
+   "seed": 509,
+   "aWin": 97,
+   "bWin": 97,
+   "draw": 6,
+   "aScore": 0.5,
+   "aAsBlack": {
+    "n": 100,
+    "win": 50
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 47
+   },
+   "ms": 13027,
+   "kind": "proxy"
+  },
+  {
+   "a": "Pgreedy",
+   "b": "L10",
+   "games": 200,
+   "opening": 4,
+   "seed": 510,
+   "aWin": 82,
+   "bWin": 113,
+   "draw": 5,
+   "aScore": 0.4225,
+   "aAsBlack": {
+    "n": 100,
+    "win": 42
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 40
+   },
+   "ms": 31341,
+   "kind": "proxy"
+  },
+  {
+   "a": "Pgreedy",
+   "b": "L11",
+   "games": 200,
+   "opening": 4,
+   "seed": 511,
+   "aWin": 62,
+   "bWin": 133,
+   "draw": 5,
+   "aScore": 0.3225,
+   "aAsBlack": {
+    "n": 100,
+    "win": 25
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 37
+   },
+   "ms": 51974,
+   "kind": "proxy"
+  },
+  {
+   "a": "Pgreedy",
+   "b": "L12",
+   "games": 200,
+   "opening": 4,
+   "seed": 512,
+   "aWin": 43,
+   "bWin": 152,
+   "draw": 5,
+   "aScore": 0.2275,
+   "aAsBlack": {
+    "n": 100,
+    "win": 23
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 20
+   },
+   "ms": 69064,
+   "kind": "proxy"
+  },
+  {
+   "a": "Pgreedy",
+   "b": "L13",
+   "games": 200,
+   "opening": 4,
+   "seed": 513,
+   "aWin": 25,
+   "bWin": 173,
+   "draw": 2,
+   "aScore": 0.13,
+   "aAsBlack": {
+    "n": 100,
+    "win": 15
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 10
+   },
+   "ms": 88548,
+   "kind": "proxy"
+  },
+  {
+   "a": "Pgreedy",
+   "b": "L14",
+   "games": 200,
+   "opening": 4,
+   "seed": 514,
+   "aWin": 17,
+   "bWin": 183,
+   "draw": 0,
+   "aScore": 0.085,
+   "aAsBlack": {
+    "n": 100,
+    "win": 12
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 5
+   },
+   "ms": 120990,
+   "kind": "proxy"
+  },
+  {
+   "a": "Pgreedy",
+   "b": "L15",
+   "games": 200,
+   "opening": 4,
+   "seed": 515,
+   "aWin": 9,
+   "bWin": 189,
+   "draw": 2,
+   "aScore": 0.05,
+   "aAsBlack": {
+    "n": 100,
+    "win": 6
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 3
+   },
+   "ms": 135939,
+   "kind": "proxy"
+  },
+  {
+   "a": "Pgreedy",
+   "b": "L16",
+   "games": 200,
+   "opening": 4,
+   "seed": 516,
+   "aWin": 10,
+   "bWin": 189,
+   "draw": 1,
+   "aScore": 0.0525,
+   "aAsBlack": {
+    "n": 100,
+    "win": 5
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 5
+   },
+   "ms": 156584,
+   "kind": "proxy"
+  },
+  {
+   "a": "Pgreedy",
+   "b": "L17",
+   "games": 200,
+   "opening": 4,
+   "seed": 517,
+   "aWin": 7,
+   "bWin": 190,
+   "draw": 3,
+   "aScore": 0.0425,
+   "aAsBlack": {
+    "n": 100,
+    "win": 5
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 2
+   },
+   "ms": 186657,
+   "kind": "proxy"
+  },
+  {
+   "a": "Pgreedy",
+   "b": "L18",
+   "games": 200,
+   "opening": 4,
+   "seed": 518,
+   "aWin": 2,
+   "bWin": 198,
+   "draw": 0,
+   "aScore": 0.01,
+   "aAsBlack": {
+    "n": 100,
+    "win": 1
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 1
+   },
+   "ms": 212364,
+   "kind": "proxy"
+  },
+  {
+   "a": "Pgreedy",
+   "b": "L19",
+   "games": 200,
+   "opening": 4,
+   "seed": 519,
+   "aWin": 2,
+   "bWin": 198,
+   "draw": 0,
+   "aScore": 0.01,
+   "aAsBlack": {
+    "n": 100,
+    "win": 0
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 2
+   },
+   "ms": 249821,
+   "kind": "proxy"
+  },
+  {
+   "a": "Pgreedy",
+   "b": "L20",
+   "games": 200,
+   "opening": 4,
+   "seed": 520,
+   "aWin": 0,
+   "bWin": 200,
+   "draw": 0,
+   "aScore": 0,
+   "aAsBlack": {
+    "n": 100,
+    "win": 0
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 0
+   },
+   "ms": 286715,
+   "kind": "proxy"
+  },
+  {
+   "a": "PgreedyCorner",
+   "b": "L1",
+   "games": 200,
+   "opening": 4,
+   "seed": 1501,
+   "aWin": 197,
+   "bWin": 3,
+   "draw": 0,
+   "aScore": 0.985,
+   "aAsBlack": {
+    "n": 100,
+    "win": 99
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 98
+   },
+   "ms": 23316,
+   "kind": "proxy"
+  },
+  {
+   "a": "PgreedyCorner",
+   "b": "L2",
+   "games": 200,
+   "opening": 4,
+   "seed": 1502,
+   "aWin": 194,
+   "bWin": 5,
+   "draw": 1,
+   "aScore": 0.9725,
+   "aAsBlack": {
+    "n": 100,
+    "win": 99
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 95
+   },
+   "ms": 19944,
+   "kind": "proxy"
+  },
+  {
+   "a": "PgreedyCorner",
+   "b": "L3",
+   "games": 200,
+   "opening": 4,
+   "seed": 1503,
+   "aWin": 194,
+   "bWin": 5,
+   "draw": 1,
+   "aScore": 0.9725,
+   "aAsBlack": {
+    "n": 100,
+    "win": 96
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 98
+   },
+   "ms": 16567,
+   "kind": "proxy"
+  },
+  {
+   "a": "PgreedyCorner",
+   "b": "L4",
+   "games": 200,
+   "opening": 4,
+   "seed": 1504,
+   "aWin": 189,
+   "bWin": 8,
+   "draw": 3,
+   "aScore": 0.9525,
+   "aAsBlack": {
+    "n": 100,
+    "win": 93
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 96
+   },
+   "ms": 14149,
+   "kind": "proxy"
+  },
+  {
+   "a": "PgreedyCorner",
+   "b": "L5",
+   "games": 200,
+   "opening": 4,
+   "seed": 1505,
+   "aWin": 188,
+   "bWin": 11,
+   "draw": 1,
+   "aScore": 0.9425,
+   "aAsBlack": {
+    "n": 100,
+    "win": 95
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 93
+   },
+   "ms": 9742,
+   "kind": "proxy"
+  },
+  {
+   "a": "PgreedyCorner",
+   "b": "L6",
+   "games": 200,
+   "opening": 4,
+   "seed": 1506,
+   "aWin": 170,
+   "bWin": 29,
+   "draw": 1,
+   "aScore": 0.8525,
+   "aAsBlack": {
+    "n": 100,
+    "win": 81
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 89
+   },
+   "ms": 7151,
+   "kind": "proxy"
+  },
+  {
+   "a": "PgreedyCorner",
+   "b": "L7",
+   "games": 200,
+   "opening": 4,
+   "seed": 1507,
+   "aWin": 174,
+   "bWin": 22,
+   "draw": 4,
+   "aScore": 0.88,
+   "aAsBlack": {
+    "n": 100,
+    "win": 86
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 88
+   },
+   "ms": 3707,
+   "kind": "proxy"
+  },
+  {
+   "a": "PgreedyCorner",
+   "b": "L8",
+   "games": 200,
+   "opening": 4,
+   "seed": 1508,
+   "aWin": 159,
+   "bWin": 37,
+   "draw": 4,
+   "aScore": 0.805,
+   "aAsBlack": {
+    "n": 100,
+    "win": 80
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 79
+   },
+   "ms": 93,
+   "kind": "proxy"
+  },
+  {
+   "a": "PgreedyCorner",
+   "b": "L9",
+   "games": 200,
+   "opening": 4,
+   "seed": 1509,
+   "aWin": 144,
+   "bWin": 49,
+   "draw": 7,
+   "aScore": 0.7375,
+   "aAsBlack": {
+    "n": 100,
+    "win": 75
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 69
+   },
+   "ms": 15064,
+   "kind": "proxy"
+  },
+  {
+   "a": "PgreedyCorner",
+   "b": "L10",
+   "games": 200,
+   "opening": 4,
+   "seed": 1510,
+   "aWin": 136,
+   "bWin": 54,
+   "draw": 10,
+   "aScore": 0.705,
+   "aAsBlack": {
+    "n": 100,
+    "win": 68
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 68
+   },
+   "ms": 35075,
+   "kind": "proxy"
+  },
+  {
+   "a": "PgreedyCorner",
+   "b": "L11",
+   "games": 200,
+   "opening": 4,
+   "seed": 1511,
+   "aWin": 103,
+   "bWin": 83,
+   "draw": 14,
+   "aScore": 0.55,
+   "aAsBlack": {
+    "n": 100,
+    "win": 48
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 55
+   },
+   "ms": 78110,
+   "kind": "proxy"
+  },
+  {
+   "a": "PgreedyCorner",
+   "b": "L12",
+   "games": 200,
+   "opening": 4,
+   "seed": 1512,
+   "aWin": 80,
+   "bWin": 109,
+   "draw": 11,
+   "aScore": 0.4275,
+   "aAsBlack": {
+    "n": 100,
+    "win": 37
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 43
+   },
+   "ms": 108148,
+   "kind": "proxy"
+  },
+  {
+   "a": "PgreedyCorner",
+   "b": "L13",
+   "games": 200,
+   "opening": 4,
+   "seed": 1513,
+   "aWin": 60,
+   "bWin": 136,
+   "draw": 4,
+   "aScore": 0.31,
+   "aAsBlack": {
+    "n": 100,
+    "win": 28
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 32
+   },
+   "ms": 130255,
+   "kind": "proxy"
+  },
+  {
+   "a": "PgreedyCorner",
+   "b": "L14",
+   "games": 200,
+   "opening": 4,
+   "seed": 1514,
+   "aWin": 43,
+   "bWin": 150,
+   "draw": 7,
+   "aScore": 0.2325,
+   "aAsBlack": {
+    "n": 100,
+    "win": 24
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 19
+   },
+   "ms": 139401,
+   "kind": "proxy"
+  },
+  {
+   "a": "PgreedyCorner",
+   "b": "L15",
+   "games": 200,
+   "opening": 4,
+   "seed": 1515,
+   "aWin": 26,
+   "bWin": 171,
+   "draw": 3,
+   "aScore": 0.1375,
+   "aAsBlack": {
+    "n": 100,
+    "win": 12
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 14
+   },
+   "ms": 177341,
+   "kind": "proxy"
+  },
+  {
+   "a": "PgreedyCorner",
+   "b": "L16",
+   "games": 200,
+   "opening": 4,
+   "seed": 1516,
+   "aWin": 17,
+   "bWin": 180,
+   "draw": 3,
+   "aScore": 0.0925,
+   "aAsBlack": {
+    "n": 100,
+    "win": 6
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 11
+   },
+   "ms": 185424,
+   "kind": "proxy"
+  },
+  {
+   "a": "PgreedyCorner",
+   "b": "L17",
+   "games": 200,
+   "opening": 4,
+   "seed": 1517,
+   "aWin": 10,
+   "bWin": 188,
+   "draw": 2,
+   "aScore": 0.055,
+   "aAsBlack": {
+    "n": 100,
+    "win": 6
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 4
+   },
+   "ms": 200043,
+   "kind": "proxy"
+  },
+  {
+   "a": "PgreedyCorner",
+   "b": "L18",
+   "games": 200,
+   "opening": 4,
+   "seed": 1518,
+   "aWin": 6,
+   "bWin": 191,
+   "draw": 3,
+   "aScore": 0.0375,
+   "aAsBlack": {
+    "n": 100,
+    "win": 4
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 2
+   },
+   "ms": 192711,
+   "kind": "proxy"
+  },
+  {
+   "a": "PgreedyCorner",
+   "b": "L19",
+   "games": 200,
+   "opening": 4,
+   "seed": 1519,
+   "aWin": 3,
+   "bWin": 197,
+   "draw": 0,
+   "aScore": 0.015,
+   "aAsBlack": {
+    "n": 100,
+    "win": 1
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 2
+   },
+   "ms": 193339,
+   "kind": "proxy"
+  },
+  {
+   "a": "PgreedyCorner",
+   "b": "L20",
+   "games": 200,
+   "opening": 4,
+   "seed": 1520,
+   "aWin": 0,
+   "bWin": 199,
+   "draw": 1,
+   "aScore": 0.0025,
+   "aAsBlack": {
+    "n": 100,
+    "win": 0
+   },
+   "aAsWhite": {
+    "n": 100,
+    "win": 0
+   },
+   "ms": 192985,
+   "kind": "proxy"
+  }
+ ]
+}

@@ -1,0 +1,2702 @@
+{
+ "games": 100,
+ "table": [
+  {
+   "spec": "C:bad=1,badDepth=4",
+   "elo": -673.0,
+   "scores": {
+    "C:rand=1": 0.025,
+    "C:bad=0.9": 0.385,
+    "Pgreedy": 0,
+    "C:depth=1,eps=0.4": 0.04
+   },
+   "isNew": true
+  },
+  {
+   "spec": "C:bad=1,badDepth=2",
+   "elo": -660.4,
+   "scores": {
+    "C:rand=1": 0.055,
+    "C:bad=0.9": 0.34,
+    "Pgreedy": 0,
+    "C:depth=1,eps=0.4": 0.08
+   },
+   "isNew": true
+  },
+  {
+   "spec": "C:bad=1,badDepth=3",
+   "elo": -636.5,
+   "scores": {
+    "C:rand=1": 0.035,
+    "C:bad=0.9": 0.415,
+    "Pgreedy": 0.005,
+    "C:depth=1,eps=0.4": 0.07
+   },
+   "isNew": true
+  },
+  {
+   "spec": "C:bad=1",
+   "elo": -612.0,
+   "scores": {
+    "C:rand=1": 0.115,
+    "C:bad=0.9": 0.355,
+    "Pgreedy": 0.05,
+    "C:depth=1,eps=0.4": 0.06
+   },
+   "isNew": true
+  },
+  {
+   "spec": "C:bad=0.8,badDepth=3",
+   "elo": -551.9,
+   "scores": {
+    "C:rand=1": 0.105,
+    "C:bad=0.9": 0.55,
+    "Pgreedy": 0.02,
+    "C:depth=1,eps=0.4": 0.055
+   },
+   "isNew": true
+  },
+  {
+   "spec": "C:bad=0.9",
+   "elo": -546.5,
+   "scores": {
+    "C:rand=1": 0.08,
+    "C:depth=1,eps=0.4": 0.1,
+    "C:depth=2,eps=0": 0.14,
+    "C:depth=4,eps=0": 0.055,
+    "C:depth=6,end=12,eps=0": 0
+   },
+   "isNew": false
+  },
+  {
+   "spec": "C:bad=0.9,badDepth=2",
+   "elo": -535.4,
+   "scores": {
+    "C:rand=1": 0.095,
+    "C:bad=0.9": 0.47,
+    "Pgreedy": 0.075,
+    "C:depth=1,eps=0.4": 0.135
+   },
+   "isNew": true
+  },
+  {
+   "spec": "C:bad=0.8,badDepth=4",
+   "elo": -516.0,
+   "scores": {
+    "C:rand=1": 0.1,
+    "C:bad=0.9": 0.615,
+    "Pgreedy": 0.075,
+    "C:depth=1,eps=0.4": 0.04
+   },
+   "isNew": true
+  },
+  {
+   "spec": "C:bad=0.8,badDepth=2",
+   "elo": -499.0,
+   "scores": {
+    "C:rand=1": 0.2,
+    "C:bad=0.9": 0.555,
+    "Pgreedy": 0.06,
+    "C:depth=1,eps=0.4": 0.065
+   },
+   "isNew": true
+  },
+  {
+   "spec": "C:bad=0.6,badDepth=3",
+   "elo": -449.4,
+   "scores": {
+    "C:rand=1": 0.205,
+    "C:bad=0.9": 0.62,
+    "Pgreedy": 0.08,
+    "C:depth=1,eps=0.4": 0.13
+   },
+   "isNew": true
+  },
+  {
+   "spec": "C:bad=0.6,badDepth=2",
+   "elo": -425.4,
+   "scores": {
+    "C:rand=1": 0.26,
+    "C:bad=0.9": 0.68,
+    "Pgreedy": 0.115,
+    "C:depth=1,eps=0.4": 0.06
+   },
+   "isNew": true
+  },
+  {
+   "spec": "C:bad=0.4,badDepth=3",
+   "elo": -409.5,
+   "scores": {
+    "C:rand=1": 0.205,
+    "C:bad=0.9": 0.75,
+    "Pgreedy": 0.115,
+    "C:depth=1,eps=0.4": 0.1
+   },
+   "isNew": true
+  },
+  {
+   "spec": "C:bad=0.8",
+   "elo": -371.3,
+   "scores": {
+    "C:rand=1": 0.115,
+    "C:depth=1,eps=0.4": 0.09,
+    "C:depth=2,eps=0": 0.17,
+    "C:depth=4,eps=0": 0.06,
+    "C:depth=6,end=12,eps=0": 0
+   },
+   "isNew": false
+  },
+  {
+   "spec": "C:bad=0.4,badDepth=2",
+   "elo": -349.4,
+   "scores": {
+    "C:rand=1": 0.255,
+    "C:bad=0.9": 0.77,
+    "Pgreedy": 0.25,
+    "C:depth=1,eps=0.4": 0.115
+   },
+   "isNew": true
+  },
+  {
+   "spec": "C:bad=0.5",
+   "elo": -344.3,
+   "scores": {
+    "C:rand=1": 0.21,
+    "C:depth=1,eps=0.4": 0.075,
+    "C:depth=2,eps=0": 0.15,
+    "C:depth=4,eps=0": 0.055,
+    "C:depth=6,end=12,eps=0": 0
+   },
+   "isNew": false
+  },
+  {
+   "spec": "C:bad=0.7",
+   "elo": -330.4,
+   "scores": {
+    "C:rand=1": 0.235,
+    "C:depth=1,eps=0.4": 0.105,
+    "C:depth=2,eps=0": 0.125,
+    "C:depth=4,eps=0": 0.055,
+    "C:depth=6,end=12,eps=0": 0
+   },
+   "isNew": false
+  },
+  {
+   "spec": "C:bad=0.6",
+   "elo": -319.3,
+   "scores": {
+    "C:rand=1": 0.24,
+    "C:depth=1,eps=0.4": 0.115,
+    "C:depth=2,eps=0": 0.125,
+    "C:depth=4,eps=0": 0.065,
+    "C:depth=6,end=12,eps=0": 0
+   },
+   "isNew": false
+  },
+  {
+   "spec": "C:bad=0.4",
+   "elo": -315.0,
+   "scores": {
+    "C:rand=1": 0.245,
+    "C:depth=1,eps=0.4": 0.115,
+    "C:depth=2,eps=0": 0.13,
+    "C:depth=4,eps=0": 0.065,
+    "C:depth=6,end=12,eps=0": 0
+   },
+   "isNew": false
+  },
+  {
+   "spec": "C:bad=0.2",
+   "elo": -285.9,
+   "scores": {
+    "C:rand=1": 0.365,
+    "C:depth=1,eps=0.4": 0.105,
+    "C:depth=2,eps=0": 0.11,
+    "C:depth=4,eps=0": 0.045,
+    "C:depth=6,end=12,eps=0": 0
+   },
+   "isNew": false
+  },
+  {
+   "spec": "C:bad=0.3",
+   "elo": -279.9,
+   "scores": {
+    "C:rand=1": 0.31,
+    "C:depth=1,eps=0.4": 0.17,
+    "C:depth=2,eps=0": 0.13,
+    "C:depth=4,eps=0": 0.03,
+    "C:depth=6,end=12,eps=0": 0
+   },
+   "isNew": false
+  },
+  {
+   "spec": "C:rand=1",
+   "elo": -216.2,
+   "scores": {
+    "C:depth=1,eps=0.4": 0.235,
+    "C:depth=2,eps=0": 0.09,
+    "C:depth=4,eps=0": 0.025,
+    "C:depth=6,end=12,eps=0": 0
+   },
+   "isNew": false
+  },
+  {
+   "spec": "C:bad=0.1",
+   "elo": -210.7,
+   "scores": {
+    "C:rand=1": 0.48,
+    "C:depth=1,eps=0.4": 0.145,
+    "C:depth=2,eps=0": 0.14,
+    "C:depth=4,eps=0": 0.065,
+    "C:depth=6,end=12,eps=0": 0
+   },
+   "isNew": false
+  },
+  {
+   "spec": "C:depth=1,eps=0.8",
+   "elo": -137.2,
+   "scores": {
+    "C:rand=1": 0.685,
+    "C:depth=1,eps=0.4": 0.215,
+    "C:depth=2,eps=0": 0.11,
+    "C:depth=4,eps=0": 0.05,
+    "C:depth=6,end=12,eps=0": 0
+   },
+   "isNew": false
+  },
+  {
+   "spec": "Pgreedy",
+   "elo": -101.3,
+   "scores": {
+    "C:rand=1": 0.63,
+    "C:depth=1,eps=0.4": 0.19,
+    "C:depth=2,eps=0": 0.115,
+    "C:depth=4,eps=0": 0.01,
+    "C:depth=6,end=12,eps=0": 0
+   },
+   "isNew": false
+  },
+  {
+   "spec": "C:depth=1,eps=0.7",
+   "elo": -100.1,
+   "scores": {
+    "C:rand=1": 0.755,
+    "C:depth=1,eps=0.4": 0.285,
+    "C:depth=2,eps=0": 0.115,
+    "C:depth=4,eps=0": 0.03,
+    "C:depth=6,end=12,eps=0": 0
+   },
+   "isNew": false
+  },
+  {
+   "spec": "C:depth=1,eps=0.6",
+   "elo": -87.1,
+   "scores": {
+    "C:rand=1": 0.755,
+    "C:depth=1,eps=0.4": 0.315,
+    "C:depth=2,eps=0": 0.1,
+    "C:depth=4,eps=0": 0.06,
+    "C:depth=6,end=12,eps=0": 0
+   },
+   "isNew": false
+  },
+  {
+   "spec": "C:corner=0.5",
+   "elo": -71.5,
+   "scores": {
+    "C:rand=1": 0.765,
+    "C:depth=1,eps=0.4": 0.33,
+    "C:depth=2,eps=0": 0.11,
+    "C:depth=4,eps=0": 0.08,
+    "C:depth=6,end=12,eps=0": 0
+   },
+   "isNew": false
+  },
+  {
+   "spec": "C:depth=1,eps=0.5",
+   "elo": -44.8,
+   "scores": {
+    "C:rand=1": 0.83,
+    "C:depth=1,eps=0.4": 0.36,
+    "C:depth=2,eps=0": 0.16,
+    "C:depth=4,eps=0": 0.03,
+    "C:depth=6,end=12,eps=0": 0
+   },
+   "isNew": false
+  },
+  {
+   "spec": "C:corner=1",
+   "elo": -39.3,
+   "scores": {
+    "C:rand=1": 0.795,
+    "C:depth=1,eps=0.4": 0.355,
+    "C:depth=2,eps=0": 0.175,
+    "C:depth=4,eps=0": 0.075,
+    "C:depth=6,end=12,eps=0": 0
+   },
+   "isNew": false
+  },
+  {
+   "spec": "C:depth=2,eps=0.6",
+   "elo": -36.5,
+   "scores": {
+    "C:rand=1": 0.805,
+    "C:depth=1,eps=0.4": 0.4,
+    "C:depth=2,eps=0": 0.14,
+    "C:depth=4,eps=0": 0.055,
+    "C:depth=6,end=12,eps=0": 0.01
+   },
+   "isNew": false
+  },
+  {
+   "spec": "PgreedyCorner",
+   "elo": -29.7,
+   "scores": {
+    "C:rand=1": 0.88,
+    "C:depth=1,eps=0.4": 0.385,
+    "C:depth=2,eps=0": 0.155,
+    "C:depth=4,eps=0": 0.015,
+    "C:depth=6,end=12,eps=0": 0
+   },
+   "isNew": false
+  },
+  {
+   "spec": "C:depth=1,eps=0.4",
+   "elo": -7.7,
+   "scores": {
+    "C:rand=1": 0.835,
+    "C:depth=2,eps=0": 0.115,
+    "C:depth=4,eps=0": 0.06,
+    "C:depth=6,end=12,eps=0": 0.03
+   },
+   "isNew": false
+  },
+  {
+   "spec": "C:depth=2,eps=0.4",
+   "elo": 4.3,
+   "scores": {
+    "C:rand=1": 0.925,
+    "C:depth=1,eps=0.4": 0.48,
+    "C:depth=2,eps=0": 0.125,
+    "C:depth=4,eps=0": 0.03,
+    "C:depth=6,end=12,eps=0": 0
+   },
+   "isNew": false
+  },
+  {
+   "spec": "C:depth=2,eps=0.5",
+   "elo": 16.4,
+   "scores": {
+    "C:rand=1": 0.9,
+    "C:depth=1,eps=0.4": 0.505,
+    "C:depth=2,eps=0": 0.15,
+    "C:depth=4,eps=0": 0.04,
+    "C:depth=6,end=12,eps=0": 0.01
+   },
+   "isNew": false
+  },
+  {
+   "spec": "C:depth=1,eps=0.2",
+   "elo": 25.8,
+   "scores": {
+    "C:rand=1": 0.825,
+    "C:depth=1,eps=0.4": 0.61,
+    "C:depth=2,eps=0": 0.105,
+    "C:depth=4,eps=0": 0.09,
+    "C:depth=6,end=12,eps=0": 0.01
+   },
+   "isNew": false
+  },
+  {
+   "spec": "C:depth=1,eps=0.3",
+   "elo": 39.1,
+   "scores": {
+    "C:rand=1": 0.865,
+    "C:depth=1,eps=0.4": 0.565,
+    "C:depth=2,eps=0": 0.19,
+    "C:depth=4,eps=0": 0.06,
+    "C:depth=6,end=12,eps=0": 0.01
+   },
+   "isNew": false
+  },
+  {
+   "spec": "C:depth=3,eps=0.5",
+   "elo": 41.8,
+   "scores": {
+    "C:rand=1": 0.92,
+    "C:depth=1,eps=0.4": 0.56,
+    "C:depth=2,eps=0": 0.17,
+    "C:depth=4,eps=0": 0.05,
+    "C:depth=6,end=12,eps=0": 0
+   },
+   "isNew": false
+  },
+  {
+   "spec": "C:depth=3,eps=0.4",
+   "elo": 70.8,
+   "scores": {
+    "C:rand=1": 0.85,
+    "C:depth=1,eps=0.4": 0.65,
+    "C:depth=2,eps=0": 0.23,
+    "C:depth=4,eps=0": 0.08,
+    "C:depth=6,end=12,eps=0": 0
+   },
+   "isNew": false
+  },
+  {
+   "spec": "C:depth=1,eps=0.1",
+   "elo": 73.4,
+   "scores": {
+    "C:rand=1": 0.895,
+    "C:depth=1,eps=0.4": 0.69,
+    "C:depth=2,eps=0": 0.17,
+    "C:depth=4,eps=0": 0.055,
+    "C:depth=6,end=12,eps=0": 0.01
+   },
+   "isNew": false
+  },
+  {
+   "spec": "C:depth=2,eps=0.3",
+   "elo": 78.7,
+   "scores": {
+    "C:rand=1": 0.86,
+    "C:depth=1,eps=0.4": 0.675,
+    "C:depth=2,eps=0": 0.24,
+    "C:depth=4,eps=0": 0.055,
+    "C:depth=6,end=12,eps=0": 0.01
+   },
+   "isNew": false
+  },
+  {
+   "spec": "C:depth=1,eps=0",
+   "elo": 83.9,
+   "scores": {
+    "C:rand=1": 0.82,
+    "C:depth=1,eps=0.4": 0.83,
+    "C:depth=2,eps=0": 0.16,
+    "C:depth=4,eps=0": 0.05,
+    "C:depth=6,end=12,eps=0": 0
+   },
+   "isNew": false
+  },
+  {
+   "spec": "C:depth=4,eps=0.4",
+   "elo": 94.3,
+   "scores": {
+    "C:rand=1": 0.905,
+    "C:depth=1,eps=0.4": 0.645,
+    "C:depth=2,eps=0": 0.195,
+    "C:depth=4,eps=0": 0.135,
+    "C:depth=6,end=12,eps=0": 0.02
+   },
+   "isNew": false
+  },
+  {
+   "spec": "C:depth=2,eps=0.2",
+   "elo": 104.8,
+   "scores": {
+    "C:rand=1": 0.87,
+    "C:depth=1,eps=0.4": 0.665,
+    "C:depth=2,eps=0": 0.295,
+    "C:depth=4,eps=0": 0.09,
+    "C:depth=6,end=12,eps=0": 0.02
+   },
+   "isNew": false
+  },
+  {
+   "spec": "C:depth=3,eps=0.3",
+   "elo": 113.9,
+   "scores": {
+    "C:rand=1": 0.93,
+    "C:depth=1,eps=0.4": 0.695,
+    "C:depth=2,eps=0": 0.3,
+    "C:depth=4,eps=0": 0.04,
+    "C:depth=6,end=12,eps=0": 0.01
+   },
+   "isNew": false
+  },
+  {
+   "spec": "C:depth=2,eps=0.1",
+   "elo": 143.6,
+   "scores": {
+    "C:rand=1": 0.87,
+    "C:depth=1,eps=0.4": 0.77,
+    "C:depth=2,eps=0": 0.28,
+    "C:depth=4,eps=0": 0.12,
+    "C:depth=6,end=12,eps=0": 0.05
+   },
+   "isNew": false
+  },
+  {
+   "spec": "C:depth=3,eps=0.2",
+   "elo": 168.1,
+   "scores": {
+    "C:rand=1": 0.875,
+    "C:depth=1,eps=0.4": 0.78,
+    "C:depth=2,eps=0": 0.395,
+    "C:depth=4,eps=0": 0.115,
+    "C:depth=6,end=12,eps=0": 0.02
+   },
+   "isNew": false
+  },
+  {
+   "spec": "C:depth=4,eps=0.3",
+   "elo": 192.5,
+   "scores": {
+    "C:rand=1": 0.89,
+    "C:depth=1,eps=0.4": 0.71,
+    "C:depth=2,eps=0": 0.44,
+    "C:depth=4,eps=0": 0.2,
+    "C:depth=6,end=12,eps=0": 0.04
+   },
+   "isNew": false
+  },
+  {
+   "spec": "C:depth=4,eps=0.2",
+   "elo": 251.4,
+   "scores": {
+    "C:rand=1": 0.9,
+    "C:depth=1,eps=0.4": 0.825,
+    "C:depth=2,eps=0": 0.49,
+    "C:depth=4,eps=0": 0.27,
+    "C:depth=6,end=12,eps=0": 0.025
+   },
+   "isNew": false
+  },
+  {
+   "spec": "C:depth=2,eps=0",
+   "elo": 262.7,
+   "scores": {
+    "C:rand=1": 0.92,
+    "C:depth=1,eps=0.4": 0.87,
+    "C:depth=4,eps=0": 0.115,
+    "C:depth=6,end=12,eps=0": 0.03
+   },
+   "isNew": false
+  },
+  {
+   "spec": "C:depth=3,eps=0.1",
+   "elo": 283.4,
+   "scores": {
+    "C:rand=1": 0.945,
+    "C:depth=1,eps=0.4": 0.845,
+    "C:depth=2,eps=0": 0.59,
+    "C:depth=4,eps=0": 0.225,
+    "C:depth=6,end=12,eps=0": 0.03
+   },
+   "isNew": false
+  },
+  {
+   "spec": "C:depth=6,end=12,eps=0.4",
+   "elo": 297.5,
+   "scores": {
+    "C:rand=1": 0.97,
+    "C:depth=1,eps=0.4": 0.9,
+    "C:depth=2,eps=0": 0.48,
+    "C:depth=4,eps=0": 0.265,
+    "C:depth=6,end=12,eps=0": 0.075
+   },
+   "isNew": false
+  },
+  {
+   "spec": "C:depth=4,eps=0.1",
+   "elo": 349.1,
+   "scores": {
+    "C:rand=1": 0.955,
+    "C:depth=1,eps=0.4": 0.935,
+    "C:depth=2,eps=0": 0.53,
+    "C:depth=4,eps=0": 0.375,
+    "C:depth=6,end=12,eps=0": 0.095
+   },
+   "isNew": false
+  },
+  {
+   "spec": "C:depth=5,end=10,eps=0.3",
+   "elo": 349.1,
+   "scores": {
+    "C:rand=1": 0.93,
+    "C:depth=1,eps=0.4": 0.9,
+    "C:depth=2,eps=0": 0.555,
+    "C:depth=4,eps=0": 0.415,
+    "C:depth=6,end=12,eps=0": 0.09
+   },
+   "isNew": false
+  },
+  {
+   "spec": "C:depth=3,eps=0",
+   "elo": 355.6,
+   "scores": {
+    "C:rand=1": 0.9,
+    "C:depth=1,eps=0.4": 0.93,
+    "C:depth=2,eps=0": 0.65,
+    "C:depth=4,eps=0": 0.33,
+    "C:depth=6,end=12,eps=0": 0.105
+   },
+   "isNew": false
+  },
+  {
+   "spec": "C:depth=4,end=8,eps=0.2",
+   "elo": 367.3,
+   "scores": {
+    "C:rand=1": 0.98,
+    "C:depth=1,eps=0.4": 0.9,
+    "C:depth=2,eps=0": 0.655,
+    "C:depth=4,eps=0": 0.325,
+    "C:depth=6,end=12,eps=0": 0.1
+   },
+   "isNew": false
+  },
+  {
+   "spec": "C:depth=6,end=12,eps=0.3",
+   "elo": 375.2,
+   "scores": {
+    "C:rand=1": 0.99,
+    "C:depth=1,eps=0.4": 0.925,
+    "C:depth=2,eps=0": 0.625,
+    "C:depth=4,eps=0": 0.3,
+    "C:depth=6,end=12,eps=0": 0.15
+   },
+   "isNew": false
+  },
+  {
+   "spec": "C:depth=4,end=8,eps=0.1",
+   "elo": 451.2,
+   "scores": {
+    "C:rand=1": 0.995,
+    "C:depth=1,eps=0.4": 0.975,
+    "C:depth=2,eps=0": 0.705,
+    "C:depth=4,eps=0": 0.455,
+    "C:depth=6,end=12,eps=0": 0.145
+   },
+   "isNew": false
+  },
+  {
+   "spec": "C:depth=5,end=10,eps=0.2",
+   "elo": 452.6,
+   "scores": {
+    "C:rand=1": 0.99,
+    "C:depth=1,eps=0.4": 0.935,
+    "C:depth=2,eps=0": 0.71,
+    "C:depth=4,eps=0": 0.55,
+    "C:depth=6,end=12,eps=0": 0.095
+   },
+   "isNew": false
+  },
+  {
+   "spec": "C:depth=4,eps=0",
+   "elo": 464.8,
+   "scores": {
+    "C:rand=1": 0.91,
+    "C:depth=1,eps=0.4": 0.95,
+    "C:depth=2,eps=0": 0.845,
+    "C:depth=6,end=12,eps=0": 0.165
+   },
+   "isNew": false
+  },
+  {
+   "spec": "C:depth=6,end=12,eps=0.2",
+   "elo": 467.6,
+   "scores": {
+    "C:rand=1": 0.99,
+    "C:depth=1,eps=0.4": 0.95,
+    "C:depth=2,eps=0": 0.685,
+    "C:depth=4,eps=0": 0.49,
+    "C:depth=6,end=12,eps=0": 0.22
+   },
+   "isNew": false
+  },
+  {
+   "spec": "C:depth=6,end=12,eps=0.15",
+   "elo": 473.2,
+   "scores": {
+    "C:rand=1": 0.975,
+    "C:depth=1,eps=0.4": 0.97,
+    "C:depth=2,eps=0": 0.65,
+    "C:depth=4,eps=0": 0.575,
+    "C:depth=6,end=12,eps=0": 0.185
+   },
+   "isNew": false
+  },
+  {
+   "spec": "C:depth=4,end=8,eps=0",
+   "elo": 534.1,
+   "scores": {
+    "C:rand=1": 1,
+    "C:depth=1,eps=0.4": 0.99,
+    "C:depth=2,eps=0": 0.85,
+    "C:depth=4,eps=0": 0.505,
+    "C:depth=6,end=12,eps=0": 0.225
+   },
+   "isNew": false
+  },
+  {
+   "spec": "C:depth=6,end=12,eps=0.1",
+   "elo": 542.8,
+   "scores": {
+    "C:rand=1": 0.99,
+    "C:depth=1,eps=0.4": 0.975,
+    "C:depth=2,eps=0": 0.72,
+    "C:depth=4,eps=0": 0.665,
+    "C:depth=6,end=12,eps=0": 0.25
+   },
+   "isNew": false
+  },
+  {
+   "spec": "C:depth=5,end=10,eps=0.1",
+   "elo": 557.6,
+   "scores": {
+    "C:rand=1": 0.98,
+    "C:depth=1,eps=0.4": 0.96,
+    "C:depth=2,eps=0": 0.815,
+    "C:depth=4,eps=0": 0.67,
+    "C:depth=6,end=12,eps=0": 0.225
+   },
+   "isNew": false
+  },
+  {
+   "spec": "C:depth=6,end=12,eps=0.05",
+   "elo": 648.1,
+   "scores": {
+    "C:rand=1": 1,
+    "C:depth=1,eps=0.4": 0.99,
+    "C:depth=2,eps=0": 0.905,
+    "C:depth=4,eps=0": 0.715,
+    "C:depth=6,end=12,eps=0": 0.33
+   },
+   "isNew": false
+  },
+  {
+   "spec": "C:depth=5,end=10,eps=0",
+   "elo": 683.4,
+   "scores": {
+    "C:rand=1": 1,
+    "C:depth=1,eps=0.4": 0.995,
+    "C:depth=2,eps=0": 0.915,
+    "C:depth=4,eps=0": 0.775,
+    "C:depth=6,end=12,eps=0": 0.36
+   },
+   "isNew": false
+  },
+  {
+   "spec": "C:depth=6,end=12,eps=0",
+   "elo": 774.5,
+   "scores": {
+    "C:rand=1": 1,
+    "C:depth=1,eps=0.4": 0.985,
+    "C:depth=2,eps=0": 0.97,
+    "C:depth=4,eps=0": 0.925
+   },
+   "isNew": false
+  }
+ ],
+ "matches": [
+  [
+   "C:bad=0.9",
+   "C:rand=1",
+   100,
+   0.08
+  ],
+  [
+   "C:bad=0.9",
+   "C:depth=1,eps=0.4",
+   100,
+   0.1
+  ],
+  [
+   "C:bad=0.9",
+   "C:depth=2,eps=0",
+   100,
+   0.14
+  ],
+  [
+   "C:bad=0.9",
+   "C:depth=4,eps=0",
+   100,
+   0.055
+  ],
+  [
+   "C:bad=0.9",
+   "C:depth=6,end=12,eps=0",
+   100,
+   0
+  ],
+  [
+   "C:bad=0.8",
+   "C:rand=1",
+   100,
+   0.115
+  ],
+  [
+   "C:bad=0.8",
+   "C:depth=1,eps=0.4",
+   100,
+   0.09
+  ],
+  [
+   "C:bad=0.8",
+   "C:depth=2,eps=0",
+   100,
+   0.17
+  ],
+  [
+   "C:bad=0.8",
+   "C:depth=4,eps=0",
+   100,
+   0.06
+  ],
+  [
+   "C:bad=0.8",
+   "C:depth=6,end=12,eps=0",
+   100,
+   0
+  ],
+  [
+   "C:bad=0.7",
+   "C:rand=1",
+   100,
+   0.235
+  ],
+  [
+   "C:bad=0.7",
+   "C:depth=1,eps=0.4",
+   100,
+   0.105
+  ],
+  [
+   "C:bad=0.7",
+   "C:depth=2,eps=0",
+   100,
+   0.125
+  ],
+  [
+   "C:bad=0.7",
+   "C:depth=4,eps=0",
+   100,
+   0.055
+  ],
+  [
+   "C:bad=0.7",
+   "C:depth=6,end=12,eps=0",
+   100,
+   0
+  ],
+  [
+   "C:bad=0.6",
+   "C:rand=1",
+   100,
+   0.24
+  ],
+  [
+   "C:bad=0.6",
+   "C:depth=1,eps=0.4",
+   100,
+   0.115
+  ],
+  [
+   "C:bad=0.6",
+   "C:depth=2,eps=0",
+   100,
+   0.125
+  ],
+  [
+   "C:bad=0.6",
+   "C:depth=4,eps=0",
+   100,
+   0.065
+  ],
+  [
+   "C:bad=0.6",
+   "C:depth=6,end=12,eps=0",
+   100,
+   0
+  ],
+  [
+   "C:bad=0.5",
+   "C:rand=1",
+   100,
+   0.21
+  ],
+  [
+   "C:bad=0.5",
+   "C:depth=1,eps=0.4",
+   100,
+   0.075
+  ],
+  [
+   "C:bad=0.5",
+   "C:depth=2,eps=0",
+   100,
+   0.15
+  ],
+  [
+   "C:bad=0.5",
+   "C:depth=4,eps=0",
+   100,
+   0.055
+  ],
+  [
+   "C:bad=0.5",
+   "C:depth=6,end=12,eps=0",
+   100,
+   0
+  ],
+  [
+   "C:bad=0.4",
+   "C:rand=1",
+   100,
+   0.245
+  ],
+  [
+   "C:bad=0.4",
+   "C:depth=1,eps=0.4",
+   100,
+   0.115
+  ],
+  [
+   "C:bad=0.4",
+   "C:depth=2,eps=0",
+   100,
+   0.13
+  ],
+  [
+   "C:bad=0.4",
+   "C:depth=4,eps=0",
+   100,
+   0.065
+  ],
+  [
+   "C:bad=0.4",
+   "C:depth=6,end=12,eps=0",
+   100,
+   0
+  ],
+  [
+   "C:bad=0.3",
+   "C:rand=1",
+   100,
+   0.31
+  ],
+  [
+   "C:bad=0.3",
+   "C:depth=1,eps=0.4",
+   100,
+   0.17
+  ],
+  [
+   "C:bad=0.3",
+   "C:depth=2,eps=0",
+   100,
+   0.13
+  ],
+  [
+   "C:bad=0.3",
+   "C:depth=4,eps=0",
+   100,
+   0.03
+  ],
+  [
+   "C:bad=0.3",
+   "C:depth=6,end=12,eps=0",
+   100,
+   0
+  ],
+  [
+   "C:bad=0.2",
+   "C:rand=1",
+   100,
+   0.365
+  ],
+  [
+   "C:bad=0.2",
+   "C:depth=1,eps=0.4",
+   100,
+   0.105
+  ],
+  [
+   "C:bad=0.2",
+   "C:depth=2,eps=0",
+   100,
+   0.11
+  ],
+  [
+   "C:bad=0.2",
+   "C:depth=4,eps=0",
+   100,
+   0.045
+  ],
+  [
+   "C:bad=0.2",
+   "C:depth=6,end=12,eps=0",
+   100,
+   0
+  ],
+  [
+   "C:bad=0.1",
+   "C:rand=1",
+   100,
+   0.48
+  ],
+  [
+   "C:bad=0.1",
+   "C:depth=1,eps=0.4",
+   100,
+   0.145
+  ],
+  [
+   "C:bad=0.1",
+   "C:depth=2,eps=0",
+   100,
+   0.14
+  ],
+  [
+   "C:bad=0.1",
+   "C:depth=4,eps=0",
+   100,
+   0.065
+  ],
+  [
+   "C:bad=0.1",
+   "C:depth=6,end=12,eps=0",
+   100,
+   0
+  ],
+  [
+   "C:rand=1",
+   "C:depth=1,eps=0.4",
+   100,
+   0.235
+  ],
+  [
+   "C:rand=1",
+   "C:depth=2,eps=0",
+   100,
+   0.09
+  ],
+  [
+   "C:rand=1",
+   "C:depth=4,eps=0",
+   100,
+   0.025
+  ],
+  [
+   "C:rand=1",
+   "C:depth=6,end=12,eps=0",
+   100,
+   0
+  ],
+  [
+   "C:corner=0.5",
+   "C:rand=1",
+   100,
+   0.765
+  ],
+  [
+   "C:corner=0.5",
+   "C:depth=1,eps=0.4",
+   100,
+   0.33
+  ],
+  [
+   "C:corner=0.5",
+   "C:depth=2,eps=0",
+   100,
+   0.11
+  ],
+  [
+   "C:corner=0.5",
+   "C:depth=4,eps=0",
+   100,
+   0.08
+  ],
+  [
+   "C:corner=0.5",
+   "C:depth=6,end=12,eps=0",
+   100,
+   0
+  ],
+  [
+   "C:corner=1",
+   "C:rand=1",
+   100,
+   0.795
+  ],
+  [
+   "C:corner=1",
+   "C:depth=1,eps=0.4",
+   100,
+   0.355
+  ],
+  [
+   "C:corner=1",
+   "C:depth=2,eps=0",
+   100,
+   0.175
+  ],
+  [
+   "C:corner=1",
+   "C:depth=4,eps=0",
+   100,
+   0.075
+  ],
+  [
+   "C:corner=1",
+   "C:depth=6,end=12,eps=0",
+   100,
+   0
+  ],
+  [
+   "C:depth=1,eps=0.8",
+   "C:rand=1",
+   100,
+   0.685
+  ],
+  [
+   "C:depth=1,eps=0.8",
+   "C:depth=1,eps=0.4",
+   100,
+   0.215
+  ],
+  [
+   "C:depth=1,eps=0.8",
+   "C:depth=2,eps=0",
+   100,
+   0.11
+  ],
+  [
+   "C:depth=1,eps=0.8",
+   "C:depth=4,eps=0",
+   100,
+   0.05
+  ],
+  [
+   "C:depth=1,eps=0.8",
+   "C:depth=6,end=12,eps=0",
+   100,
+   0
+  ],
+  [
+   "C:depth=1,eps=0.7",
+   "C:rand=1",
+   100,
+   0.755
+  ],
+  [
+   "C:depth=1,eps=0.7",
+   "C:depth=1,eps=0.4",
+   100,
+   0.285
+  ],
+  [
+   "C:depth=1,eps=0.7",
+   "C:depth=2,eps=0",
+   100,
+   0.115
+  ],
+  [
+   "C:depth=1,eps=0.7",
+   "C:depth=4,eps=0",
+   100,
+   0.03
+  ],
+  [
+   "C:depth=1,eps=0.7",
+   "C:depth=6,end=12,eps=0",
+   100,
+   0
+  ],
+  [
+   "C:depth=1,eps=0.6",
+   "C:rand=1",
+   100,
+   0.755
+  ],
+  [
+   "C:depth=1,eps=0.6",
+   "C:depth=1,eps=0.4",
+   100,
+   0.315
+  ],
+  [
+   "C:depth=1,eps=0.6",
+   "C:depth=2,eps=0",
+   100,
+   0.1
+  ],
+  [
+   "C:depth=1,eps=0.6",
+   "C:depth=4,eps=0",
+   100,
+   0.06
+  ],
+  [
+   "C:depth=1,eps=0.6",
+   "C:depth=6,end=12,eps=0",
+   100,
+   0
+  ],
+  [
+   "C:depth=1,eps=0.5",
+   "C:rand=1",
+   100,
+   0.83
+  ],
+  [
+   "C:depth=1,eps=0.5",
+   "C:depth=1,eps=0.4",
+   100,
+   0.36
+  ],
+  [
+   "C:depth=1,eps=0.5",
+   "C:depth=2,eps=0",
+   100,
+   0.16
+  ],
+  [
+   "C:depth=1,eps=0.5",
+   "C:depth=4,eps=0",
+   100,
+   0.03
+  ],
+  [
+   "C:depth=1,eps=0.5",
+   "C:depth=6,end=12,eps=0",
+   100,
+   0
+  ],
+  [
+   "C:depth=1,eps=0.4",
+   "C:rand=1",
+   100,
+   0.835
+  ],
+  [
+   "C:depth=1,eps=0.4",
+   "C:depth=2,eps=0",
+   100,
+   0.115
+  ],
+  [
+   "C:depth=1,eps=0.4",
+   "C:depth=4,eps=0",
+   100,
+   0.06
+  ],
+  [
+   "C:depth=1,eps=0.4",
+   "C:depth=6,end=12,eps=0",
+   100,
+   0.03
+  ],
+  [
+   "C:depth=1,eps=0.3",
+   "C:rand=1",
+   100,
+   0.865
+  ],
+  [
+   "C:depth=1,eps=0.3",
+   "C:depth=1,eps=0.4",
+   100,
+   0.565
+  ],
+  [
+   "C:depth=1,eps=0.3",
+   "C:depth=2,eps=0",
+   100,
+   0.19
+  ],
+  [
+   "C:depth=1,eps=0.3",
+   "C:depth=4,eps=0",
+   100,
+   0.06
+  ],
+  [
+   "C:depth=1,eps=0.3",
+   "C:depth=6,end=12,eps=0",
+   100,
+   0.01
+  ],
+  [
+   "C:depth=1,eps=0.2",
+   "C:rand=1",
+   100,
+   0.825
+  ],
+  [
+   "C:depth=1,eps=0.2",
+   "C:depth=1,eps=0.4",
+   100,
+   0.61
+  ],
+  [
+   "C:depth=1,eps=0.2",
+   "C:depth=2,eps=0",
+   100,
+   0.105
+  ],
+  [
+   "C:depth=1,eps=0.2",
+   "C:depth=4,eps=0",
+   100,
+   0.09
+  ],
+  [
+   "C:depth=1,eps=0.2",
+   "C:depth=6,end=12,eps=0",
+   100,
+   0.01
+  ],
+  [
+   "C:depth=1,eps=0.1",
+   "C:rand=1",
+   100,
+   0.895
+  ],
+  [
+   "C:depth=1,eps=0.1",
+   "C:depth=1,eps=0.4",
+   100,
+   0.69
+  ],
+  [
+   "C:depth=1,eps=0.1",
+   "C:depth=2,eps=0",
+   100,
+   0.17
+  ],
+  [
+   "C:depth=1,eps=0.1",
+   "C:depth=4,eps=0",
+   100,
+   0.055
+  ],
+  [
+   "C:depth=1,eps=0.1",
+   "C:depth=6,end=12,eps=0",
+   100,
+   0.01
+  ],
+  [
+   "C:depth=1,eps=0",
+   "C:rand=1",
+   100,
+   0.82
+  ],
+  [
+   "C:depth=1,eps=0",
+   "C:depth=1,eps=0.4",
+   100,
+   0.83
+  ],
+  [
+   "C:depth=1,eps=0",
+   "C:depth=2,eps=0",
+   100,
+   0.16
+  ],
+  [
+   "C:depth=1,eps=0",
+   "C:depth=4,eps=0",
+   100,
+   0.05
+  ],
+  [
+   "C:depth=1,eps=0",
+   "C:depth=6,end=12,eps=0",
+   100,
+   0
+  ],
+  [
+   "C:depth=2,eps=0.6",
+   "C:rand=1",
+   100,
+   0.805
+  ],
+  [
+   "C:depth=2,eps=0.6",
+   "C:depth=1,eps=0.4",
+   100,
+   0.4
+  ],
+  [
+   "C:depth=2,eps=0.6",
+   "C:depth=2,eps=0",
+   100,
+   0.14
+  ],
+  [
+   "C:depth=2,eps=0.6",
+   "C:depth=4,eps=0",
+   100,
+   0.055
+  ],
+  [
+   "C:depth=2,eps=0.6",
+   "C:depth=6,end=12,eps=0",
+   100,
+   0.01
+  ],
+  [
+   "C:depth=2,eps=0.5",
+   "C:rand=1",
+   100,
+   0.9
+  ],
+  [
+   "C:depth=2,eps=0.5",
+   "C:depth=1,eps=0.4",
+   100,
+   0.505
+  ],
+  [
+   "C:depth=2,eps=0.5",
+   "C:depth=2,eps=0",
+   100,
+   0.15
+  ],
+  [
+   "C:depth=2,eps=0.5",
+   "C:depth=4,eps=0",
+   100,
+   0.04
+  ],
+  [
+   "C:depth=2,eps=0.5",
+   "C:depth=6,end=12,eps=0",
+   100,
+   0.01
+  ],
+  [
+   "C:depth=2,eps=0.4",
+   "C:rand=1",
+   100,
+   0.925
+  ],
+  [
+   "C:depth=2,eps=0.4",
+   "C:depth=1,eps=0.4",
+   100,
+   0.48
+  ],
+  [
+   "C:depth=2,eps=0.4",
+   "C:depth=2,eps=0",
+   100,
+   0.125
+  ],
+  [
+   "C:depth=2,eps=0.4",
+   "C:depth=4,eps=0",
+   100,
+   0.03
+  ],
+  [
+   "C:depth=2,eps=0.4",
+   "C:depth=6,end=12,eps=0",
+   100,
+   0
+  ],
+  [
+   "C:depth=2,eps=0.3",
+   "C:rand=1",
+   100,
+   0.86
+  ],
+  [
+   "C:depth=2,eps=0.3",
+   "C:depth=1,eps=0.4",
+   100,
+   0.675
+  ],
+  [
+   "C:depth=2,eps=0.3",
+   "C:depth=2,eps=0",
+   100,
+   0.24
+  ],
+  [
+   "C:depth=2,eps=0.3",
+   "C:depth=4,eps=0",
+   100,
+   0.055
+  ],
+  [
+   "C:depth=2,eps=0.3",
+   "C:depth=6,end=12,eps=0",
+   100,
+   0.01
+  ],
+  [
+   "C:depth=2,eps=0.2",
+   "C:rand=1",
+   100,
+   0.87
+  ],
+  [
+   "C:depth=2,eps=0.2",
+   "C:depth=1,eps=0.4",
+   100,
+   0.665
+  ],
+  [
+   "C:depth=2,eps=0.2",
+   "C:depth=2,eps=0",
+   100,
+   0.295
+  ],
+  [
+   "C:depth=2,eps=0.2",
+   "C:depth=4,eps=0",
+   100,
+   0.09
+  ],
+  [
+   "C:depth=2,eps=0.2",
+   "C:depth=6,end=12,eps=0",
+   100,
+   0.02
+  ],
+  [
+   "C:depth=2,eps=0.1",
+   "C:rand=1",
+   100,
+   0.87
+  ],
+  [
+   "C:depth=2,eps=0.1",
+   "C:depth=1,eps=0.4",
+   100,
+   0.77
+  ],
+  [
+   "C:depth=2,eps=0.1",
+   "C:depth=2,eps=0",
+   100,
+   0.28
+  ],
+  [
+   "C:depth=2,eps=0.1",
+   "C:depth=4,eps=0",
+   100,
+   0.12
+  ],
+  [
+   "C:depth=2,eps=0.1",
+   "C:depth=6,end=12,eps=0",
+   100,
+   0.05
+  ],
+  [
+   "C:depth=2,eps=0",
+   "C:rand=1",
+   100,
+   0.92
+  ],
+  [
+   "C:depth=2,eps=0",
+   "C:depth=1,eps=0.4",
+   100,
+   0.87
+  ],
+  [
+   "C:depth=2,eps=0",
+   "C:depth=4,eps=0",
+   100,
+   0.115
+  ],
+  [
+   "C:depth=2,eps=0",
+   "C:depth=6,end=12,eps=0",
+   100,
+   0.03
+  ],
+  [
+   "C:depth=3,eps=0.5",
+   "C:rand=1",
+   100,
+   0.92
+  ],
+  [
+   "C:depth=3,eps=0.5",
+   "C:depth=1,eps=0.4",
+   100,
+   0.56
+  ],
+  [
+   "C:depth=3,eps=0.5",
+   "C:depth=2,eps=0",
+   100,
+   0.17
+  ],
+  [
+   "C:depth=3,eps=0.5",
+   "C:depth=4,eps=0",
+   100,
+   0.05
+  ],
+  [
+   "C:depth=3,eps=0.5",
+   "C:depth=6,end=12,eps=0",
+   100,
+   0
+  ],
+  [
+   "C:depth=3,eps=0.4",
+   "C:rand=1",
+   100,
+   0.85
+  ],
+  [
+   "C:depth=3,eps=0.4",
+   "C:depth=1,eps=0.4",
+   100,
+   0.65
+  ],
+  [
+   "C:depth=3,eps=0.4",
+   "C:depth=2,eps=0",
+   100,
+   0.23
+  ],
+  [
+   "C:depth=3,eps=0.4",
+   "C:depth=4,eps=0",
+   100,
+   0.08
+  ],
+  [
+   "C:depth=3,eps=0.4",
+   "C:depth=6,end=12,eps=0",
+   100,
+   0
+  ],
+  [
+   "C:depth=3,eps=0.3",
+   "C:rand=1",
+   100,
+   0.93
+  ],
+  [
+   "C:depth=3,eps=0.3",
+   "C:depth=1,eps=0.4",
+   100,
+   0.695
+  ],
+  [
+   "C:depth=3,eps=0.3",
+   "C:depth=2,eps=0",
+   100,
+   0.3
+  ],
+  [
+   "C:depth=3,eps=0.3",
+   "C:depth=4,eps=0",
+   100,
+   0.04
+  ],
+  [
+   "C:depth=3,eps=0.3",
+   "C:depth=6,end=12,eps=0",
+   100,
+   0.01
+  ],
+  [
+   "C:depth=3,eps=0.2",
+   "C:rand=1",
+   100,
+   0.875
+  ],
+  [
+   "C:depth=3,eps=0.2",
+   "C:depth=1,eps=0.4",
+   100,
+   0.78
+  ],
+  [
+   "C:depth=3,eps=0.2",
+   "C:depth=2,eps=0",
+   100,
+   0.395
+  ],
+  [
+   "C:depth=3,eps=0.2",
+   "C:depth=4,eps=0",
+   100,
+   0.115
+  ],
+  [
+   "C:depth=3,eps=0.2",
+   "C:depth=6,end=12,eps=0",
+   100,
+   0.02
+  ],
+  [
+   "C:depth=3,eps=0.1",
+   "C:rand=1",
+   100,
+   0.945
+  ],
+  [
+   "C:depth=3,eps=0.1",
+   "C:depth=1,eps=0.4",
+   100,
+   0.845
+  ],
+  [
+   "C:depth=3,eps=0.1",
+   "C:depth=2,eps=0",
+   100,
+   0.59
+  ],
+  [
+   "C:depth=3,eps=0.1",
+   "C:depth=4,eps=0",
+   100,
+   0.225
+  ],
+  [
+   "C:depth=3,eps=0.1",
+   "C:depth=6,end=12,eps=0",
+   100,
+   0.03
+  ],
+  [
+   "C:depth=3,eps=0",
+   "C:rand=1",
+   100,
+   0.9
+  ],
+  [
+   "C:depth=3,eps=0",
+   "C:depth=1,eps=0.4",
+   100,
+   0.93
+  ],
+  [
+   "C:depth=3,eps=0",
+   "C:depth=2,eps=0",
+   100,
+   0.65
+  ],
+  [
+   "C:depth=3,eps=0",
+   "C:depth=4,eps=0",
+   100,
+   0.33
+  ],
+  [
+   "C:depth=3,eps=0",
+   "C:depth=6,end=12,eps=0",
+   100,
+   0.105
+  ],
+  [
+   "C:depth=4,eps=0.4",
+   "C:rand=1",
+   100,
+   0.905
+  ],
+  [
+   "C:depth=4,eps=0.4",
+   "C:depth=1,eps=0.4",
+   100,
+   0.645
+  ],
+  [
+   "C:depth=4,eps=0.4",
+   "C:depth=2,eps=0",
+   100,
+   0.195
+  ],
+  [
+   "C:depth=4,eps=0.4",
+   "C:depth=4,eps=0",
+   100,
+   0.135
+  ],
+  [
+   "C:depth=4,eps=0.4",
+   "C:depth=6,end=12,eps=0",
+   100,
+   0.02
+  ],
+  [
+   "C:depth=4,eps=0.3",
+   "C:rand=1",
+   100,
+   0.89
+  ],
+  [
+   "C:depth=4,eps=0.3",
+   "C:depth=1,eps=0.4",
+   100,
+   0.71
+  ],
+  [
+   "C:depth=4,eps=0.3",
+   "C:depth=2,eps=0",
+   100,
+   0.44
+  ],
+  [
+   "C:depth=4,eps=0.3",
+   "C:depth=4,eps=0",
+   100,
+   0.2
+  ],
+  [
+   "C:depth=4,eps=0.3",
+   "C:depth=6,end=12,eps=0",
+   100,
+   0.04
+  ],
+  [
+   "C:depth=4,eps=0.2",
+   "C:rand=1",
+   100,
+   0.9
+  ],
+  [
+   "C:depth=4,eps=0.2",
+   "C:depth=1,eps=0.4",
+   100,
+   0.825
+  ],
+  [
+   "C:depth=4,eps=0.2",
+   "C:depth=2,eps=0",
+   100,
+   0.49
+  ],
+  [
+   "C:depth=4,eps=0.2",
+   "C:depth=4,eps=0",
+   100,
+   0.27
+  ],
+  [
+   "C:depth=4,eps=0.2",
+   "C:depth=6,end=12,eps=0",
+   100,
+   0.025
+  ],
+  [
+   "C:depth=4,eps=0.1",
+   "C:rand=1",
+   100,
+   0.955
+  ],
+  [
+   "C:depth=4,eps=0.1",
+   "C:depth=1,eps=0.4",
+   100,
+   0.935
+  ],
+  [
+   "C:depth=4,eps=0.1",
+   "C:depth=2,eps=0",
+   100,
+   0.53
+  ],
+  [
+   "C:depth=4,eps=0.1",
+   "C:depth=4,eps=0",
+   100,
+   0.375
+  ],
+  [
+   "C:depth=4,eps=0.1",
+   "C:depth=6,end=12,eps=0",
+   100,
+   0.095
+  ],
+  [
+   "C:depth=4,eps=0",
+   "C:rand=1",
+   100,
+   0.91
+  ],
+  [
+   "C:depth=4,eps=0",
+   "C:depth=1,eps=0.4",
+   100,
+   0.95
+  ],
+  [
+   "C:depth=4,eps=0",
+   "C:depth=2,eps=0",
+   100,
+   0.845
+  ],
+  [
+   "C:depth=4,eps=0",
+   "C:depth=6,end=12,eps=0",
+   100,
+   0.165
+  ],
+  [
+   "C:depth=4,end=8,eps=0.2",
+   "C:rand=1",
+   100,
+   0.98
+  ],
+  [
+   "C:depth=4,end=8,eps=0.2",
+   "C:depth=1,eps=0.4",
+   100,
+   0.9
+  ],
+  [
+   "C:depth=4,end=8,eps=0.2",
+   "C:depth=2,eps=0",
+   100,
+   0.655
+  ],
+  [
+   "C:depth=4,end=8,eps=0.2",
+   "C:depth=4,eps=0",
+   100,
+   0.325
+  ],
+  [
+   "C:depth=4,end=8,eps=0.2",
+   "C:depth=6,end=12,eps=0",
+   100,
+   0.1
+  ],
+  [
+   "C:depth=4,end=8,eps=0.1",
+   "C:rand=1",
+   100,
+   0.995
+  ],
+  [
+   "C:depth=4,end=8,eps=0.1",
+   "C:depth=1,eps=0.4",
+   100,
+   0.975
+  ],
+  [
+   "C:depth=4,end=8,eps=0.1",
+   "C:depth=2,eps=0",
+   100,
+   0.705
+  ],
+  [
+   "C:depth=4,end=8,eps=0.1",
+   "C:depth=4,eps=0",
+   100,
+   0.455
+  ],
+  [
+   "C:depth=4,end=8,eps=0.1",
+   "C:depth=6,end=12,eps=0",
+   100,
+   0.145
+  ],
+  [
+   "C:depth=4,end=8,eps=0",
+   "C:rand=1",
+   100,
+   1
+  ],
+  [
+   "C:depth=4,end=8,eps=0",
+   "C:depth=1,eps=0.4",
+   100,
+   0.99
+  ],
+  [
+   "C:depth=4,end=8,eps=0",
+   "C:depth=2,eps=0",
+   100,
+   0.85
+  ],
+  [
+   "C:depth=4,end=8,eps=0",
+   "C:depth=4,eps=0",
+   100,
+   0.505
+  ],
+  [
+   "C:depth=4,end=8,eps=0",
+   "C:depth=6,end=12,eps=0",
+   100,
+   0.225
+  ],
+  [
+   "C:depth=5,end=10,eps=0.3",
+   "C:rand=1",
+   100,
+   0.93
+  ],
+  [
+   "C:depth=5,end=10,eps=0.3",
+   "C:depth=1,eps=0.4",
+   100,
+   0.9
+  ],
+  [
+   "C:depth=5,end=10,eps=0.3",
+   "C:depth=2,eps=0",
+   100,
+   0.555
+  ],
+  [
+   "C:depth=5,end=10,eps=0.3",
+   "C:depth=4,eps=0",
+   100,
+   0.415
+  ],
+  [
+   "C:depth=5,end=10,eps=0.3",
+   "C:depth=6,end=12,eps=0",
+   100,
+   0.09
+  ],
+  [
+   "C:depth=5,end=10,eps=0.2",
+   "C:rand=1",
+   100,
+   0.99
+  ],
+  [
+   "C:depth=5,end=10,eps=0.2",
+   "C:depth=1,eps=0.4",
+   100,
+   0.935
+  ],
+  [
+   "C:depth=5,end=10,eps=0.2",
+   "C:depth=2,eps=0",
+   100,
+   0.71
+  ],
+  [
+   "C:depth=5,end=10,eps=0.2",
+   "C:depth=4,eps=0",
+   100,
+   0.55
+  ],
+  [
+   "C:depth=5,end=10,eps=0.2",
+   "C:depth=6,end=12,eps=0",
+   100,
+   0.095
+  ],
+  [
+   "C:depth=5,end=10,eps=0.1",
+   "C:rand=1",
+   100,
+   0.98
+  ],
+  [
+   "C:depth=5,end=10,eps=0.1",
+   "C:depth=1,eps=0.4",
+   100,
+   0.96
+  ],
+  [
+   "C:depth=5,end=10,eps=0.1",
+   "C:depth=2,eps=0",
+   100,
+   0.815
+  ],
+  [
+   "C:depth=5,end=10,eps=0.1",
+   "C:depth=4,eps=0",
+   100,
+   0.67
+  ],
+  [
+   "C:depth=5,end=10,eps=0.1",
+   "C:depth=6,end=12,eps=0",
+   100,
+   0.225
+  ],
+  [
+   "C:depth=5,end=10,eps=0",
+   "C:rand=1",
+   100,
+   1
+  ],
+  [
+   "C:depth=5,end=10,eps=0",
+   "C:depth=1,eps=0.4",
+   100,
+   0.995
+  ],
+  [
+   "C:depth=5,end=10,eps=0",
+   "C:depth=2,eps=0",
+   100,
+   0.915
+  ],
+  [
+   "C:depth=5,end=10,eps=0",
+   "C:depth=4,eps=0",
+   100,
+   0.775
+  ],
+  [
+   "C:depth=5,end=10,eps=0",
+   "C:depth=6,end=12,eps=0",
+   100,
+   0.36
+  ],
+  [
+   "C:depth=6,end=12,eps=0.4",
+   "C:rand=1",
+   100,
+   0.97
+  ],
+  [
+   "C:depth=6,end=12,eps=0.4",
+   "C:depth=1,eps=0.4",
+   100,
+   0.9
+  ],
+  [
+   "C:depth=6,end=12,eps=0.4",
+   "C:depth=2,eps=0",
+   100,
+   0.48
+  ],
+  [
+   "C:depth=6,end=12,eps=0.4",
+   "C:depth=4,eps=0",
+   100,
+   0.265
+  ],
+  [
+   "C:depth=6,end=12,eps=0.4",
+   "C:depth=6,end=12,eps=0",
+   100,
+   0.075
+  ],
+  [
+   "C:depth=6,end=12,eps=0.3",
+   "C:rand=1",
+   100,
+   0.99
+  ],
+  [
+   "C:depth=6,end=12,eps=0.3",
+   "C:depth=1,eps=0.4",
+   100,
+   0.925
+  ],
+  [
+   "C:depth=6,end=12,eps=0.3",
+   "C:depth=2,eps=0",
+   100,
+   0.625
+  ],
+  [
+   "C:depth=6,end=12,eps=0.3",
+   "C:depth=4,eps=0",
+   100,
+   0.3
+  ],
+  [
+   "C:depth=6,end=12,eps=0.3",
+   "C:depth=6,end=12,eps=0",
+   100,
+   0.15
+  ],
+  [
+   "C:depth=6,end=12,eps=0.2",
+   "C:rand=1",
+   100,
+   0.99
+  ],
+  [
+   "C:depth=6,end=12,eps=0.2",
+   "C:depth=1,eps=0.4",
+   100,
+   0.95
+  ],
+  [
+   "C:depth=6,end=12,eps=0.2",
+   "C:depth=2,eps=0",
+   100,
+   0.685
+  ],
+  [
+   "C:depth=6,end=12,eps=0.2",
+   "C:depth=4,eps=0",
+   100,
+   0.49
+  ],
+  [
+   "C:depth=6,end=12,eps=0.2",
+   "C:depth=6,end=12,eps=0",
+   100,
+   0.22
+  ],
+  [
+   "C:depth=6,end=12,eps=0.15",
+   "C:rand=1",
+   100,
+   0.975
+  ],
+  [
+   "C:depth=6,end=12,eps=0.15",
+   "C:depth=1,eps=0.4",
+   100,
+   0.97
+  ],
+  [
+   "C:depth=6,end=12,eps=0.15",
+   "C:depth=2,eps=0",
+   100,
+   0.65
+  ],
+  [
+   "C:depth=6,end=12,eps=0.15",
+   "C:depth=4,eps=0",
+   100,
+   0.575
+  ],
+  [
+   "C:depth=6,end=12,eps=0.15",
+   "C:depth=6,end=12,eps=0",
+   100,
+   0.185
+  ],
+  [
+   "C:depth=6,end=12,eps=0.1",
+   "C:rand=1",
+   100,
+   0.99
+  ],
+  [
+   "C:depth=6,end=12,eps=0.1",
+   "C:depth=1,eps=0.4",
+   100,
+   0.975
+  ],
+  [
+   "C:depth=6,end=12,eps=0.1",
+   "C:depth=2,eps=0",
+   100,
+   0.72
+  ],
+  [
+   "C:depth=6,end=12,eps=0.1",
+   "C:depth=4,eps=0",
+   100,
+   0.665
+  ],
+  [
+   "C:depth=6,end=12,eps=0.1",
+   "C:depth=6,end=12,eps=0",
+   100,
+   0.25
+  ],
+  [
+   "C:depth=6,end=12,eps=0.05",
+   "C:rand=1",
+   100,
+   1
+  ],
+  [
+   "C:depth=6,end=12,eps=0.05",
+   "C:depth=1,eps=0.4",
+   100,
+   0.99
+  ],
+  [
+   "C:depth=6,end=12,eps=0.05",
+   "C:depth=2,eps=0",
+   100,
+   0.905
+  ],
+  [
+   "C:depth=6,end=12,eps=0.05",
+   "C:depth=4,eps=0",
+   100,
+   0.715
+  ],
+  [
+   "C:depth=6,end=12,eps=0.05",
+   "C:depth=6,end=12,eps=0",
+   100,
+   0.33
+  ],
+  [
+   "C:depth=6,end=12,eps=0",
+   "C:rand=1",
+   100,
+   1
+  ],
+  [
+   "C:depth=6,end=12,eps=0",
+   "C:depth=1,eps=0.4",
+   100,
+   0.985
+  ],
+  [
+   "C:depth=6,end=12,eps=0",
+   "C:depth=2,eps=0",
+   100,
+   0.97
+  ],
+  [
+   "C:depth=6,end=12,eps=0",
+   "C:depth=4,eps=0",
+   100,
+   0.925
+  ],
+  [
+   "Pgreedy",
+   "C:rand=1",
+   100,
+   0.63
+  ],
+  [
+   "Pgreedy",
+   "C:depth=1,eps=0.4",
+   100,
+   0.19
+  ],
+  [
+   "Pgreedy",
+   "C:depth=2,eps=0",
+   100,
+   0.115
+  ],
+  [
+   "Pgreedy",
+   "C:depth=4,eps=0",
+   100,
+   0.01
+  ],
+  [
+   "Pgreedy",
+   "C:depth=6,end=12,eps=0",
+   100,
+   0
+  ],
+  [
+   "PgreedyCorner",
+   "C:rand=1",
+   100,
+   0.88
+  ],
+  [
+   "PgreedyCorner",
+   "C:depth=1,eps=0.4",
+   100,
+   0.385
+  ],
+  [
+   "PgreedyCorner",
+   "C:depth=2,eps=0",
+   100,
+   0.155
+  ],
+  [
+   "PgreedyCorner",
+   "C:depth=4,eps=0",
+   100,
+   0.015
+  ],
+  [
+   "PgreedyCorner",
+   "C:depth=6,end=12,eps=0",
+   100,
+   0
+  ],
+  [
+   "C:bad=1",
+   "C:rand=1",
+   100,
+   0.115
+  ],
+  [
+   "C:bad=1",
+   "C:bad=0.9",
+   100,
+   0.355
+  ],
+  [
+   "C:bad=1",
+   "Pgreedy",
+   100,
+   0.05
+  ],
+  [
+   "C:bad=1",
+   "C:depth=1,eps=0.4",
+   100,
+   0.06
+  ],
+  [
+   "C:bad=1,badDepth=2",
+   "C:rand=1",
+   100,
+   0.055
+  ],
+  [
+   "C:bad=1,badDepth=2",
+   "C:bad=0.9",
+   100,
+   0.34
+  ],
+  [
+   "C:bad=1,badDepth=2",
+   "Pgreedy",
+   100,
+   0
+  ],
+  [
+   "C:bad=1,badDepth=2",
+   "C:depth=1,eps=0.4",
+   100,
+   0.08
+  ],
+  [
+   "C:bad=0.9,badDepth=2",
+   "C:rand=1",
+   100,
+   0.095
+  ],
+  [
+   "C:bad=0.9,badDepth=2",
+   "C:bad=0.9",
+   100,
+   0.47
+  ],
+  [
+   "C:bad=0.9,badDepth=2",
+   "Pgreedy",
+   100,
+   0.075
+  ],
+  [
+   "C:bad=0.9,badDepth=2",
+   "C:depth=1,eps=0.4",
+   100,
+   0.135
+  ],
+  [
+   "C:bad=0.8,badDepth=2",
+   "C:rand=1",
+   100,
+   0.2
+  ],
+  [
+   "C:bad=0.8,badDepth=2",
+   "C:bad=0.9",
+   100,
+   0.555
+  ],
+  [
+   "C:bad=0.8,badDepth=2",
+   "Pgreedy",
+   100,
+   0.06
+  ],
+  [
+   "C:bad=0.8,badDepth=2",
+   "C:depth=1,eps=0.4",
+   100,
+   0.065
+  ],
+  [
+   "C:bad=0.6,badDepth=2",
+   "C:rand=1",
+   100,
+   0.26
+  ],
+  [
+   "C:bad=0.6,badDepth=2",
+   "C:bad=0.9",
+   100,
+   0.68
+  ],
+  [
+   "C:bad=0.6,badDepth=2",
+   "Pgreedy",
+   100,
+   0.115
+  ],
+  [
+   "C:bad=0.6,badDepth=2",
+   "C:depth=1,eps=0.4",
+   100,
+   0.06
+  ],
+  [
+   "C:bad=0.4,badDepth=2",
+   "C:rand=1",
+   100,
+   0.255
+  ],
+  [
+   "C:bad=0.4,badDepth=2",
+   "C:bad=0.9",
+   100,
+   0.77
+  ],
+  [
+   "C:bad=0.4,badDepth=2",
+   "Pgreedy",
+   100,
+   0.25
+  ],
+  [
+   "C:bad=0.4,badDepth=2",
+   "C:depth=1,eps=0.4",
+   100,
+   0.115
+  ],
+  [
+   "C:bad=1,badDepth=3",
+   "C:rand=1",
+   100,
+   0.035
+  ],
+  [
+   "C:bad=1,badDepth=3",
+   "C:bad=0.9",
+   100,
+   0.415
+  ],
+  [
+   "C:bad=1,badDepth=3",
+   "Pgreedy",
+   100,
+   0.005
+  ],
+  [
+   "C:bad=1,badDepth=3",
+   "C:depth=1,eps=0.4",
+   100,
+   0.07
+  ],
+  [
+   "C:bad=0.8,badDepth=3",
+   "C:rand=1",
+   100,
+   0.105
+  ],
+  [
+   "C:bad=0.8,badDepth=3",
+   "C:bad=0.9",
+   100,
+   0.55
+  ],
+  [
+   "C:bad=0.8,badDepth=3",
+   "Pgreedy",
+   100,
+   0.02
+  ],
+  [
+   "C:bad=0.8,badDepth=3",
+   "C:depth=1,eps=0.4",
+   100,
+   0.055
+  ],
+  [
+   "C:bad=0.6,badDepth=3",
+   "C:rand=1",
+   100,
+   0.205
+  ],
+  [
+   "C:bad=0.6,badDepth=3",
+   "C:bad=0.9",
+   100,
+   0.62
+  ],
+  [
+   "C:bad=0.6,badDepth=3",
+   "Pgreedy",
+   100,
+   0.08
+  ],
+  [
+   "C:bad=0.6,badDepth=3",
+   "C:depth=1,eps=0.4",
+   100,
+   0.13
+  ],
+  [
+   "C:bad=0.4,badDepth=3",
+   "C:rand=1",
+   100,
+   0.205
+  ],
+  [
+   "C:bad=0.4,badDepth=3",
+   "C:bad=0.9",
+   100,
+   0.75
+  ],
+  [
+   "C:bad=0.4,badDepth=3",
+   "Pgreedy",
+   100,
+   0.115
+  ],
+  [
+   "C:bad=0.4,badDepth=3",
+   "C:depth=1,eps=0.4",
+   100,
+   0.1
+  ],
+  [
+   "C:bad=1,badDepth=4",
+   "C:rand=1",
+   100,
+   0.025
+  ],
+  [
+   "C:bad=1,badDepth=4",
+   "C:bad=0.9",
+   100,
+   0.385
+  ],
+  [
+   "C:bad=1,badDepth=4",
+   "Pgreedy",
+   100,
+   0
+  ],
+  [
+   "C:bad=1,badDepth=4",
+   "C:depth=1,eps=0.4",
+   100,
+   0.04
+  ],
+  [
+   "C:bad=0.8,badDepth=4",
+   "C:rand=1",
+   100,
+   0.1
+  ],
+  [
+   "C:bad=0.8,badDepth=4",
+   "C:bad=0.9",
+   100,
+   0.615
+  ],
+  [
+   "C:bad=0.8,badDepth=4",
+   "Pgreedy",
+   100,
+   0.075
+  ],
+  [
+   "C:bad=0.8,badDepth=4",
+   "C:depth=1,eps=0.4",
+   100,
+   0.04
+  ]
+ ]
+}

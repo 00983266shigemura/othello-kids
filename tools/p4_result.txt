@@ -1,0 +1,17 @@
+OK  1. かどh8が とれたのに h6へ うった  期待=noCorner  判定=noCorner  そん=286(mid) ply=46
+OK  2. あきかどh1の となり g2へ うった  期待=nextToCorner  判定=nextToCorner  そん=272(mid) ply=43
+OK  3. あきかどh8の となり g7へ うった  期待=nextToCorner  判定=nextToCorner  そん=156(mid) ply=44
+OK  4. b8の あと おける所が2に へった  期待=lostMobility  判定=lostMobility  そん=119(mid) ply=36
+OK  5. b6の あと おける所が2に へった  期待=lostMobility  判定=lostMobility  そん=194(mid) ply=32
+OK  6. あき12マスで b7に うって14石そん  期待=endCount  判定=endCount  そん=14(end) ply=48
+OK  7. b1で1枚だけ返して大そん（型なし）  期待=none  判定=none  そん=224(mid) ply=32
+OK  8. h2で3枚返して そん（型なし）  期待=none  判定=none  そん=120(mid) ply=30
+OK  9. かどh1が とれたのに h2へ うった（しろ番）  期待=noCorner  判定=noCorner  そん=310(mid) ply=33
+OK  10. あき7マスで26石そんを した（しろ番）  期待=endCount  判定=endCount  そん=26(end) ply=53
+OK  11. じょうずな打ちて＝悪手なし  期待=NOBLUNDER  判定=NOBLUNDER  悪手なし
+OK  12. うまったかどの となり g1へ うって そん（型なし）  期待=none  判定=none  そん=102(mid) ply=30
+OK  13. しきい値をこえる悪手が1つも無い局  期待=NOBLUNDER  判定=NOBLUNDER  悪手なし
+OK  14. b6で b7を じぶんの色にして あいてに a8を あけた  期待=gaveCorner  判定=gaveCorner  そん=157(mid) ply=18
+
+一致 = 14 / 14（100%）   採点の読み = {"depth":5,"endEmpties":12}   しきい値（中盤/終盤）= {"mid":60,"end":8}
+P4 = PASS（合格条件＝10本以上、かつ9割以上が一致）

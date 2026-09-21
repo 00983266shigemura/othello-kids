@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>はやさ はかり ── つよくなるオセロ</title>
+<style>
+  :root{
+    color-scheme: light dark;
+    --ground:#ffffff; --card:#f6f8fa; --card2:#eef2f6;
+    --ink:#1b1b1b; --ink-soft:#55606b; --line:#d6d8dc;
+    --ao:#0072B2; --ryokuao:#009E73; --daidai:#E69F00; --murasaki:#CC79A7;
+    --ao-bg:#eaf3fa; --daidai-bg:#fdf3e2; --murasaki-bg:#f9edf3;
+    --on-accent:#ffffff;
+    --nashi:#9aa5ae; --daidai-ink:#8a5a00; --murasaki-ink:#8c3a68;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; padding:16px 18px 40px;
+    background:var(--ground); color:var(--ink);
+    font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
+    font-size:20px; line-height:1.7;
+    -webkit-text-size-adjust:100%;
+  }
+  main{max-width:960px; margin:0 auto;}
+  h1{font-size:28px; margin:0 0 4px; border-bottom:4px solid var(--ao); padding-bottom:8px;}
+  p.sub{color:var(--ink-soft); font-size:17px; margin:6px 0 14px;}
+  button#go{
+    display:block; width:100%; min-height:72px; margin:10px 0 18px;
+    font-size:26px; font-weight:bold; color:var(--on-accent);
+    background:var(--ao); border:0; border-radius:10px;
+    -webkit-appearance:none; cursor:pointer;
+  }
+  button#go[disabled]{background:var(--nashi);}
+  table{border-collapse:collapse; width:100%; margin:12px 0; font-size:18px;}
+  th,td{border:1px solid var(--line); padding:8px 10px; text-align:left; vertical-align:top;}
+  th{background:var(--card2); white-space:nowrap;}
+  td.num{text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap;}
+  section{background:var(--card); border:1px solid var(--line); border-radius:8px;
+          padding:10px 14px; margin:14px 0;}
+  h2{font-size:21px; margin:6px 0 8px; border-left:8px solid var(--ao); padding-left:10px;}
+  .big{font-size:34px; font-weight:bold; color:var(--ao);}
+  .mark-ok{color:var(--ao); font-weight:bold;}
+  .mark-warn{color:var(--daidai); font-weight:bold;}
+  .mark-bad{color:var(--murasaki); font-weight:bold;}
+  .state{padding:2px 8px; border-radius:5px; font-size:16px;}
+  .state-ok{background:var(--ao-bg); color:var(--ao);}
+  .state-warn{background:var(--daidai-bg); color:var(--daidai-ink);}
+  .state-bad{background:var(--murasaki-bg); color:var(--murasaki-ink);}
+  textarea{width:100%; height:120px; font-size:16px; font-family:monospace;
+           border:1px solid var(--line); border-radius:6px; padding:8px;
+           background:var(--ground); color:var(--ink);}
+  .hint{font-size:16px; color:var(--ink-soft);}
+  @media (prefers-color-scheme: dark){
+    :root{
+      --ground:#14191f; --card:#1c232b; --card2:#232c36;
+      --ink:#e8edf2; --ink-soft:#a7b4c0; --line:#38434e;
+      --ao:#56B4E9; --ryokuao:#3fcfa4; --daidai:#f2b544; --murasaki:#e9a3c8;
+      --ao-bg:#12354a; --daidai-bg:#3d3010; --murasaki-bg:#3a2530;
+      --on-accent:#10151a;
+      --nashi:#5b6672; --daidai-ink:#f2b544; --murasaki-ink:#e9a3c8;
+    }
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>はやさ はかり</h1>
+  <p class="sub">
+    「つよくなるオセロ」の相手の頭の速さを、この iPad で1回だけ測ります。<br>
+    ボタンを押して、表がぜんぶ埋まるまで待ってください（30秒ほど・とじないで）。
+  </p>
+
+  <button id="go">はかる</button>
+
+  <section>
+    <h2>いま どこまで</h2>
+    <p id="now" class="big">まだ はじめていません</p>
+    <p id="warn" class="hint">画面が止まって見えても計算中です。指を触れずに待ってください。</p>
+  </section>
+
+  <section>
+    <h2>けっか</h2>
+    <table>
+      <tr><th>はかった もの</th><th>この 端末</th><th>Mac の Safari（きじゅん）</th><th>Mac の何ばい おそい</th></tr>
+      <tr><th>1秒に読める 局面の数</th><td class="num" id="r-nps">—</td><td class="num">243,563</td><td class="num" id="x-nps">—</td></tr>
+      <tr><th>5手先読み いちばん遅いとき</th><td class="num" id="r-m5">—</td><td class="num">12 ミリ秒</td><td class="num" id="x-m5">—</td></tr>
+      <tr><th>6手先読み いちばん遅いとき</th><td class="num" id="r-m6">—</td><td class="num">48 ミリ秒</td><td class="num" id="x-m6">—</td></tr>
+      <tr><th>終盤 あき11マス 完全読み</th><td class="num" id="r-e11">—</td><td class="num">6 ミリ秒</td><td class="num" id="x-e11">—</td></tr>
+      <tr><th>終盤 あき12マス 完全読み</th><td class="num" id="r-e12">—</td><td class="num">27 ミリ秒</td><td class="num" id="x-e12">—</td></tr>
+      <tr><th>終盤 あき13マス 完全読み</th><td class="num" id="r-e13">—</td><td class="num">69 ミリ秒</td><td class="num" id="x-e13">—</td></tr>
+      <tr><th>終盤 あき14マス 完全読み</th><td class="num" id="r-e14">—</td><td class="num">Mac でも とばした</td><td class="num" id="x-e14">—</td></tr>
+    </table>
+    <p id="verdicts"></p>
+  </section>
+
+  <section>
+    <h2>CC に わたす 1行</h2>
+    <p class="hint">この枠を長押しして「すべてを選択」→「コピー」で貼れます。写真を撮って送るのでもかまいません。</p>
+    <textarea id="payload" readonly>まだ はかっていません</textarea>
+  </section>
+
+  <section>
+    <h2>この端末のこと</h2>
+    <table>
+      <tr><th>画面の広さ</th><td id="i-screen">—</td></tr>
+      <tr><th>別スレッド（Worker）</th><td id="i-worker">—</td></tr>
+      <tr><th>ブラウザの名札</th><td id="i-ua" style="word-break:break-all;">—</td></tr>
+    </table>
+  </section>
+</main>
+
+<script>
+/* つよくなるオセロ ── はやさ はかり の中身（ES5のみ・DOMを使わない）
+   2026-09-21 工程0.5。
+   目的＝同じ計算を Mac と 2012年のiPad で走らせ、速さの倍率を実測で出す。
+   約束事＝let/const/アロー/クラス/テンプレート文字列を使わない（Safari 10.1 で動く形）。
+   盤は 0〜63 の配列。0=あき 1=くろ 2=しろ。 */
+
+var OK = {};
+
+(function () {
+  'use strict';
+
+  var EMPTY = 0, BLACK = 1, WHITE = 2;
+  OK.EMPTY = EMPTY; OK.BLACK = BLACK; OK.WHITE = WHITE;
+
+  /* ---- 8方向の光線を先に作る（当たり判定を毎回計算しない） ---- */
+  var DR = [-1, -1, -1, 0, 0, 1, 1, 1];
+  var DC = [-1, 0, 1, -1, 1, -1, 0, 1];
+  var RAYS = [];   /* RAYS[sq] = [ 方向ごとのマス列 ] */
+  (function buildRays() {
+    var sq, d, r, c, ray;
+    for (sq = 0; sq < 64; sq++) {
+      RAYS[sq] = [];
+      for (d = 0; d < 8; d++) {
+        ray = [];
+        r = (sq >> 3) + DR[d];
+        c = (sq & 7) + DC[d];
+        while (r >= 0 && r < 8 && c >= 0 && c < 8) {
+          ray.push(r * 8 + c);
+          r += DR[d];
+          c += DC[d];
+        }
+        RAYS[sq].push(ray);
+      }
+    }
+  })();
+
+  /* ---- 盤の作りかた ---- */
+  function initBoard() {
+    var b = [], i;
+    for (i = 0; i < 64; i++) { b.push(EMPTY); }
+    b[27] = WHITE; b[28] = BLACK;
+    b[35] = BLACK; b[36] = WHITE;
+    return b;
+  }
+  OK.initBoard = initBoard;
+
+  function other(p) { return p === BLACK ? WHITE : BLACK; }
+  OK.other = other;
+
+  /* 置けるなら裏返る枚数、置けないなら0 */
+  function countFlips(b, sq, p) {
+    if (b[sq] !== EMPTY) { return 0; }
+    var opp = other(p), total = 0, d, ray, i, n, seen;
+    for (d = 0; d < 8; d++) {
+      ray = RAYS[sq][d];
+      n = ray.length;
+      seen = 0;
+      for (i = 0; i < n; i++) {
+        if (b[ray[i]] === opp) { seen++; continue; }
+        if (b[ray[i]] === p && seen > 0) { total += seen; }
+        break;
+      }
+    }
+    return total;
+  }
+  OK.countFlips = countFlips;
+
+  /* 置いて裏返す。戻り値＝裏返したマスの配列（戻すときに使う） */
+  function applyMove(b, sq, p) {
+    var opp = other(p), flipped = [], d, ray, i, n, run, j;
+    for (d = 0; d < 8; d++) {
+      ray = RAYS[sq][d];
+      n = ray.length;
+      run = 0;
+      for (i = 0; i < n; i++) {
+        if (b[ray[i]] === opp) { run++; continue; }
+        if (b[ray[i]] === p && run > 0) {
+          for (j = 0; j < run; j++) { flipped.push(ray[j]); }
+        }
+        break;
+      }
+    }
+    for (i = 0; i < flipped.length; i++) { b[flipped[i]] = p; }
+    b[sq] = p;
+    return flipped;
+  }
+  OK.applyMove = applyMove;
+
+  function undoMove(b, sq, p, flipped) {
+    var opp = other(p), i;
+    for (i = 0; i < flipped.length; i++) { b[flipped[i]] = opp; }
+    b[sq] = EMPTY;
+  }
+  OK.undoMove = undoMove;
+
+  /* 置ける場所の一覧。角・辺を先に見る並び（読みを早く切るため・端末に依らない固定順） */
+  var ORDER = [
+    0, 7, 56, 63,
+    2, 3, 4, 5, 16, 24, 32, 40, 23, 31, 39, 47, 58, 59, 60, 61,
+    18, 19, 20, 21, 26, 27, 28, 29, 34, 35, 36, 37, 42, 43, 44, 45,
+    10, 11, 12, 13, 17, 22, 25, 30, 33, 38, 41, 46, 50, 51, 52, 53,
+    1, 6, 8, 15, 48, 55, 57, 62,
+    9, 14, 49, 54
+  ];
+  function legalMoves(b, p) {
+    var out = [], i, sq;
+    for (i = 0; i < 64; i++) {
+      sq = ORDER[i];
+      if (countFlips(b, sq, p) > 0) { out.push(sq); }
+    }
+    return out;
+  }
+  OK.legalMoves = legalMoves;
+
+  function discDiff(b, p) {
+    var mine = 0, theirs = 0, i;
+    for (i = 0; i < 64; i++) {
+      if (b[i] === p) { mine++; }
+      else if (b[i] !== EMPTY) { theirs++; }
+    }
+    return mine - theirs;
+  }
+  OK.discDiff = discDiff;
+
+  function discCount(b) {
+    var n = 0, i;
+    for (i = 0; i < 64; i++) { if (b[i] !== EMPTY) { n++; } }
+    return n;
+  }
+  OK.discCount = discCount;
+
+  /* ---- 手の良さの見積り（中盤）＝マスの重み＋置ける手数 ---- */
+  var W = [
+    120, -20, 20, 5, 5, 20, -20, 120,
+    -20, -40, -5, -5, -5, -5, -40, -20,
+    20, -5, 15, 3, 3, 15, -5, 20,
+    5, -5, 3, 3, 3, 3, -5, 5,
+    5, -5, 3, 3, 3, 3, -5, 5,
+    20, -5, 15, 3, 3, 15, -5, 20,
+    -20, -40, -5, -5, -5, -5, -40, -20,
+    120, -20, 20, 5, 5, 20, -20, 120
+  ];
+
+  var nodes = 0;
+  OK.getNodes = function () { return nodes; };
+  OK.resetNodes = function () { nodes = 0; };
+
+  function evalBoard(b, p) {
+    var opp = other(p), s = 0, i;
+    for (i = 0; i < 64; i++) {
+      if (b[i] === p) { s += W[i]; }
+      else if (b[i] === opp) { s -= W[i]; }
+    }
+    return s + 3 * (legalMoves(b, p).length - legalMoves(b, opp).length);
+  }
+  OK.evalBoard = evalBoard;
+
+  /* ---- 中盤の先読み（深さ指定・アルファベータ） ---- */
+  function searchMid(b, p, depth, alpha, beta, passed) {
+    nodes++;
+    if (depth === 0) { return evalBoard(b, p); }
+    var moves = legalMoves(b, p), i, sq, flipped, v;
+    if (moves.length === 0) {
+      if (passed) { return 1000 * discDiff(b, p); }
+      return -searchMid(b, other(p), depth, -beta, -alpha, true);
+    }
+    for (i = 0; i < moves.length; i++) {
+      sq = moves[i];
+      flipped = applyMove(b, sq, p);
+      v = -searchMid(b, other(p), depth - 1, -beta, -alpha, false);
+      undoMove(b, sq, p, flipped);
+      if (v > alpha) { alpha = v; }
+      if (alpha >= beta) { return alpha; }
+    }
+    return alpha;
+  }
+
+  /* 最善手と値を返す（実際の対局で使う形＝この時間を測る） */
+  OK.bestMoveMid = function (b, p, depth) {
+    var moves = legalMoves(b, p), best = -1, bestV = -1e9, i, sq, flipped, v;
+    for (i = 0; i < moves.length; i++) {
+      sq = moves[i];
+      flipped = applyMove(b, sq, p);
+      v = -searchMid(b, other(p), depth - 1, -1e9, -bestV, false);
+      undoMove(b, sq, p, flipped);
+      if (v > bestV) { bestV = v; best = sq; }
+    }
+    return { move: best, value: bestV };
+  };
+
+  /* ---- 終盤の完全読み（最後まで読む・石差そのもの） ---- */
+  function searchEnd(b, p, alpha, beta, passed) {
+    nodes++;
+    var moves = legalMoves(b, p), i, sq, flipped, v;
+    if (moves.length === 0) {
+      if (passed) { return discDiff(b, p); }
+      return -searchEnd(b, other(p), -beta, -alpha, true);
+    }
+    for (i = 0; i < moves.length; i++) {
+      sq = moves[i];
+      flipped = applyMove(b, sq, p);
+      v = -searchEnd(b, other(p), -beta, -alpha, false);
+      undoMove(b, sq, p, flipped);
+      if (v > alpha) { alpha = v; }
+      if (alpha >= beta) { return alpha; }
+    }
+    return alpha;
+  }
+  OK.solveEnd = function (b, p) {
+    return searchEnd(b, p, -64, 64, false);
+  };
+
+  /* ---- 決まった局面を作る（同じ種＝MacでもiPadでも同じ盤になる） ---- */
+  function minstd(seed) {
+    var s = seed;
+    return function () {
+      s = (s * 16807) % 2147483647;   /* 2^53 を超えないので端末に依らず同じ値 */
+      return s / 2147483647;
+    };
+  }
+
+  /* 石が targetDiscs 枚になるまで、決まった乱数で打ち進めた局面を返す */
+  OK.makePos = function (targetDiscs, seed) {
+    var b = initBoard(), p = BLACK, rnd = minstd(seed || 12345);
+    var passed = false, moves, sq;
+    while (discCount(b) < targetDiscs) {
+      moves = legalMoves(b, p);
+      if (moves.length === 0) {
+        if (passed) { break; }
+        passed = true;
+        p = other(p);
+        continue;
+      }
+      passed = false;
+      sq = moves[Math.floor(rnd() * moves.length)];
+      applyMove(b, sq, p);
+      p = other(p);
+    }
+    return { board: b, player: p, discs: discCount(b) };
+  };
+
+  OK.now = function () {
+    if (typeof performance !== 'undefined' && performance && performance.now) {
+      return performance.now();
+    }
+    return Date.now();
+  };
+
+  /* ================= はかる中身 ================= */
+
+  /* ①1秒に読める局面の数＝深さ5の先読みを1回して、局面数÷秒 */
+  OK.measureNps = function () {
+    var pos = OK.makePos(20), t0, t1;
+    OK.resetNodes();
+    t0 = OK.now();
+    OK.bestMoveMid(pos.board, pos.player, 5);
+    t1 = OK.now();
+    var ms = t1 - t0;
+    return { ms: ms, nodes: OK.getNodes(), nps: Math.round(OK.getNodes() / (ms / 1000)) };
+  };
+
+  /* ②5手先読みが いちばん遅いとき（石数のちがう6局面の最悪値） */
+  var MID_DISCS = [12, 20, 28, 36, 44, 52];
+  OK.midCases = MID_DISCS;
+  OK.measureMidOne = function (i, depth) {
+    var pos = OK.makePos(MID_DISCS[i]), t0, t1, n0;
+    n0 = OK.getNodes();
+    t0 = OK.now();
+    OK.bestMoveMid(pos.board, pos.player, depth);
+    t1 = OK.now();
+    return { discs: MID_DISCS[i], ms: t1 - t0, nodes: OK.getNodes() - n0 };
+  };
+
+  /* ③終盤の完全読み（あき N マス） */
+  OK.measureEndOne = function (empties) {
+    var pos = OK.makePos(64 - empties), t0, t1, n0, v;
+    n0 = OK.getNodes();
+    t0 = OK.now();
+    v = OK.solveEnd(pos.board, pos.player);
+    t1 = OK.now();
+    return { empties: empties, ms: t1 - t0, nodes: OK.getNodes() - n0, value: v };
+  };
+
+  /* 別スレッド（Web Worker）が使えるかだけ見る＝設計の予備案の確認 */
+  OK.workerOk = function () {
+    try {
+      if (typeof Worker === 'undefined') { return 'つかえない（Worker なし）'; }
+      if (typeof Blob === 'undefined' || typeof URL === 'undefined' || !URL.createObjectURL) {
+        return 'あやしい（Blob URL がない）';
+      }
+      return 'つかえそう（Worker＋Blob URL あり）';
+    } catch (e) {
+      return 'しらべられなかった';
+    }
+  };
+})();
+
+if (typeof module !== 'undefined' && module.exports) { module.exports = OK; }
+
+</script>
+<script>
+/* ---- 画面まわり（ES5のみ） ---- */
+(function () {
+  'use strict';
+
+  /* きじゅん＝Mac（M5・2026-09-21）の Safari 26.6.2 で実測した値。
+     同じブラウザどうしで比べるため、jsc（506,104局面/秒）ではなく Safari の値を使う。
+     局面の数は端末に依らず同じなので、時間の見積りに使える。 */
+  var MAC = {
+    nps: 243563,
+    m5: 12, m6: 48,
+    e11: 6, e12: 27, e13: 69, e14: 0,   /* e14 は Mac の Safari でもとばした */
+    endNodes: { 11: 24039, 12: 122277, 13: 362045, 14: 2235177 }
+  };
+  /* これ以上かかる見込みの計算はとばす。
+     理由＝古いSafariは1つの計算が10秒ほど続くとページを強制的に読み込み直す。
+     5秒で切れば、いちばん深い読みが入らなくても測り直しにならない。 */
+  var SKIP_MS = 5000;
+
+  function $(id) { return document.getElementById(id); }
+  function setText(id, s) { var e = $(id); if (e) { e.innerHTML = ''; e.appendChild(document.createTextNode(s)); } }
+  function fmt(n, d) { return (Math.round(n * Math.pow(10, d)) / Math.pow(10, d)).toString(); }
+  function comma(n) {
+    var s = String(Math.round(n)), out = '', i, c = 0;
+    for (i = s.length - 1; i >= 0; i--) {
+      out = s.charAt(i) + out; c++;
+      if (c % 3 === 0 && i > 0) { out = ',' + out; }
+    }
+    return out;
+  }
+
+  var R = { ua: navigator.userAgent, worker: OK.workerOk() };
+  R.isPad = /iPad|iPhone|iPod/.test(R.ua);
+
+  /* 測る相手を まちがえていないか、はじめに はっきり出す
+     （Mac の Safari で測っても、古い iPad の速さは分からないため） */
+  if (!R.isPad) {
+    var w = $('warn');
+    w.innerHTML = '';
+    w.className = '';
+    w.appendChild(mark('bad', 'この端末は iPad ではありません＝ここで測っても iPad の速さは分かりません'));
+  }
+
+  setText('i-screen', window.screen.width + '×' + window.screen.height
+    + '（見えている広さ ' + window.innerWidth + '×' + window.innerHeight + '）');
+  setText('i-worker', R.worker);
+  setText('i-ua', R.ua);
+
+  var steps = [];
+
+  function stepRule() {
+    setText('now', '① ルールの確認');
+    var b = OK.initBoard();
+    var n = perft(b, OK.BLACK, 6, false);
+    R.perft6 = n;
+    setText('now', '① ルールの確認 ' + (n === 8200 ? 'あっています' : 'ちがいます（' + n + '）'));
+  }
+
+  function perft(b, p, depth, passed) {
+    if (depth === 0) { return 1; }
+    var moves = OK.legalMoves(b, p), i, sq, fl, sum = 0;
+    if (moves.length === 0) {
+      if (passed) { return 1; }
+      return perft(b, OK.other(p), depth, true);
+    }
+    for (i = 0; i < moves.length; i++) {
+      sq = moves[i];
+      fl = OK.applyMove(b, sq, p);
+      sum += perft(b, OK.other(p), depth - 1, false);
+      OK.undoMove(b, sq, p, fl);
+    }
+    return sum;
+  }
+
+  function stepNps(k) {
+    return function () {
+      setText('now', '② 1秒に読める 局面の数（' + k + '回目 / 3回）');
+      var r = OK.measureNps();
+      if (!R.npsList) { R.npsList = []; }
+      R.npsList.push(r.nps);
+      var sorted = R.npsList.slice(0).sort(function (a, b) { return a - b; });
+      R.nps = sorted[Math.floor(sorted.length / 2)];
+      setText('r-nps', comma(R.nps) + ' 局面');
+      setText('x-nps', fmt(MAC.nps / R.nps, 1) + ' ばい');
+    };
+  }
+
+  function stepMid(depth) {
+    return function () {
+      var key = depth === 5 ? 'm5' : 'm6';
+      if (R.nps && MAC.nps / R.nps > 400) {   /* あまりに遅い端末なら6手はとばす */
+        if (depth === 6) { setText('r-m6', 'とばした'); return; }
+      }
+      var worst = 0, each = [], i, one;
+      for (i = 0; i < OK.midCases.length; i++) {
+        setText('now', '③ ' + depth + '手先読み（' + (i + 1) + ' / ' + OK.midCases.length + '）');
+        one = OK.measureMidOne(i, depth);
+        each.push(Math.round(one.ms));
+        if (one.ms > worst) { worst = one.ms; }
+      }
+      R[key] = worst;
+      R[key + 'each'] = each;
+      setText('r-' + key, comma(worst) + ' ミリ秒');
+      setText('x-' + key, fmt(worst / MAC[key], 1) + ' ばい');
+    };
+  }
+
+  /* 終盤の見積りは「終盤の実測」から出す。
+     中盤の局面数/秒で終盤を見積ると、終盤のほうが1局面あたり軽いぶん
+     何倍も遅く見積ってしまい、測れるはずの深さをとばしてしまう（2026-09-21 実機で確認）。
+     そこで、まず軽い あき10マス を測り、その時間と局面数の比で深いほうを見積る。 */
+  var ANCHOR_EMPTIES = 10, ANCHOR_NODES = 8427;
+  function stepAnchor() {
+    setText('now', '④ 終盤の完全読み（まず あき ' + ANCHOR_EMPTIES + 'マス）');
+    var one = OK.measureEndOne(ANCHOR_EMPTIES);
+    R.e10 = one.ms;
+    R.anchorMs = one.ms > 0 ? one.ms : 1;
+  }
+
+  function stepEnd(empties) {
+    return function () {
+      var key = 'e' + empties;
+      var predict;
+      if (R.anchorMs) { predict = R.anchorMs * (MAC.endNodes[empties] / ANCHOR_NODES); }
+      else { predict = R.nps ? (MAC.endNodes[empties] / R.nps) * 1000 : 0; }
+      if (predict > SKIP_MS) {
+        setText('r-' + key, 'とばした（' + comma(predict / 1000) + '秒 かかる見込み）');
+        R[key] = -1;
+        return;
+      }
+      setText('now', '④ 終盤の完全読み（あき ' + empties + 'マス）');
+      var one = OK.measureEndOne(empties);
+      R[key] = one.ms;
+      setText('r-' + key, comma(one.ms) + ' ミリ秒');
+      if (MAC[key] > 0) { setText('x-' + key, fmt(one.ms / MAC[key], 1) + ' ばい'); }
+    };
+  }
+
+  function mark(kind, label) {
+    var span = document.createElement('span');
+    span.className = 'state state-' + kind;
+    span.appendChild(document.createTextNode((kind === 'ok' ? '✓ ' : kind === 'warn' ? '！ ' : '✕ ') + label));
+    return span;
+  }
+
+  function stepSummary() {
+    setText('now', 'おわりました。ありがとう！');
+    $('warn').innerHTML = '';
+
+    var box = $('verdicts');
+    box.innerHTML = '';
+    function add(kind, label) { box.appendChild(mark(kind, label)); box.appendChild(document.createElement('br')); }
+
+    var ratio = MAC.nps / R.nps;
+    if (!R.isPad) {
+      add('bad', 'この端末は iPad ではありません＝下の数字は iPad の速さではない。iPad の Safari で測り直してください');
+    }
+    add('ok', 'Mac の Safari の ' + fmt(ratio, 1) + ' ばい おそい（設計の見込みは 40 ばい）');
+
+    if (R.m5 <= 2000) { add('ok', '5手先読みは いちばん遅いときでも ' + comma(R.m5) + ' ミリ秒＝2秒いない'); }
+    else { add('bad', '5手先読みが ' + comma(R.m5) + ' ミリ秒＝2秒を こえた'); }
+
+    var deepest = -1, dk;
+    var list = [11, 12, 13, 14];
+    for (var i = 0; i < list.length; i++) {
+      dk = R['e' + list[i]];
+      if (dk >= 0 && dk <= 2000) { deepest = list[i]; }
+    }
+    if (deepest > 0) { add('ok', '終盤の完全読みは あき ' + deepest + 'マス までなら 2秒いない'); }
+    else { add('warn', '終盤の完全読みは あき 11マス でも 2秒を こえた'); }
+
+    if (R.perft6 !== 8200) { add('bad', 'ルールの確認が 合わなかった＝この数字は使えない'); }
+    if (R.worker.indexOf('つかえ') !== 0) { add('warn', '別スレッド＝' + R.worker); }
+
+    var p = 'OTHELLO-SPEED-v1 nps=' + R.nps
+      + ' mid5=' + Math.round(R.m5 === undefined ? -1 : R.m5)
+      + ' mid6=' + Math.round(R.m6 === undefined ? -1 : R.m6)
+      + ' e10=' + Math.round(R.e10 === undefined ? -1 : R.e10)
+      + ' e11=' + Math.round(R.e11 === undefined ? -1 : R.e11)
+      + ' e12=' + Math.round(R.e12 === undefined ? -1 : R.e12)
+      + ' e13=' + Math.round(R.e13 === undefined ? -1 : R.e13)
+      + ' e14=' + Math.round(R.e14 === undefined ? -1 : R.e14)
+      + ' ratio=' + fmt(ratio, 2)
+      + ' perft6=' + R.perft6
+      + ' worker=' + (R.worker.indexOf('つかえそう') === 0 ? 'yes' : 'no')
+      + ' device=' + (R.isPad ? 'ipad' : 'NOT-IPAD')
+      + ' screen=' + window.screen.width + 'x' + window.screen.height
+      + ' ua="' + R.ua + '"';
+    $('payload').value = p;
+    $('go').disabled = false;
+    $('go').innerHTML = 'もう一度 はかる';
+  }
+
+  steps.push(stepRule);
+  steps.push(stepNps(1)); steps.push(stepNps(2)); steps.push(stepNps(3));
+  steps.push(stepMid(5)); steps.push(stepMid(6));
+  steps.push(stepAnchor);
+  steps.push(stepEnd(11)); steps.push(stepEnd(12)); steps.push(stepEnd(13)); steps.push(stepEnd(14));
+  steps.push(stepSummary);
+
+  function runFrom(i) {
+    if (i >= steps.length) { return; }
+    setTimeout(function () {
+      try {
+        steps[i]();
+      } catch (e) {
+        setText('now', 'とまりました＝' + (e && e.message ? e.message : e));
+        return;
+      }
+      runFrom(i + 1);
+    }, 40);
+  }
+
+  $('go').onclick = function () {
+    $('go').disabled = true;
+    R.npsList = null;
+    runFrom(0);
+  };
+})();
+</script>
+</body>
+</html>

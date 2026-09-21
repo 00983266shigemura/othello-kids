@@ -1,0 +1,18 @@
+# 作り直しの控え（手で消すのは しげの承認が要るため、gitには載せない）
+*.bak
+*.bak2
+*.bak3
+*.bak_*
+tools/_argtest.js
+
+# 途中で取り消した梯子の測定結果（最終版 p3_result_v5.json だけを残す）
+tools/p3_result_v1.json
+tools/p3_result_v2.json
+tools/p3_result_v3.json
+tools/p3_result_v4.json
+tools/p3_v2.log
+tools/p3_v3.log
+tools/p3_v4.log
+
+# macOS
+.DS_Store

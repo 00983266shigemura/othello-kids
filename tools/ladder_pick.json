@@ -1,0 +1,185 @@
+{
+ "minGap": 60.9,
+ "levels": [
+  {
+   "level": 1,
+   "spec": "C:bad=1,badDepth=4",
+   "elo": -670.7,
+   "gap": 0.0,
+   "winProb": 0.0,
+   "proxyGreedy": 0.964,
+   "proxyGreedyCorner": 0.975
+  },
+  {
+   "level": 2,
+   "spec": "C:bad=1",
+   "elo": -609.8,
+   "gap": 60.9,
+   "winProb": 0.587,
+   "proxyGreedy": 0.949,
+   "proxyGreedyCorner": 0.965
+  },
+  {
+   "level": 3,
+   "spec": "C:bad=0.9",
+   "elo": -543.9,
+   "gap": 65.9,
+   "winProb": 0.594,
+   "proxyGreedy": 0.928,
+   "proxyGreedyCorner": 0.95
+  },
+  {
+   "level": 4,
+   "spec": "C:bad=0.7,badDepth=3",
+   "elo": -478.4,
+   "gap": 65.5,
+   "winProb": 0.593,
+   "proxyGreedy": 0.898,
+   "proxyGreedyCorner": 0.929
+  },
+  {
+   "level": 5,
+   "spec": "C:bad=0.4,badDepth=3",
+   "elo": -407.5,
+   "gap": 70.9,
+   "winProb": 0.601,
+   "proxyGreedy": 0.854,
+   "proxyGreedyCorner": 0.897
+  },
+  {
+   "level": 6,
+   "spec": "C:bad=0.5",
+   "elo": -343.8,
+   "gap": 63.7,
+   "winProb": 0.591,
+   "proxyGreedy": 0.802,
+   "proxyGreedyCorner": 0.858
+  },
+  {
+   "level": 7,
+   "spec": "C:bad=0.3",
+   "elo": -279.6,
+   "gap": 64.2,
+   "winProb": 0.591,
+   "proxyGreedy": 0.737,
+   "proxyGreedyCorner": 0.806
+  },
+  {
+   "level": 8,
+   "spec": "C:rand=1",
+   "elo": -215.3,
+   "gap": 64.3,
+   "winProb": 0.591,
+   "proxyGreedy": 0.66,
+   "proxyGreedyCorner": 0.742
+  },
+  {
+   "level": 9,
+   "spec": "C:depth=6,end=12,eps=0.9",
+   "elo": -146.1,
+   "gap": 69.2,
+   "winProb": 0.598,
+   "proxyGreedy": 0.565,
+   "proxyGreedyCorner": 0.659
+  },
+  {
+   "level": 10,
+   "spec": "C:corner=0.5",
+   "elo": -72.9,
+   "gap": 73.2,
+   "winProb": 0.604,
+   "proxyGreedy": 0.461,
+   "proxyGreedyCorner": 0.559
+  },
+  {
+   "level": 11,
+   "spec": "C:depth=1,eps=0.4",
+   "elo": -3.0,
+   "gap": 69.9,
+   "winProb": 0.599,
+   "proxyGreedy": 0.363,
+   "proxyGreedyCorner": 0.459
+  },
+  {
+   "level": 12,
+   "spec": "C:depth=6,end=12,eps=0.7",
+   "elo": 65.5,
+   "gap": 68.5,
+   "winProb": 0.597,
+   "proxyGreedy": 0.278,
+   "proxyGreedyCorner": 0.364
+  },
+  {
+   "level": 13,
+   "spec": "C:depth=2,eps=0.1",
+   "elo": 137.3,
+   "gap": 71.8,
+   "winProb": 0.602,
+   "proxyGreedy": 0.203,
+   "proxyGreedyCorner": 0.274
+  },
+  {
+   "level": 14,
+   "spec": "C:depth=6,end=12,eps=0.5",
+   "elo": 201.6,
+   "gap": 64.3,
+   "winProb": 0.591,
+   "proxyGreedy": 0.15,
+   "proxyGreedyCorner": 0.207
+  },
+  {
+   "level": 15,
+   "spec": "C:depth=3,eps=0.1",
+   "elo": 272.8,
+   "gap": 71.2,
+   "winProb": 0.601,
+   "proxyGreedy": 0.104,
+   "proxyGreedyCorner": 0.148
+  },
+  {
+   "level": 16,
+   "spec": "C:depth=5,end=10,eps=0.3",
+   "elo": 336.5,
+   "gap": 63.7,
+   "winProb": 0.591,
+   "proxyGreedy": 0.075,
+   "proxyGreedyCorner": 0.107
+  },
+  {
+   "level": 17,
+   "spec": "C:depth=6,end=12,eps=0.25",
+   "elo": 416.7,
+   "gap": 80.2,
+   "winProb": 0.613,
+   "proxyGreedy": 0.048,
+   "proxyGreedyCorner": 0.07
+  },
+  {
+   "level": 18,
+   "spec": "C:depth=4,end=8,eps=0",
+   "elo": 517.3,
+   "gap": 100.6,
+   "winProb": 0.641,
+   "proxyGreedy": 0.028,
+   "proxyGreedyCorner": 0.041
+  },
+  {
+   "level": 19,
+   "spec": "C:depth=6,end=12,eps=0.08",
+   "elo": 621.3,
+   "gap": 104.0,
+   "winProb": 0.645,
+   "proxyGreedy": 0.015,
+   "proxyGreedyCorner": 0.023
+  },
+  {
+   "level": 20,
+   "spec": "C:depth=6,end=12,eps=0.03",
+   "elo": 736.1,
+   "gap": 114.8,
+   "winProb": 0.659,
+   "proxyGreedy": 0.008,
+   "proxyGreedyCorner": 0.012
+  }
+ ]
+}

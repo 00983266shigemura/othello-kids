@@ -1,0 +1,96 @@
+あたらしい試合 = 100 組 × 100局
+  ... 15 / 100
+  ... 30 / 100
+  ... 45 / 100
+  ... 60 / 100
+  ... 75 / 100
+  ... 90 / 100
+C:bad=1,badDepth=4                 elo=  -670.7
+C:bad=1,badDepth=2                 elo=  -658.1
+C:bad=1,badDepth=3                 elo=  -634.3
+C:bad=1                            elo=  -609.8
+C:bad=0.95,badDepth=3              elo=  -571.2
+C:bad=0.8,badDepth=3               elo=  -549.8
+C:bad=0.9                          elo=  -543.9
+C:bad=0.9,badDepth=2               elo=  -533.3
+C:bad=0.8,badDepth=4               elo=  -513.9
+C:bad=0.8,badDepth=2               elo=  -496.9
+C:bad=0.7,badDepth=3               elo=  -478.4
+C:bad=0.85,badDepth=3              elo=  -472.7
+C:bad=0.9,badDepth=3               elo=  -472.7
+C:bad=0.6,badDepth=3               elo=  -447.4
+C:bad=0.6,badDepth=2               elo=  -423.4
+C:bad=0.4,badDepth=3               elo=  -407.5
+C:bad=0.5,badDepth=3               elo=  -378.9
+C:bad=0.8                          elo=  -370.8
+C:bad=0.3,badDepth=3               elo=  -353.4
+C:bad=0.4,badDepth=2               elo=  -347.4
+C:bad=0.5                          elo=  -343.8
+C:bad=0.7                          elo=  -330.0
+C:bad=0.6                          elo=  -318.9
+C:bad=0.4                          elo=  -314.5
+C:bad=0.2,badDepth=3               elo=  -299.3
+C:bad=0.2                          elo=  -285.5
+C:bad=0.3                          elo=  -279.6
+C:bad=0.1,badDepth=3               elo=  -247.1
+C:rand=1                           elo=  -215.3
+C:bad=0.1                          elo=  -210.7
+C:depth=6,end=12,eps=0.9           elo=  -146.1
+C:depth=1,eps=0.8                  elo=  -137.8
+C:depth=1,eps=0.7                  elo=  -101.2
+Pgreedy                            elo=  -100.4
+C:depth=1,eps=0.6                  elo=   -88.4
+C:corner=0.5                       elo=   -72.9
+C:depth=1,eps=0.5                  elo=   -46.7
+C:depth=6,end=12,eps=0.8           elo=   -42.3
+C:corner=1                         elo=   -41.2
+C:depth=2,eps=0.6                  elo=   -38.5
+PgreedyCorner                      elo=   -31.8
+C:depth=1,eps=0.4                  elo=    -3.0
+C:depth=2,eps=0.4                  elo=     1.6
+C:depth=2,eps=0.5                  elo=    13.4
+C:depth=1,eps=0.2                  elo=    22.6
+C:depth=1,eps=0.3                  elo=    35.6
+C:depth=3,eps=0.5                  elo=    38.2
+C:depth=6,end=12,eps=0.7           elo=    65.5
+C:depth=3,eps=0.4                  elo=    66.5
+C:depth=1,eps=0.1                  elo=    69.0
+C:depth=2,eps=0.3                  elo=    74.1
+C:depth=1,eps=0                    elo=    79.2
+C:depth=4,eps=0.4                  elo=    89.4
+C:depth=2,eps=0.2                  elo=    99.5
+C:depth=3,eps=0.3                  elo=   108.4
+C:depth=2,eps=0.1                  elo=   137.3
+C:depth=6,end=12,eps=0.6           elo=   146.9
+C:depth=3,eps=0.2                  elo=   161.0
+C:depth=4,eps=0.3                  elo=   184.7
+C:depth=6,end=12,eps=0.5           elo=   201.6
+C:depth=4,eps=0.2                  elo=   241.7
+C:depth=2,eps=0                    elo=   254.4
+C:depth=6,end=12,eps=0.45          elo=   255.9
+C:depth=3,eps=0.1                  elo=   272.8
+C:depth=6,end=12,eps=0.4           elo=   286.4
+C:depth=4,eps=0.1                  elo=   336.5
+C:depth=5,end=10,eps=0.3           elo=   336.5
+C:depth=3,eps=0                    elo=   342.8
+C:depth=6,end=12,eps=0.35          elo=   343.1
+C:depth=4,end=8,eps=0.2            elo=   354.3
+C:depth=6,end=12,eps=0.3           elo=   361.9
+C:depth=6,end=12,eps=0.25          elo=   416.7
+C:depth=4,end=8,eps=0.1            elo=   436.0
+C:depth=5,end=10,eps=0.2           elo=   437.4
+C:depth=4,eps=0                    elo=   439.8
+C:depth=6,end=12,eps=0.2           elo=   452.1
+C:depth=6,end=12,eps=0.15          elo=   457.5
+C:depth=6,end=12,eps=0.18          elo=   471.1
+C:depth=4,end=8,eps=0              elo=   517.3
+C:depth=6,end=12,eps=0.1           elo=   526.0
+C:depth=5,end=10,eps=0.1           elo=   540.5
+C:depth=6,end=12,eps=0.12          elo=   546.3
+C:depth=6,end=12,eps=0.08          elo=   621.3
+C:depth=6,end=12,eps=0.05          elo=   629.9
+C:depth=5,end=10,eps=0             elo=   665.0
+C:depth=6,end=12,eps=0.03          elo=   736.1
+C:depth=6,end=12,eps=0             elo=   755.2
+
+書き出し = gauntlet_v3.json

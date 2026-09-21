@@ -1,0 +1,3435 @@
+{
+ "note": "期待する理由は、盤の絵と事実の行をCCが1本ずつ読んで決めたもの。判定器の出力は使っていない。",
+ "cases": [
+  {
+   "name": "かどh8が とれたのに h6へ うった",
+   "expect": "noCorner",
+   "childColor": 1,
+   "src": {
+    "file": "fixtures_raw2.txt",
+    "index": 0,
+    "seed": 314159,
+    "child": "greedy",
+    "opp": {
+     "kind": "random",
+     "bad": 0
+    }
+   },
+   "moves": [
+    {
+     "sq": 26,
+     "player": 1
+    },
+    {
+     "sq": 34,
+     "player": 2
+    },
+    {
+     "sq": 43,
+     "player": 1
+    },
+    {
+     "sq": 18,
+     "player": 2
+    },
+    {
+     "sq": 25,
+     "player": 1
+    },
+    {
+     "sq": 50,
+     "player": 2
+    },
+    {
+     "sq": 10,
+     "player": 1
+    },
+    {
+     "sq": 20,
+     "player": 2
+    },
+    {
+     "sq": 21,
+     "player": 1
+    },
+    {
+     "sq": 19,
+     "player": 2
+    },
+    {
+     "sq": 12,
+     "player": 1
+    },
+    {
+     "sq": 29,
+     "player": 2
+    },
+    {
+     "sq": 37,
+     "player": 1
+    },
+    {
+     "sq": 24,
+     "player": 2
+    },
+    {
+     "sq": 57,
+     "player": 1
+    },
+    {
+     "sq": 2,
+     "player": 2
+    },
+    {
+     "sq": 9,
+     "player": 1
+    },
+    {
+     "sq": 11,
+     "player": 2
+    },
+    {
+     "sq": 17,
+     "player": 1
+    },
+    {
+     "sq": 16,
+     "player": 2
+    },
+    {
+     "sq": 8,
+     "player": 1
+    },
+    {
+     "sq": 52,
+     "player": 2
+    },
+    {
+     "sq": 32,
+     "player": 1
+    },
+    {
+     "sq": 38,
+     "player": 2
+    },
+    {
+     "sq": 22,
+     "player": 1
+    },
+    {
+     "sq": 44,
+     "player": 2
+    },
+    {
+     "sq": 60,
+     "player": 1
+    },
+    {
+     "sq": 53,
+     "player": 2
+    },
+    {
+     "sq": 62,
+     "player": 1
+    },
+    {
+     "sq": 13,
+     "player": 2
+    },
+    {
+     "sq": 4,
+     "player": 1
+    },
+    {
+     "sq": 61,
+     "player": 2
+    },
+    {
+     "sq": 30,
+     "player": 1
+    },
+    {
+     "sq": 59,
+     "player": 2
+    },
+    {
+     "sq": 58,
+     "player": 1
+    },
+    {
+     "sq": 15,
+     "player": 2
+    },
+    {
+     "sq": 45,
+     "player": 1
+    },
+    {
+     "sq": 3,
+     "player": 2
+    },
+    {
+     "sq": 42,
+     "player": 1
+    },
+    {
+     "sq": 41,
+     "player": 2
+    },
+    {
+     "sq": 48,
+     "player": 1
+    },
+    {
+     "sq": 5,
+     "player": 2
+    },
+    {
+     "sq": 14,
+     "player": 1
+    },
+    {
+     "sq": 46,
+     "player": 2
+    },
+    {
+     "sq": 55,
+     "player": 1
+    },
+    {
+     "sq": 54,
+     "player": 2
+    },
+    {
+     "sq": 47,
+     "player": 1
+    },
+    {
+     "sq": 33,
+     "player": 2
+    },
+    {
+     "sq": 31,
+     "player": 2
+    },
+    {
+     "sq": 23,
+     "player": 1
+    },
+    {
+     "sq": 7,
+     "player": 2
+    },
+    {
+     "sq": 6,
+     "player": 1
+    },
+    {
+     "sq": 49,
+     "player": 2
+    },
+    {
+     "sq": 56,
+     "player": 1
+    },
+    {
+     "sq": 63,
+     "player": 2
+    },
+    {
+     "sq": 1,
+     "player": 1
+    },
+    {
+     "sq": 51,
+     "player": 2
+    },
+    {
+     "sq": 40,
+     "player": 1
+    },
+    {
+     "sq": 39,
+     "player": 2
+    },
+    {
+     "sq": 0,
+     "player": 2
+    }
+   ]
+  },
+  {
+   "name": "あきかどh1の となり g2へ うった",
+   "expect": "nextToCorner",
+   "childColor": 1,
+   "src": {
+    "file": "fixtures_raw2.txt",
+    "index": 1,
+    "seed": 314176,
+    "child": "greedy",
+    "opp": {
+     "kind": "search",
+     "depth": 1,
+     "eps": 0.3
+    }
+   },
+   "moves": [
+    {
+     "sq": 26,
+     "player": 1
+    },
+    {
+     "sq": 18,
+     "player": 2
+    },
+    {
+     "sq": 19,
+     "player": 1
+    },
+    {
+     "sq": 34,
+     "player": 2
+    },
+    {
+     "sq": 33,
+     "player": 1
+    },
+    {
+     "sq": 11,
+     "player": 2
+    },
+    {
+     "sq": 37,
+     "player": 1
+    },
+    {
+     "sq": 25,
+     "player": 2
+    },
+    {
+     "sq": 3,
+     "player": 1
+    },
+    {
+     "sq": 40,
+     "player": 2
+    },
+    {
+     "sq": 32,
+     "player": 1
+    },
+    {
+     "sq": 10,
+     "player": 2
+    },
+    {
+     "sq": 2,
+     "player": 1
+    },
+    {
+     "sq": 24,
+     "player": 2
+    },
+    {
+     "sq": 29,
+     "player": 2
+    },
+    {
+     "sq": 17,
+     "player": 1
+    },
+    {
+     "sq": 4,
+     "player": 2
+    },
+    {
+     "sq": 30,
+     "player": 1
+    },
+    {
+     "sq": 1,
+     "player": 2
+    },
+    {
+     "sq": 9,
+     "player": 1
+    },
+    {
+     "sq": 42,
+     "player": 2
+    },
+    {
+     "sq": 41,
+     "player": 1
+    },
+    {
+     "sq": 38,
+     "player": 2
+    },
+    {
+     "sq": 43,
+     "player": 1
+    },
+    {
+     "sq": 49,
+     "player": 2
+    },
+    {
+     "sq": 57,
+     "player": 1
+    },
+    {
+     "sq": 0,
+     "player": 2
+    },
+    {
+     "sq": 39,
+     "player": 1
+    },
+    {
+     "sq": 20,
+     "player": 2
+    },
+    {
+     "sq": 12,
+     "player": 1
+    },
+    {
+     "sq": 16,
+     "player": 2
+    },
+    {
+     "sq": 8,
+     "player": 1
+    },
+    {
+     "sq": 50,
+     "player": 2
+    },
+    {
+     "sq": 48,
+     "player": 1
+    },
+    {
+     "sq": 56,
+     "player": 2
+    },
+    {
+     "sq": 58,
+     "player": 1
+    },
+    {
+     "sq": 21,
+     "player": 2
+    },
+    {
+     "sq": 22,
+     "player": 1
+    },
+    {
+     "sq": 23,
+     "player": 2
+    },
+    {
+     "sq": 13,
+     "player": 1
+    },
+    {
+     "sq": 45,
+     "player": 2
+    },
+    {
+     "sq": 54,
+     "player": 1
+    },
+    {
+     "sq": 6,
+     "player": 2
+    },
+    {
+     "sq": 14,
+     "player": 1
+    },
+    {
+     "sq": 47,
+     "player": 2
+    },
+    {
+     "sq": 51,
+     "player": 1
+    },
+    {
+     "sq": 7,
+     "player": 2
+    },
+    {
+     "sq": 46,
+     "player": 1
+    },
+    {
+     "sq": 63,
+     "player": 2
+    },
+    {
+     "sq": 44,
+     "player": 1
+    },
+    {
+     "sq": 53,
+     "player": 2
+    },
+    {
+     "sq": 61,
+     "player": 1
+    },
+    {
+     "sq": 60,
+     "player": 2
+    },
+    {
+     "sq": 59,
+     "player": 1
+    },
+    {
+     "sq": 62,
+     "player": 2
+    },
+    {
+     "sq": 52,
+     "player": 1
+    },
+    {
+     "sq": 55,
+     "player": 2
+    },
+    {
+     "sq": 15,
+     "player": 1
+    },
+    {
+     "sq": 5,
+     "player": 2
+    },
+    {
+     "sq": 31,
+     "player": 1
+    }
+   ]
+  },
+  {
+   "name": "あきかどh8の となり g7へ うった",
+   "expect": "nextToCorner",
+   "childColor": 1,
+   "src": {
+    "file": "fixtures_raw2.txt",
+    "index": 2,
+    "seed": 314193,
+    "child": "greedy",
+    "opp": {
+     "kind": "search",
+     "depth": 2,
+     "eps": 0
+    }
+   },
+   "moves": [
+    {
+     "sq": 26,
+     "player": 1
+    },
+    {
+     "sq": 18,
+     "player": 2
+    },
+    {
+     "sq": 10,
+     "player": 1
+    },
+    {
+     "sq": 43,
+     "player": 2
+    },
+    {
+     "sq": 45,
+     "player": 1
+    },
+    {
+     "sq": 21,
+     "player": 2
+    },
+    {
+     "sq": 51,
+     "player": 1
+    },
+    {
+     "sq": 42,
+     "player": 2
+    },
+    {
+     "sq": 20,
+     "player": 1
+    },
+    {
+     "sq": 19,
+     "player": 2
+    },
+    {
+     "sq": 22,
+     "player": 1
+    },
+    {
+     "sq": 37,
+     "player": 2
+    },
+    {
+     "sq": 29,
+     "player": 1
+    },
+    {
+     "sq": 38,
+     "player": 2
+    },
+    {
+     "sq": 49,
+     "player": 1
+    },
+    {
+     "sq": 11,
+     "player": 2
+    },
+    {
+     "sq": 12,
+     "player": 1
+    },
+    {
+     "sq": 2,
+     "player": 2
+    },
+    {
+     "sq": 39,
+     "player": 1
+    },
+    {
+     "sq": 23,
+     "player": 2
+    },
+    {
+     "sq": 30,
+     "player": 1
+    },
+    {
+     "sq": 50,
+     "player": 2
+    },
+    {
+     "sq": 44,
+     "player": 1
+    },
+    {
+     "sq": 34,
+     "player": 2
+    },
+    {
+     "sq": 9,
+     "player": 1
+    },
+    {
+     "sq": 56,
+     "player": 2
+    },
+    {
+     "sq": 58,
+     "player": 1
+    },
+    {
+     "sq": 41,
+     "player": 2
+    },
+    {
+     "sq": 40,
+     "player": 1
+    },
+    {
+     "sq": 0,
+     "player": 2
+    },
+    {
+     "sq": 13,
+     "player": 1
+    },
+    {
+     "sq": 5,
+     "player": 2
+    },
+    {
+     "sq": 14,
+     "player": 1
+    },
+    {
+     "sq": 7,
+     "player": 2
+    },
+    {
+     "sq": 33,
+     "player": 1
+    },
+    {
+     "sq": 32,
+     "player": 2
+    },
+    {
+     "sq": 25,
+     "player": 1
+    },
+    {
+     "sq": 48,
+     "player": 2
+    },
+    {
+     "sq": 6,
+     "player": 1
+    },
+    {
+     "sq": 46,
+     "player": 2
+    },
+    {
+     "sq": 53,
+     "player": 1
+    },
+    {
+     "sq": 61,
+     "player": 2
+    },
+    {
+     "sq": 52,
+     "player": 1
+    },
+    {
+     "sq": 47,
+     "player": 2
+    },
+    {
+     "sq": 54,
+     "player": 1
+    },
+    {
+     "sq": 63,
+     "player": 2
+    },
+    {
+     "sq": 55,
+     "player": 1
+    },
+    {
+     "sq": 16,
+     "player": 2
+    },
+    {
+     "sq": 57,
+     "player": 1
+    },
+    {
+     "sq": 17,
+     "player": 2
+    },
+    {
+     "sq": 24,
+     "player": 1
+    },
+    {
+     "sq": 3,
+     "player": 2
+    },
+    {
+     "sq": 4,
+     "player": 1
+    },
+    {
+     "sq": 31,
+     "player": 2
+    },
+    {
+     "sq": 1,
+     "player": 1
+    },
+    {
+     "sq": 15,
+     "player": 2
+    },
+    {
+     "sq": 8,
+     "player": 1
+    },
+    {
+     "sq": 60,
+     "player": 2
+    },
+    {
+     "sq": 59,
+     "player": 1
+    },
+    {
+     "sq": 62,
+     "player": 2
+    }
+   ]
+  },
+  {
+   "name": "b8の あと おける所が2に へった",
+   "expect": "lostMobility",
+   "childColor": 1,
+   "src": {
+    "file": "fixtures_raw2.txt",
+    "index": 3,
+    "seed": 314210,
+    "child": "greedy",
+    "opp": {
+     "kind": "search",
+     "depth": 4,
+     "eps": 0
+    }
+   },
+   "moves": [
+    {
+     "sq": 26,
+     "player": 1
+    },
+    {
+     "sq": 20,
+     "player": 2
+    },
+    {
+     "sq": 45,
+     "player": 1
+    },
+    {
+     "sq": 42,
+     "player": 2
+    },
+    {
+     "sq": 12,
+     "player": 1
+    },
+    {
+     "sq": 21,
+     "player": 2
+    },
+    {
+     "sq": 29,
+     "player": 1
+    },
+    {
+     "sq": 19,
+     "player": 2
+    },
+    {
+     "sq": 49,
+     "player": 1
+    },
+    {
+     "sq": 56,
+     "player": 2
+    },
+    {
+     "sq": 18,
+     "player": 1
+    },
+    {
+     "sq": 17,
+     "player": 2
+    },
+    {
+     "sq": 33,
+     "player": 1
+    },
+    {
+     "sq": 44,
+     "player": 2
+    },
+    {
+     "sq": 52,
+     "player": 1
+    },
+    {
+     "sq": 37,
+     "player": 2
+    },
+    {
+     "sq": 13,
+     "player": 1
+    },
+    {
+     "sq": 53,
+     "player": 2
+    },
+    {
+     "sq": 62,
+     "player": 1
+    },
+    {
+     "sq": 34,
+     "player": 2
+    },
+    {
+     "sq": 8,
+     "player": 1
+    },
+    {
+     "sq": 4,
+     "player": 2
+    },
+    {
+     "sq": 50,
+     "player": 1
+    },
+    {
+     "sq": 30,
+     "player": 2
+    },
+    {
+     "sq": 31,
+     "player": 1
+    },
+    {
+     "sq": 58,
+     "player": 2
+    },
+    {
+     "sq": 3,
+     "player": 1
+    },
+    {
+     "sq": 2,
+     "player": 2
+    },
+    {
+     "sq": 9,
+     "player": 1
+    },
+    {
+     "sq": 0,
+     "player": 2
+    },
+    {
+     "sq": 41,
+     "player": 1
+    },
+    {
+     "sq": 40,
+     "player": 2
+    },
+    {
+     "sq": 10,
+     "player": 1
+    },
+    {
+     "sq": 5,
+     "player": 2
+    },
+    {
+     "sq": 11,
+     "player": 1
+    },
+    {
+     "sq": 25,
+     "player": 2
+    },
+    {
+     "sq": 57,
+     "player": 1
+    },
+    {
+     "sq": 43,
+     "player": 2
+    },
+    {
+     "sq": 51,
+     "player": 1
+    },
+    {
+     "sq": 59,
+     "player": 2
+    },
+    {
+     "sq": 60,
+     "player": 1
+    },
+    {
+     "sq": 1,
+     "player": 2
+    },
+    {
+     "sq": 61,
+     "player": 2
+    },
+    {
+     "sq": 54,
+     "player": 1
+    },
+    {
+     "sq": 32,
+     "player": 2
+    },
+    {
+     "sq": 16,
+     "player": 1
+    },
+    {
+     "sq": 23,
+     "player": 2
+    },
+    {
+     "sq": 22,
+     "player": 1
+    },
+    {
+     "sq": 39,
+     "player": 2
+    },
+    {
+     "sq": 38,
+     "player": 1
+    },
+    {
+     "sq": 24,
+     "player": 2
+    },
+    {
+     "sq": 14,
+     "player": 1
+    },
+    {
+     "sq": 6,
+     "player": 2
+    },
+    {
+     "sq": 63,
+     "player": 2
+    },
+    {
+     "sq": 46,
+     "player": 1
+    },
+    {
+     "sq": 47,
+     "player": 2
+    },
+    {
+     "sq": 55,
+     "player": 1
+    },
+    {
+     "sq": 48,
+     "player": 2
+    },
+    {
+     "sq": 15,
+     "player": 1
+    },
+    {
+     "sq": 7,
+     "player": 2
+    }
+   ]
+  },
+  {
+   "name": "b6の あと おける所が2に へった",
+   "expect": "lostMobility",
+   "childColor": 1,
+   "src": {
+    "file": "fixtures_raw2.txt",
+    "index": 4,
+    "seed": 314290,
+    "child": "greedyCorner",
+    "opp": {
+     "kind": "random",
+     "bad": 0
+    }
+   },
+   "moves": [
+    {
+     "sq": 26,
+     "player": 1
+    },
+    {
+     "sq": 18,
+     "player": 2
+    },
+    {
+     "sq": 19,
+     "player": 1
+    },
+    {
+     "sq": 20,
+     "player": 2
+    },
+    {
+     "sq": 45,
+     "player": 1
+    },
+    {
+     "sq": 25,
+     "player": 2
+    },
+    {
+     "sq": 12,
+     "player": 1
+    },
+    {
+     "sq": 37,
+     "player": 2
+    },
+    {
+     "sq": 17,
+     "player": 1
+    },
+    {
+     "sq": 11,
+     "player": 2
+    },
+    {
+     "sq": 29,
+     "player": 1
+    },
+    {
+     "sq": 43,
+     "player": 2
+    },
+    {
+     "sq": 10,
+     "player": 1
+    },
+    {
+     "sq": 38,
+     "player": 2
+    },
+    {
+     "sq": 51,
+     "player": 1
+    },
+    {
+     "sq": 30,
+     "player": 2
+    },
+    {
+     "sq": 21,
+     "player": 1
+    },
+    {
+     "sq": 44,
+     "player": 2
+    },
+    {
+     "sq": 53,
+     "player": 1
+    },
+    {
+     "sq": 1,
+     "player": 2
+    },
+    {
+     "sq": 39,
+     "player": 1
+    },
+    {
+     "sq": 52,
+     "player": 2
+    },
+    {
+     "sq": 60,
+     "player": 1
+    },
+    {
+     "sq": 9,
+     "player": 2
+    },
+    {
+     "sq": 0,
+     "player": 1
+    },
+    {
+     "sq": 34,
+     "player": 2
+    },
+    {
+     "sq": 33,
+     "player": 1
+    },
+    {
+     "sq": 24,
+     "player": 2
+    },
+    {
+     "sq": 2,
+     "player": 1
+    },
+    {
+     "sq": 31,
+     "player": 2
+    },
+    {
+     "sq": 22,
+     "player": 1
+    },
+    {
+     "sq": 40,
+     "player": 2
+    },
+    {
+     "sq": 41,
+     "player": 1
+    },
+    {
+     "sq": 8,
+     "player": 2
+    },
+    {
+     "sq": 16,
+     "player": 1
+    },
+    {
+     "sq": 48,
+     "player": 2
+    },
+    {
+     "sq": 42,
+     "player": 1
+    },
+    {
+     "sq": 5,
+     "player": 2
+    },
+    {
+     "sq": 32,
+     "player": 1
+    },
+    {
+     "sq": 59,
+     "player": 2
+    },
+    {
+     "sq": 56,
+     "player": 1
+    },
+    {
+     "sq": 62,
+     "player": 2
+    },
+    {
+     "sq": 46,
+     "player": 1
+    },
+    {
+     "sq": 47,
+     "player": 2
+    },
+    {
+     "sq": 50,
+     "player": 1
+    },
+    {
+     "sq": 61,
+     "player": 2
+    },
+    {
+     "sq": 54,
+     "player": 1
+    },
+    {
+     "sq": 13,
+     "player": 2
+    },
+    {
+     "sq": 14,
+     "player": 1
+    },
+    {
+     "sq": 55,
+     "player": 2
+    },
+    {
+     "sq": 63,
+     "player": 1
+    },
+    {
+     "sq": 23,
+     "player": 2
+    },
+    {
+     "sq": 7,
+     "player": 1
+    },
+    {
+     "sq": 58,
+     "player": 2
+    },
+    {
+     "sq": 15,
+     "player": 1
+    },
+    {
+     "sq": 4,
+     "player": 2
+    },
+    {
+     "sq": 57,
+     "player": 1
+    },
+    {
+     "sq": 6,
+     "player": 2
+    },
+    {
+     "sq": 3,
+     "player": 1
+    },
+    {
+     "sq": 49,
+     "player": 2
+    }
+   ]
+  },
+  {
+   "name": "あき12マスで b7に うって14石そん",
+   "expect": "endCount",
+   "childColor": 1,
+   "src": {
+    "file": "fixtures_raw2.txt",
+    "index": 5,
+    "seed": 314307,
+    "child": "greedyCorner",
+    "opp": {
+     "kind": "search",
+     "depth": 1,
+     "eps": 0.3
+    }
+   },
+   "moves": [
+    {
+     "sq": 26,
+     "player": 1
+    },
+    {
+     "sq": 18,
+     "player": 2
+    },
+    {
+     "sq": 19,
+     "player": 1
+    },
+    {
+     "sq": 34,
+     "player": 2
+    },
+    {
+     "sq": 17,
+     "player": 1
+    },
+    {
+     "sq": 10,
+     "player": 2
+    },
+    {
+     "sq": 44,
+     "player": 1
+    },
+    {
+     "sq": 45,
+     "player": 2
+    },
+    {
+     "sq": 2,
+     "player": 1
+    },
+    {
+     "sq": 43,
+     "player": 2
+    },
+    {
+     "sq": 51,
+     "player": 1
+    },
+    {
+     "sq": 20,
+     "player": 2
+    },
+    {
+     "sq": 29,
+     "player": 1
+    },
+    {
+     "sq": 16,
+     "player": 2
+    },
+    {
+     "sq": 12,
+     "player": 1
+    },
+    {
+     "sq": 37,
+     "player": 2
+    },
+    {
+     "sq": 53,
+     "player": 1
+    },
+    {
+     "sq": 54,
+     "player": 2
+    },
+    {
+     "sq": 63,
+     "player": 1
+    },
+    {
+     "sq": 21,
+     "player": 2
+    },
+    {
+     "sq": 11,
+     "player": 1
+    },
+    {
+     "sq": 61,
+     "player": 2
+    },
+    {
+     "sq": 30,
+     "player": 1
+    },
+    {
+     "sq": 13,
+     "player": 2
+    },
+    {
+     "sq": 22,
+     "player": 1
+    },
+    {
+     "sq": 23,
+     "player": 2
+    },
+    {
+     "sq": 46,
+     "player": 1
+    },
+    {
+     "sq": 39,
+     "player": 2
+    },
+    {
+     "sq": 5,
+     "player": 1
+    },
+    {
+     "sq": 42,
+     "player": 2
+    },
+    {
+     "sq": 41,
+     "player": 1
+    },
+    {
+     "sq": 25,
+     "player": 2
+    },
+    {
+     "sq": 47,
+     "player": 1
+    },
+    {
+     "sq": 50,
+     "player": 2
+    },
+    {
+     "sq": 58,
+     "player": 1
+    },
+    {
+     "sq": 40,
+     "player": 2
+    },
+    {
+     "sq": 31,
+     "player": 1
+    },
+    {
+     "sq": 52,
+     "player": 2
+    },
+    {
+     "sq": 60,
+     "player": 1
+    },
+    {
+     "sq": 62,
+     "player": 2
+    },
+    {
+     "sq": 33,
+     "player": 1
+    },
+    {
+     "sq": 55,
+     "player": 2
+    },
+    {
+     "sq": 15,
+     "player": 1
+    },
+    {
+     "sq": 57,
+     "player": 2
+    },
+    {
+     "sq": 56,
+     "player": 1
+    },
+    {
+     "sq": 4,
+     "player": 2
+    },
+    {
+     "sq": 3,
+     "player": 1
+    },
+    {
+     "sq": 59,
+     "player": 2
+    },
+    {
+     "sq": 49,
+     "player": 1
+    },
+    {
+     "sq": 24,
+     "player": 2
+    },
+    {
+     "sq": 9,
+     "player": 1
+    },
+    {
+     "sq": 0,
+     "player": 2
+    },
+    {
+     "sq": 8,
+     "player": 1
+    },
+    {
+     "sq": 38,
+     "player": 2
+    },
+    {
+     "sq": 32,
+     "player": 1
+    },
+    {
+     "sq": 1,
+     "player": 2
+    },
+    {
+     "sq": 48,
+     "player": 1
+    },
+    {
+     "sq": 14,
+     "player": 2
+    },
+    {
+     "sq": 7,
+     "player": 1
+    },
+    {
+     "sq": 6,
+     "player": 2
+    }
+   ]
+  },
+  {
+   "name": "b1で1枚だけ返して大そん（型なし）",
+   "expect": "none",
+   "childColor": 1,
+   "src": {
+    "file": "fixtures_raw2.txt",
+    "index": 6,
+    "seed": 314324,
+    "child": "greedyCorner",
+    "opp": {
+     "kind": "search",
+     "depth": 2,
+     "eps": 0
+    }
+   },
+   "moves": [
+    {
+     "sq": 26,
+     "player": 1
+    },
+    {
+     "sq": 20,
+     "player": 2
+    },
+    {
+     "sq": 13,
+     "player": 1
+    },
+    {
+     "sq": 12,
+     "player": 2
+    },
+    {
+     "sq": 37,
+     "player": 1
+    },
+    {
+     "sq": 42,
+     "player": 2
+    },
+    {
+     "sq": 4,
+     "player": 1
+    },
+    {
+     "sq": 17,
+     "player": 2
+    },
+    {
+     "sq": 49,
+     "player": 1
+    },
+    {
+     "sq": 44,
+     "player": 2
+    },
+    {
+     "sq": 25,
+     "player": 1
+    },
+    {
+     "sq": 56,
+     "player": 2
+    },
+    {
+     "sq": 53,
+     "player": 1
+    },
+    {
+     "sq": 21,
+     "player": 2
+    },
+    {
+     "sq": 29,
+     "player": 1
+    },
+    {
+     "sq": 19,
+     "player": 2
+    },
+    {
+     "sq": 34,
+     "player": 1
+    },
+    {
+     "sq": 22,
+     "player": 2
+    },
+    {
+     "sq": 11,
+     "player": 1
+    },
+    {
+     "sq": 18,
+     "player": 2
+    },
+    {
+     "sq": 33,
+     "player": 1
+    },
+    {
+     "sq": 45,
+     "player": 2
+    },
+    {
+     "sq": 38,
+     "player": 1
+    },
+    {
+     "sq": 30,
+     "player": 2
+    },
+    {
+     "sq": 31,
+     "player": 1
+    },
+    {
+     "sq": 5,
+     "player": 2
+    },
+    {
+     "sq": 6,
+     "player": 1
+    },
+    {
+     "sq": 23,
+     "player": 2
+    },
+    {
+     "sq": 15,
+     "player": 1
+    },
+    {
+     "sq": 61,
+     "player": 2
+    },
+    {
+     "sq": 9,
+     "player": 1
+    },
+    {
+     "sq": 0,
+     "player": 2
+    },
+    {
+     "sq": 1,
+     "player": 1
+    },
+    {
+     "sq": 3,
+     "player": 2
+    },
+    {
+     "sq": 10,
+     "player": 1
+    },
+    {
+     "sq": 7,
+     "player": 2
+    },
+    {
+     "sq": 54,
+     "player": 1
+    },
+    {
+     "sq": 16,
+     "player": 2
+    },
+    {
+     "sq": 50,
+     "player": 1
+    },
+    {
+     "sq": 63,
+     "player": 2
+    },
+    {
+     "sq": 52,
+     "player": 1
+    },
+    {
+     "sq": 58,
+     "player": 2
+    },
+    {
+     "sq": 41,
+     "player": 1
+    },
+    {
+     "sq": 40,
+     "player": 2
+    },
+    {
+     "sq": 57,
+     "player": 1
+    },
+    {
+     "sq": 46,
+     "player": 2
+    },
+    {
+     "sq": 55,
+     "player": 1
+    },
+    {
+     "sq": 43,
+     "player": 2
+    },
+    {
+     "sq": 24,
+     "player": 1
+    },
+    {
+     "sq": 39,
+     "player": 2
+    },
+    {
+     "sq": 51,
+     "player": 1
+    },
+    {
+     "sq": 59,
+     "player": 2
+    },
+    {
+     "sq": 60,
+     "player": 1
+    },
+    {
+     "sq": 32,
+     "player": 2
+    },
+    {
+     "sq": 2,
+     "player": 1
+    },
+    {
+     "sq": 8,
+     "player": 2
+    },
+    {
+     "sq": 14,
+     "player": 1
+    },
+    {
+     "sq": 47,
+     "player": 2
+    },
+    {
+     "sq": 62,
+     "player": 1
+    },
+    {
+     "sq": 48,
+     "player": 2
+    }
+   ]
+  },
+  {
+   "name": "h2で3枚返して そん（型なし）",
+   "expect": "none",
+   "childColor": 1,
+   "src": {
+    "file": "fixtures_raw2.txt",
+    "index": 7,
+    "seed": 314341,
+    "child": "greedyCorner",
+    "opp": {
+     "kind": "search",
+     "depth": 4,
+     "eps": 0
+    }
+   },
+   "moves": [
+    {
+     "sq": 26,
+     "player": 1
+    },
+    {
+     "sq": 34,
+     "player": 2
+    },
+    {
+     "sq": 45,
+     "player": 1
+    },
+    {
+     "sq": 21,
+     "player": 2
+    },
+    {
+     "sq": 33,
+     "player": 1
+    },
+    {
+     "sq": 44,
+     "player": 2
+    },
+    {
+     "sq": 14,
+     "player": 1
+    },
+    {
+     "sq": 20,
+     "player": 2
+    },
+    {
+     "sq": 19,
+     "player": 1
+    },
+    {
+     "sq": 7,
+     "player": 2
+    },
+    {
+     "sq": 52,
+     "player": 1
+    },
+    {
+     "sq": 18,
+     "player": 2
+    },
+    {
+     "sq": 12,
+     "player": 1
+    },
+    {
+     "sq": 42,
+     "player": 2
+    },
+    {
+     "sq": 17,
+     "player": 1
+    },
+    {
+     "sq": 16,
+     "player": 2
+    },
+    {
+     "sq": 50,
+     "player": 1
+    },
+    {
+     "sq": 58,
+     "player": 2
+    },
+    {
+     "sq": 8,
+     "player": 1
+    },
+    {
+     "sq": 0,
+     "player": 2
+    },
+    {
+     "sq": 22,
+     "player": 1
+    },
+    {
+     "sq": 23,
+     "player": 2
+    },
+    {
+     "sq": 13,
+     "player": 1
+    },
+    {
+     "sq": 40,
+     "player": 2
+    },
+    {
+     "sq": 32,
+     "player": 1
+    },
+    {
+     "sq": 43,
+     "player": 2
+    },
+    {
+     "sq": 41,
+     "player": 1
+    },
+    {
+     "sq": 24,
+     "player": 2
+    },
+    {
+     "sq": 11,
+     "player": 1
+    },
+    {
+     "sq": 5,
+     "player": 2
+    },
+    {
+     "sq": 15,
+     "player": 1
+    },
+    {
+     "sq": 51,
+     "player": 2
+    },
+    {
+     "sq": 59,
+     "player": 1
+    },
+    {
+     "sq": 60,
+     "player": 2
+    },
+    {
+     "sq": 29,
+     "player": 1
+    },
+    {
+     "sq": 3,
+     "player": 2
+    },
+    {
+     "sq": 10,
+     "player": 1
+    },
+    {
+     "sq": 25,
+     "player": 2
+    },
+    {
+     "sq": 9,
+     "player": 1
+    },
+    {
+     "sq": 4,
+     "player": 2
+    },
+    {
+     "sq": 53,
+     "player": 1
+    },
+    {
+     "sq": 30,
+     "player": 2
+    },
+    {
+     "sq": 31,
+     "player": 1
+    },
+    {
+     "sq": 37,
+     "player": 2
+    },
+    {
+     "sq": 38,
+     "player": 1
+    },
+    {
+     "sq": 39,
+     "player": 2
+    },
+    {
+     "sq": 46,
+     "player": 1
+    },
+    {
+     "sq": 47,
+     "player": 2
+    },
+    {
+     "sq": 54,
+     "player": 1
+    },
+    {
+     "sq": 2,
+     "player": 2
+    },
+    {
+     "sq": 49,
+     "player": 1
+    },
+    {
+     "sq": 6,
+     "player": 2
+    },
+    {
+     "sq": 1,
+     "player": 1
+    },
+    {
+     "sq": 63,
+     "player": 2
+    },
+    {
+     "sq": 62,
+     "player": 1
+    },
+    {
+     "sq": 56,
+     "player": 2
+    },
+    {
+     "sq": 48,
+     "player": 1
+    },
+    {
+     "sq": 55,
+     "player": 2
+    },
+    {
+     "sq": 61,
+     "player": 2
+    },
+    {
+     "sq": 57,
+     "player": 2
+    }
+   ]
+  },
+  {
+   "name": "かどh1が とれたのに h2へ うった（しろ番）",
+   "expect": "noCorner",
+   "childColor": 2,
+   "src": {
+    "file": "fixtures_raw.txt",
+    "index": 8,
+    "seed": 337916,
+    "child": "greedy",
+    "opp": {
+     "kind": "random",
+     "bad": 0
+    }
+   },
+   "moves": [
+    {
+     "sq": 37,
+     "player": 1
+    },
+    {
+     "sq": 45,
+     "player": 2
+    },
+    {
+     "sq": 19,
+     "player": 1
+    },
+    {
+     "sq": 20,
+     "player": 2
+    },
+    {
+     "sq": 13,
+     "player": 1
+    },
+    {
+     "sq": 38,
+     "player": 2
+    },
+    {
+     "sq": 39,
+     "player": 1
+    },
+    {
+     "sq": 18,
+     "player": 2
+    },
+    {
+     "sq": 21,
+     "player": 1
+    },
+    {
+     "sq": 22,
+     "player": 2
+    },
+    {
+     "sq": 10,
+     "player": 1
+    },
+    {
+     "sq": 29,
+     "player": 2
+    },
+    {
+     "sq": 11,
+     "player": 1
+    },
+    {
+     "sq": 4,
+     "player": 2
+    },
+    {
+     "sq": 12,
+     "player": 1
+    },
+    {
+     "sq": 3,
+     "player": 2
+    },
+    {
+     "sq": 5,
+     "player": 1
+    },
+    {
+     "sq": 47,
+     "player": 2
+    },
+    {
+     "sq": 31,
+     "player": 1
+    },
+    {
+     "sq": 23,
+     "player": 2
+    },
+    {
+     "sq": 26,
+     "player": 1
+    },
+    {
+     "sq": 17,
+     "player": 2
+    },
+    {
+     "sq": 8,
+     "player": 1
+    },
+    {
+     "sq": 6,
+     "player": 2
+    },
+    {
+     "sq": 44,
+     "player": 1
+    },
+    {
+     "sq": 52,
+     "player": 2
+    },
+    {
+     "sq": 30,
+     "player": 1
+    },
+    {
+     "sq": 25,
+     "player": 2
+    },
+    {
+     "sq": 14,
+     "player": 1
+    },
+    {
+     "sq": 43,
+     "player": 2
+    },
+    {
+     "sq": 9,
+     "player": 1
+    },
+    {
+     "sq": 1,
+     "player": 2
+    },
+    {
+     "sq": 16,
+     "player": 1
+    },
+    {
+     "sq": 15,
+     "player": 2
+    },
+    {
+     "sq": 51,
+     "player": 1
+    },
+    {
+     "sq": 59,
+     "player": 2
+    },
+    {
+     "sq": 33,
+     "player": 1
+    },
+    {
+     "sq": 41,
+     "player": 2
+    },
+    {
+     "sq": 32,
+     "player": 1
+    },
+    {
+     "sq": 24,
+     "player": 2
+    },
+    {
+     "sq": 60,
+     "player": 1
+    },
+    {
+     "sq": 61,
+     "player": 2
+    },
+    {
+     "sq": 42,
+     "player": 1
+    },
+    {
+     "sq": 49,
+     "player": 2
+    },
+    {
+     "sq": 34,
+     "player": 1
+    },
+    {
+     "sq": 53,
+     "player": 2
+    },
+    {
+     "sq": 50,
+     "player": 1
+    },
+    {
+     "sq": 40,
+     "player": 2
+    },
+    {
+     "sq": 0,
+     "player": 1
+    },
+    {
+     "sq": 58,
+     "player": 2
+    },
+    {
+     "sq": 54,
+     "player": 1
+    },
+    {
+     "sq": 46,
+     "player": 2
+    },
+    {
+     "sq": 62,
+     "player": 1
+    },
+    {
+     "sq": 63,
+     "player": 2
+    },
+    {
+     "sq": 2,
+     "player": 1
+    },
+    {
+     "sq": 48,
+     "player": 1
+    },
+    {
+     "sq": 57,
+     "player": 2
+    },
+    {
+     "sq": 56,
+     "player": 1
+    },
+    {
+     "sq": 55,
+     "player": 1
+    },
+    {
+     "sq": 7,
+     "player": 1
+    }
+   ]
+  },
+  {
+   "name": "あき7マスで26石そんを した（しろ番）",
+   "expect": "endCount",
+   "childColor": 2,
+   "src": {
+    "file": "fixtures_raw.txt",
+    "index": 9,
+    "seed": 337967,
+    "child": "greedy",
+    "opp": {
+     "kind": "search",
+     "depth": 4,
+     "eps": 0
+    }
+   },
+   "moves": [
+    {
+     "sq": 37,
+     "player": 1
+    },
+    {
+     "sq": 43,
+     "player": 2
+    },
+    {
+     "sq": 42,
+     "player": 1
+    },
+    {
+     "sq": 45,
+     "player": 2
+    },
+    {
+     "sq": 53,
+     "player": 1
+    },
+    {
+     "sq": 41,
+     "player": 2
+    },
+    {
+     "sq": 18,
+     "player": 1
+    },
+    {
+     "sq": 21,
+     "player": 2
+    },
+    {
+     "sq": 51,
+     "player": 1
+    },
+    {
+     "sq": 44,
+     "player": 2
+    },
+    {
+     "sq": 40,
+     "player": 1
+    },
+    {
+     "sq": 49,
+     "player": 2
+    },
+    {
+     "sq": 20,
+     "player": 1
+    },
+    {
+     "sq": 46,
+     "player": 2
+    },
+    {
+     "sq": 56,
+     "player": 1
+    },
+    {
+     "sq": 19,
+     "player": 2
+    },
+    {
+     "sq": 22,
+     "player": 1
+    },
+    {
+     "sq": 58,
+     "player": 2
+    },
+    {
+     "sq": 59,
+     "player": 1
+    },
+    {
+     "sq": 9,
+     "player": 2
+    },
+    {
+     "sq": 29,
+     "player": 1
+    },
+    {
+     "sq": 23,
+     "player": 2
+    },
+    {
+     "sq": 0,
+     "player": 1
+    },
+    {
+     "sq": 61,
+     "player": 2
+    },
+    {
+     "sq": 57,
+     "player": 1
+    },
+    {
+     "sq": 34,
+     "player": 2
+    },
+    {
+     "sq": 25,
+     "player": 1
+    },
+    {
+     "sq": 48,
+     "player": 2
+    },
+    {
+     "sq": 47,
+     "player": 1
+    },
+    {
+     "sq": 50,
+     "player": 2
+    },
+    {
+     "sq": 60,
+     "player": 1
+    },
+    {
+     "sq": 62,
+     "player": 2
+    },
+    {
+     "sq": 63,
+     "player": 1
+    },
+    {
+     "sq": 55,
+     "player": 2
+    },
+    {
+     "sq": 26,
+     "player": 1
+    },
+    {
+     "sq": 33,
+     "player": 2
+    },
+    {
+     "sq": 30,
+     "player": 1
+    },
+    {
+     "sq": 38,
+     "player": 2
+    },
+    {
+     "sq": 13,
+     "player": 1
+    },
+    {
+     "sq": 24,
+     "player": 2
+    },
+    {
+     "sq": 32,
+     "player": 1
+    },
+    {
+     "sq": 52,
+     "player": 2
+    },
+    {
+     "sq": 31,
+     "player": 1
+    },
+    {
+     "sq": 14,
+     "player": 2
+    },
+    {
+     "sq": 39,
+     "player": 1
+    },
+    {
+     "sq": 6,
+     "player": 2
+    },
+    {
+     "sq": 10,
+     "player": 1
+    },
+    {
+     "sq": 1,
+     "player": 2
+    },
+    {
+     "sq": 12,
+     "player": 1
+    },
+    {
+     "sq": 17,
+     "player": 2
+    },
+    {
+     "sq": 7,
+     "player": 1
+    },
+    {
+     "sq": 54,
+     "player": 2
+    },
+    {
+     "sq": 4,
+     "player": 1
+    },
+    {
+     "sq": 5,
+     "player": 2
+    },
+    {
+     "sq": 2,
+     "player": 1
+    },
+    {
+     "sq": 3,
+     "player": 2
+    },
+    {
+     "sq": 15,
+     "player": 1
+    },
+    {
+     "sq": 11,
+     "player": 2
+    },
+    {
+     "sq": 8,
+     "player": 1
+    },
+    {
+     "sq": 16,
+     "player": 2
+    }
+   ]
+  },
+  {
+   "name": "じょうずな打ちて＝悪手なし",
+   "expect": "NOBLUNDER",
+   "childColor": 1,
+   "src": {
+    "file": "fx_noblunder.txt",
+    "index": 0,
+    "seed": 314159,
+    "child": "greedy",
+    "opp": {
+     "kind": "random",
+     "bad": 0
+    }
+   },
+   "moves": [
+    {
+     "sq": 26,
+     "player": 1
+    },
+    {
+     "sq": 34,
+     "player": 2
+    },
+    {
+     "sq": 43,
+     "player": 1
+    },
+    {
+     "sq": 18,
+     "player": 2
+    },
+    {
+     "sq": 25,
+     "player": 1
+    },
+    {
+     "sq": 33,
+     "player": 2
+    },
+    {
+     "sq": 40,
+     "player": 1
+    },
+    {
+     "sq": 52,
+     "player": 2
+    },
+    {
+     "sq": 61,
+     "player": 1
+    },
+    {
+     "sq": 21,
+     "player": 2
+    },
+    {
+     "sq": 11,
+     "player": 1
+    },
+    {
+     "sq": 17,
+     "player": 2
+    },
+    {
+     "sq": 16,
+     "player": 1
+    },
+    {
+     "sq": 24,
+     "player": 2
+    },
+    {
+     "sq": 32,
+     "player": 1
+    },
+    {
+     "sq": 42,
+     "player": 2
+    },
+    {
+     "sq": 41,
+     "player": 1
+    },
+    {
+     "sq": 8,
+     "player": 2
+    },
+    {
+     "sq": 0,
+     "player": 1
+    },
+    {
+     "sq": 10,
+     "player": 2
+    },
+    {
+     "sq": 44,
+     "player": 1
+    },
+    {
+     "sq": 60,
+     "player": 2
+    },
+    {
+     "sq": 59,
+     "player": 1
+    },
+    {
+     "sq": 4,
+     "player": 2
+    },
+    {
+     "sq": 2,
+     "player": 1
+    },
+    {
+     "sq": 9,
+     "player": 2
+    },
+    {
+     "sq": 3,
+     "player": 1
+    },
+    {
+     "sq": 50,
+     "player": 2
+    },
+    {
+     "sq": 5,
+     "player": 1
+    },
+    {
+     "sq": 49,
+     "player": 2
+    },
+    {
+     "sq": 12,
+     "player": 1
+    },
+    {
+     "sq": 13,
+     "player": 2
+    },
+    {
+     "sq": 19,
+     "player": 1
+    },
+    {
+     "sq": 20,
+     "player": 2
+    },
+    {
+     "sq": 56,
+     "player": 1
+    },
+    {
+     "sq": 48,
+     "player": 2
+    },
+    {
+     "sq": 57,
+     "player": 1
+    },
+    {
+     "sq": 58,
+     "player": 1
+    },
+    {
+     "sq": 51,
+     "player": 2
+    },
+    {
+     "sq": 22,
+     "player": 1
+    },
+    {
+     "sq": 6,
+     "player": 2
+    },
+    {
+     "sq": 7,
+     "player": 1
+    },
+    {
+     "sq": 23,
+     "player": 2
+    },
+    {
+     "sq": 30,
+     "player": 1
+    },
+    {
+     "sq": 14,
+     "player": 2
+    },
+    {
+     "sq": 29,
+     "player": 1
+    },
+    {
+     "sq": 38,
+     "player": 2
+    },
+    {
+     "sq": 37,
+     "player": 1
+    },
+    {
+     "sq": 45,
+     "player": 2
+    },
+    {
+     "sq": 47,
+     "player": 1
+    },
+    {
+     "sq": 46,
+     "player": 2
+    },
+    {
+     "sq": 39,
+     "player": 1
+    },
+    {
+     "sq": 31,
+     "player": 2
+    },
+    {
+     "sq": 1,
+     "player": 1
+    },
+    {
+     "sq": 55,
+     "player": 2
+    },
+    {
+     "sq": 15,
+     "player": 1
+    },
+    {
+     "sq": 63,
+     "player": 1
+    },
+    {
+     "sq": 54,
+     "player": 1
+    },
+    {
+     "sq": 53,
+     "player": 1
+    }
+   ]
+  },
+  {
+   "name": "うまったかどの となり g1へ うって そん（型なし）",
+   "expect": "none",
+   "childColor": 1,
+   "src": {
+    "file": "fx_rest2.txt",
+    "seed": 11079291,
+    "child": "greedy",
+    "opp": {
+     "kind": "search",
+     "depth": 6,
+     "eps": 0,
+     "endEmpties": 12
+    }
+   },
+   "moves": [
+    {
+     "sq": 37,
+     "player": 1
+    },
+    {
+     "sq": 43,
+     "player": 2
+    },
+    {
+     "sq": 26,
+     "player": 1
+    },
+    {
+     "sq": 21,
+     "player": 2
+    },
+    {
+     "sq": 51,
+     "player": 1
+    },
+    {
+     "sq": 25,
+     "player": 2
+    },
+    {
+     "sq": 14,
+     "player": 1
+    },
+    {
+     "sq": 59,
+     "player": 2
+    },
+    {
+     "sq": 24,
+     "player": 1
+    },
+    {
+     "sq": 7,
+     "player": 2
+    },
+    {
+     "sq": 44,
+     "player": 1
+    },
+    {
+     "sq": 45,
+     "player": 2
+    },
+    {
+     "sq": 53,
+     "player": 1
+    },
+    {
+     "sq": 46,
+     "player": 2
+    },
+    {
+     "sq": 29,
+     "player": 1
+    },
+    {
+     "sq": 61,
+     "player": 2
+    },
+    {
+     "sq": 55,
+     "player": 1
+    },
+    {
+     "sq": 39,
+     "player": 2
+    },
+    {
+     "sq": 58,
+     "player": 1
+    },
+    {
+     "sq": 18,
+     "player": 2
+    },
+    {
+     "sq": 13,
+     "player": 1
+    },
+    {
+     "sq": 5,
+     "player": 2
+    },
+    {
+     "sq": 30,
+     "player": 1
+    },
+    {
+     "sq": 38,
+     "player": 2
+    },
+    {
+     "sq": 47,
+     "player": 1
+    },
+    {
+     "sq": 63,
+     "player": 2
+    },
+    {
+     "sq": 9,
+     "player": 1
+    },
+    {
+     "sq": 22,
+     "player": 2
+    },
+    {
+     "sq": 60,
+     "player": 1
+    },
+    {
+     "sq": 57,
+     "player": 2
+    },
+    {
+     "sq": 6,
+     "player": 1
+    },
+    {
+     "sq": 0,
+     "player": 2
+    },
+    {
+     "sq": 50,
+     "player": 1
+    },
+    {
+     "sq": 34,
+     "player": 2
+    },
+    {
+     "sq": 33,
+     "player": 1
+    },
+    {
+     "sq": 20,
+     "player": 2
+    },
+    {
+     "sq": 19,
+     "player": 1
+    },
+    {
+     "sq": 52,
+     "player": 2
+    },
+    {
+     "sq": 4,
+     "player": 1
+    },
+    {
+     "sq": 3,
+     "player": 2
+    },
+    {
+     "sq": 17,
+     "player": 1
+    },
+    {
+     "sq": 31,
+     "player": 2
+    },
+    {
+     "sq": 15,
+     "player": 1
+    },
+    {
+     "sq": 23,
+     "player": 2
+    },
+    {
+     "sq": 1,
+     "player": 1
+    },
+    {
+     "sq": 2,
+     "player": 2
+    },
+    {
+     "sq": 54,
+     "player": 1
+    },
+    {
+     "sq": 42,
+     "player": 2
+    },
+    {
+     "sq": 49,
+     "player": 1
+    },
+    {
+     "sq": 12,
+     "player": 2
+    },
+    {
+     "sq": 11,
+     "player": 1
+    },
+    {
+     "sq": 10,
+     "player": 2
+    },
+    {
+     "sq": 41,
+     "player": 1
+    },
+    {
+     "sq": 62,
+     "player": 2
+    },
+    {
+     "sq": 48,
+     "player": 2
+    },
+    {
+     "sq": 16,
+     "player": 2
+    },
+    {
+     "sq": 8,
+     "player": 1
+    },
+    {
+     "sq": 32,
+     "player": 2
+    }
+   ]
+  },
+  {
+   "name": "しきい値をこえる悪手が1つも無い局",
+   "expect": "NOBLUNDER",
+   "childColor": 1,
+   "src": {
+    "file": "fx_rest2.txt",
+    "seed": 11079371,
+    "child": "greedyCorner",
+    "opp": {
+     "kind": "search",
+     "depth": 1,
+     "eps": 0.3
+    }
+   },
+   "moves": [
+    {
+     "sq": 37,
+     "player": 1
+    },
+    {
+     "sq": 45,
+     "player": 2
+    },
+    {
+     "sq": 44,
+     "player": 1
+    },
+    {
+     "sq": 43,
+     "player": 2
+    },
+    {
+     "sq": 53,
+     "player": 1
+    },
+    {
+     "sq": 62,
+     "player": 2
+    },
+    {
+     "sq": 42,
+     "player": 1
+    },
+    {
+     "sq": 29,
+     "player": 2
+    },
+    {
+     "sq": 21,
+     "player": 1
+    },
+    {
+     "sq": 34,
+     "player": 2
+    },
+    {
+     "sq": 61,
+     "player": 1
+    },
+    {
+     "sq": 60,
+     "player": 2
+    },
+    {
+     "sq": 26,
+     "player": 1
+    },
+    {
+     "sq": 54,
+     "player": 2
+    },
+    {
+     "sq": 63,
+     "player": 1
+    },
+    {
+     "sq": 47,
+     "player": 2
+    },
+    {
+     "sq": 59,
+     "player": 1
+    },
+    {
+     "sq": 18,
+     "player": 2
+    },
+    {
+     "sq": 9,
+     "player": 1
+    }
+   ]
+  },
+  {
+   "name": "b6で b7を じぶんの色にして あいてに a8を あけた",
+   "expect": "gaveCorner",
+   "childColor": 1,
+   "src": {
+    "file": "fx_rest3.txt",
+    "seed": 22095100,
+    "child": "greedy",
+    "opp": {
+     "kind": "search",
+     "depth": 1,
+     "eps": 0.3
+    }
+   },
+   "moves": [
+    {
+     "sq": 44,
+     "player": 1
+    },
+    {
+     "sq": 43,
+     "player": 2
+    },
+    {
+     "sq": 18,
+     "player": 1
+    },
+    {
+     "sq": 37,
+     "player": 2
+    },
+    {
+     "sq": 42,
+     "player": 1
+    },
+    {
+     "sq": 50,
+     "player": 2
+    },
+    {
+     "sq": 38,
+     "player": 1
+    },
+    {
+     "sq": 19,
+     "player": 2
+    },
+    {
+     "sq": 57,
+     "player": 1
+    },
+    {
+     "sq": 17,
+     "player": 2
+    },
+    {
+     "sq": 11,
+     "player": 1
+    },
+    {
+     "sq": 4,
+     "player": 2
+    },
+    {
+     "sq": 16,
+     "player": 1
+    },
+    {
+     "sq": 51,
+     "player": 2
+    },
+    {
+     "sq": 26,
+     "player": 1
+    },
+    {
+     "sq": 49,
+     "player": 2
+    },
+    {
+     "sq": 58,
+     "player": 1
+    },
+    {
+     "sq": 21,
+     "player": 2
+    },
+    {
+     "sq": 41,
+     "player": 1
+    },
+    {
+     "sq": 56,
+     "player": 2
+    },
+    {
+     "sq": 3,
+     "player": 1
+    },
+    {
+     "sq": 45,
+     "player": 2
+    },
+    {
+     "sq": 46,
+     "player": 1
+    },
+    {
+     "sq": 2,
+     "player": 2
+    },
+    {
+     "sq": 14,
+     "player": 1
+    },
+    {
+     "sq": 7,
+     "player": 2
+    },
+    {
+     "sq": 34,
+     "player": 1
+    },
+    {
+     "sq": 20,
+     "player": 2
+    },
+    {
+     "sq": 22,
+     "player": 1
+    },
+    {
+     "sq": 12,
+     "player": 2
+    },
+    {
+     "sq": 40,
+     "player": 1
+    },
+    {
+     "sq": 30,
+     "player": 2
+    },
+    {
+     "sq": 23,
+     "player": 1
+    },
+    {
+     "sq": 25,
+     "player": 2
+    },
+    {
+     "sq": 9,
+     "player": 1
+    },
+    {
+     "sq": 59,
+     "player": 2
+    },
+    {
+     "sq": 10,
+     "player": 1
+    },
+    {
+     "sq": 0,
+     "player": 2
+    },
+    {
+     "sq": 24,
+     "player": 1
+    },
+    {
+     "sq": 47,
+     "player": 2
+    },
+    {
+     "sq": 52,
+     "player": 1
+    },
+    {
+     "sq": 39,
+     "player": 2
+    },
+    {
+     "sq": 54,
+     "player": 1
+    },
+    {
+     "sq": 55,
+     "player": 2
+    },
+    {
+     "sq": 5,
+     "player": 1
+    },
+    {
+     "sq": 63,
+     "player": 2
+    },
+    {
+     "sq": 1,
+     "player": 1
+    },
+    {
+     "sq": 29,
+     "player": 2
+    },
+    {
+     "sq": 62,
+     "player": 1
+    },
+    {
+     "sq": 6,
+     "player": 2
+    },
+    {
+     "sq": 13,
+     "player": 1
+    },
+    {
+     "sq": 60,
+     "player": 2
+    },
+    {
+     "sq": 53,
+     "player": 1
+    },
+    {
+     "sq": 31,
+     "player": 2
+    },
+    {
+     "sq": 61,
+     "player": 1
+    },
+    {
+     "sq": 8,
+     "player": 2
+    },
+    {
+     "sq": 15,
+     "player": 1
+    },
+    {
+     "sq": 32,
+     "player": 2
+    },
+    {
+     "sq": 33,
+     "player": 1
+    },
+    {
+     "sq": 48,
+     "player": 2
+    }
+   ]
+  }
+ ]
+}

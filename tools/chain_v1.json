@@ -1,0 +1,290 @@
+{
+ "games": 200,
+ "table": [
+  {
+   "spec": "C:bad=1,badDepth=4",
+   "elo": 0.0
+  },
+  {
+   "spec": "C:bad=0.95,badDepth=4",
+   "elo": 63.2
+  },
+  {
+   "spec": "C:bad=0.9,badDepth=4",
+   "elo": 98.1
+  },
+  {
+   "spec": "C:bad=0.85,badDepth=4",
+   "elo": 98.1
+  },
+  {
+   "spec": "C:bad=0.8,badDepth=4",
+   "elo": 140.0
+  },
+  {
+   "spec": "C:bad=0.7,badDepth=4",
+   "elo": 201.4
+  },
+  {
+   "spec": "C:bad=0.6,badDepth=4",
+   "elo": 259.3
+  },
+  {
+   "spec": "C:bad=0.5,badDepth=4",
+   "elo": 266.2
+  },
+  {
+   "spec": "C:bad=0.4,badDepth=4",
+   "elo": 274.9
+  },
+  {
+   "spec": "C:bad=0.3,badDepth=4",
+   "elo": 349.0
+  },
+  {
+   "spec": "C:bad=0.2,badDepth=4",
+   "elo": 383.8
+  },
+  {
+   "spec": "C:bad=0.1,badDepth=4",
+   "elo": 403.0
+  },
+  {
+   "spec": "C:rand=1",
+   "elo": 425.6
+  },
+  {
+   "spec": "C:depth=6,end=12,eps=0.92",
+   "elo": 540.8
+  },
+  {
+   "spec": "C:depth=6,end=12,eps=0.86",
+   "elo": 604.0
+  },
+  {
+   "spec": "C:depth=6,end=12,eps=0.8",
+   "elo": 654.8
+  },
+  {
+   "spec": "C:depth=6,end=12,eps=0.74",
+   "elo": 707.3
+  },
+  {
+   "spec": "C:depth=6,end=12,eps=0.68",
+   "elo": 779.5
+  },
+  {
+   "spec": "C:depth=6,end=12,eps=0.62",
+   "elo": 816.1
+  },
+  {
+   "spec": "C:depth=6,end=12,eps=0.56",
+   "elo": 908.6
+  },
+  {
+   "spec": "C:depth=6,end=12,eps=0.5",
+   "elo": 901.6
+  },
+  {
+   "spec": "C:depth=6,end=12,eps=0.44",
+   "elo": 963.1
+  },
+  {
+   "spec": "C:depth=6,end=12,eps=0.38",
+   "elo": 1031.7
+  },
+  {
+   "spec": "C:depth=6,end=12,eps=0.32",
+   "elo": 1105.8
+  },
+  {
+   "spec": "C:depth=6,end=12,eps=0.26",
+   "elo": 1124.9
+  },
+  {
+   "spec": "C:depth=6,end=12,eps=0.21",
+   "elo": 1154.5
+  },
+  {
+   "spec": "C:depth=6,end=12,eps=0.16",
+   "elo": 1207.0
+  },
+  {
+   "spec": "C:depth=6,end=12,eps=0.12",
+   "elo": 1305.1
+  },
+  {
+   "spec": "C:depth=6,eps=0",
+   "elo": 1408.8
+  },
+  {
+   "spec": "C:depth=6,end=8,eps=0",
+   "elo": 1448.9
+  },
+  {
+   "spec": "C:depth=6,end=10,eps=0",
+   "elo": 1499.7
+  },
+  {
+   "spec": "C:depth=6,end=12,eps=0",
+   "elo": 1555.8
+  }
+ ],
+ "links": [
+  [
+   "C:bad=0.95,badDepth=4",
+   "C:bad=1,badDepth=4",
+   0.59
+  ],
+  [
+   "C:bad=0.9,badDepth=4",
+   "C:bad=0.95,badDepth=4",
+   0.55
+  ],
+  [
+   "C:bad=0.85,badDepth=4",
+   "C:bad=0.9,badDepth=4",
+   0.5
+  ],
+  [
+   "C:bad=0.8,badDepth=4",
+   "C:bad=0.85,badDepth=4",
+   0.56
+  ],
+  [
+   "C:bad=0.7,badDepth=4",
+   "C:bad=0.8,badDepth=4",
+   0.5875
+  ],
+  [
+   "C:bad=0.6,badDepth=4",
+   "C:bad=0.7,badDepth=4",
+   0.5825
+  ],
+  [
+   "C:bad=0.5,badDepth=4",
+   "C:bad=0.6,badDepth=4",
+   0.51
+  ],
+  [
+   "C:bad=0.4,badDepth=4",
+   "C:bad=0.5,badDepth=4",
+   0.5125
+  ],
+  [
+   "C:bad=0.3,badDepth=4",
+   "C:bad=0.4,badDepth=4",
+   0.605
+  ],
+  [
+   "C:bad=0.2,badDepth=4",
+   "C:bad=0.3,badDepth=4",
+   0.55
+  ],
+  [
+   "C:bad=0.1,badDepth=4",
+   "C:bad=0.2,badDepth=4",
+   0.5275
+  ],
+  [
+   "C:rand=1",
+   "C:bad=0.1,badDepth=4",
+   0.5325
+  ],
+  [
+   "C:depth=6,end=12,eps=0.92",
+   "C:rand=1",
+   0.66
+  ],
+  [
+   "C:depth=6,end=12,eps=0.86",
+   "C:depth=6,end=12,eps=0.92",
+   0.59
+  ],
+  [
+   "C:depth=6,end=12,eps=0.8",
+   "C:depth=6,end=12,eps=0.86",
+   0.5725
+  ],
+  [
+   "C:depth=6,end=12,eps=0.74",
+   "C:depth=6,end=12,eps=0.8",
+   0.575
+  ],
+  [
+   "C:depth=6,end=12,eps=0.68",
+   "C:depth=6,end=12,eps=0.74",
+   0.6025
+  ],
+  [
+   "C:depth=6,end=12,eps=0.62",
+   "C:depth=6,end=12,eps=0.68",
+   0.5525
+  ],
+  [
+   "C:depth=6,end=12,eps=0.56",
+   "C:depth=6,end=12,eps=0.62",
+   0.63
+  ],
+  [
+   "C:depth=6,end=12,eps=0.5",
+   "C:depth=6,end=12,eps=0.56",
+   0.49
+  ],
+  [
+   "C:depth=6,end=12,eps=0.44",
+   "C:depth=6,end=12,eps=0.5",
+   0.5875
+  ],
+  [
+   "C:depth=6,end=12,eps=0.38",
+   "C:depth=6,end=12,eps=0.44",
+   0.5975
+  ],
+  [
+   "C:depth=6,end=12,eps=0.32",
+   "C:depth=6,end=12,eps=0.38",
+   0.605
+  ],
+  [
+   "C:depth=6,end=12,eps=0.26",
+   "C:depth=6,end=12,eps=0.32",
+   0.5275
+  ],
+  [
+   "C:depth=6,end=12,eps=0.21",
+   "C:depth=6,end=12,eps=0.26",
+   0.5425
+  ],
+  [
+   "C:depth=6,end=12,eps=0.16",
+   "C:depth=6,end=12,eps=0.21",
+   0.575
+  ],
+  [
+   "C:depth=6,end=12,eps=0.12",
+   "C:depth=6,end=12,eps=0.16",
+   0.6375
+  ],
+  [
+   "C:depth=6,eps=0",
+   "C:depth=6,end=12,eps=0.12",
+   0.645
+  ],
+  [
+   "C:depth=6,end=8,eps=0",
+   "C:depth=6,eps=0",
+   0.5575
+  ],
+  [
+   "C:depth=6,end=10,eps=0",
+   "C:depth=6,end=8,eps=0",
+   0.5725
+  ],
+  [
+   "C:depth=6,end=12,eps=0",
+   "C:depth=6,end=10,eps=0",
+   0.58
+  ]
+ ]
+}

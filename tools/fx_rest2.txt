@@ -1,0 +1,38 @@
+=========================================================
+判定器の型 = gaveCorner（かどを わたした）
+こども = greedy / 色 = くろ # / あいて = {"kind":"search","depth":6,"eps":0,"endEmpties":12} / seed = 11079291
+手数 ply=24  うったマス=h6  そん=100(mid)  そのとき おけた手=10  ひっくり返した数=3  あき=36  この局の悪手=7個
+! = こどもが うったところ   * = そのあと あいてが とった かど
+   a b c d e f g h
+ 1 . . . . . O . O 
+ 2 . . . . . O O . 
+ 3 . . O . . O . . 
+ 4 # # # O # # # . 
+ 5 . . . # O O O O 
+ 6 . . . O # O O ! 
+ 7 . . . # . O . # 
+ 8 . . # O . O . * 
+このあとの4手 = Oh8 #b2 Og3 #e8
+事実 = じぶんが取れたかど=[] / うったマスはかどの となりか=いいえ / あいてに開いたかど=[]→[h8] / 4手いないに あいてが取ったかど=h8 / あいてが1手返した時 自分に残る手=9 / 手数=24 / ひっくり返し=3 / 場面=mid
+文 = 「この てで あいてに かどを あげた」／「つぎは かどを わたさない てを さがそう」
+JSON={"judged":"gaveCorner","childColor":1,"child":"greedy","opp":{"kind":"search","depth":6,"eps":0,"endEmpties":12},"seed":11079291,"ply":24,"sq":47,"loss":100,"phase":"mid","moves":[{"sq":37,"player":1},{"sq":43,"player":2},{"sq":26,"player":1},{"sq":21,"player":2},{"sq":51,"player":1},{"sq":25,"player":2},{"sq":14,"player":1},{"sq":59,"player":2},{"sq":24,"player":1},{"sq":7,"player":2},{"sq":44,"player":1},{"sq":45,"player":2},{"sq":53,"player":1},{"sq":46,"player":2},{"sq":29,"player":1},{"sq":61,"player":2},{"sq":55,"player":1},{"sq":39,"player":2},{"sq":58,"player":1},{"sq":18,"player":2},{"sq":13,"player":1},{"sq":5,"player":2},{"sq":30,"player":1},{"sq":38,"player":2},{"sq":47,"player":1},{"sq":63,"player":2},{"sq":9,"player":1},{"sq":22,"player":2},{"sq":60,"player":1},{"sq":57,"player":2},{"sq":6,"player":1},{"sq":0,"player":2},{"sq":50,"player":1},{"sq":34,"player":2},{"sq":33,"player":1},{"sq":20,"player":2},{"sq":19,"player":1},{"sq":52,"player":2},{"sq":4,"player":1},{"sq":3,"player":2},{"sq":17,"player":1},{"sq":31,"player":2},{"sq":15,"player":1},{"sq":23,"player":2},{"sq":1,"player":1},{"sq":2,"player":2},{"sq":54,"player":1},{"sq":42,"player":2},{"sq":49,"player":1},{"sq":12,"player":2},{"sq":11,"player":1},{"sq":10,"player":2},{"sq":41,"player":1},{"sq":62,"player":2},{"sq":48,"player":2},{"sq":16,"player":2},{"sq":8,"player":1},{"sq":32,"player":2}]}
+=========================================================
+判定器の型 = tookTooMany（たくさん とりすぎ）
+こども = greedyCorner / 色 = くろ # / あいて = {"kind":"search","depth":1,"eps":0.3} / seed = 11079371
+手数 ply=10  うったマス=f8  そん=28(mid)  そのとき おけた手=7  ひっくり返した数=4  あき=50  この局の悪手=1個
+! = こどもが うったところ   * = そのあと あいてが とった かど
+   a b c d e f g h
+ 1 . . . . . . . . 
+ 2 . . . . . . . . 
+ 3 . . . . . # . . 
+ 4 . . . O # O . . 
+ 5 . . O O O O . . 
+ 6 . . # # # O . . 
+ 7 . . . . . O . . 
+ 8 . . . . . ! O . 
+このあとの4手 = Oe8 #c4 Og7 #h8
+事実 = じぶんが取れたかど=[] / うったマスはかどの となりか=いいえ / あいてに開いたかど=[]→[] / 4手いないに あいてが取ったかど=- / あいてが1手返した時 自分に残る手=5 / 手数=10 / ひっくり返し=4 / 場面=mid
+文 = 「ここで たくさん とりすぎた」／「さいしょは すこしだけ とろう」
+JSON={"judged":"tookTooMany","childColor":1,"child":"greedyCorner","opp":{"kind":"search","depth":1,"eps":0.3},"seed":11079371,"ply":10,"sq":61,"loss":28,"phase":"mid","moves":[{"sq":37,"player":1},{"sq":45,"player":2},{"sq":44,"player":1},{"sq":43,"player":2},{"sq":53,"player":1},{"sq":62,"player":2},{"sq":42,"player":1},{"sq":29,"player":2},{"sq":21,"player":1},{"sq":34,"player":2},{"sq":61,"player":1},{"sq":60,"player":2},{"sq":26,"player":1},{"sq":54,"player":2},{"sq":63,"player":1},{"sq":47,"player":2},{"sq":59,"player":1},{"sq":18,"player":2},{"sq":9,"player":1}]}
+
+見つかった型 = {"gaveCorner":1,"tookTooMany":1}
