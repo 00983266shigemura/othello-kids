@@ -106,12 +106,18 @@ def main():
     print("P3(a) 色の偏り（上の段の勝ち数÷局数・引き分けは含めない）＝"
           "くろ番 %.3f（%d/%d）／しろ番 %.3f（%d/%d）"
           % (bw / bn, bw, bn, ww / wn, ww, wn))
-    print("P3(b) 単調でない所【設計書の文言どおり＝1度でも上がったら違反】 = %d件 %s"
+    # P3(b) の述語＝2026-09-21 しげ裁定「Aで」で次の形に確定した。
+    #   各段の勝率が単調に下がる（ただし測定のばらつき＝標準誤差×2 の内側の上昇は違反に数えない）
+    #   かつ レベル1〜3は代理が70%以上勝てる
+    b1, b2 = not ng_mono, not ng_low
+    print("P3(b)【2026-09-21しげ承認の述語】 = %s" % ("合格" if (b1 and b2) else "不合格"))
+    print("   ①ばらつきを超えた上昇 = %d件 %s → %s"
+          % (len(ng_mono), ng_mono if ng_mono else "", "OK" if b1 else "NG"))
+    print("   ②L1〜L3で代理が70%%以上勝てるか（70%%未満 = %d件 %s） → %s"
+          % (len(ng_low), ng_low if ng_low else "", "OK" if b2 else "NG"))
+    print("  ↓合否ではなく参考値")
+    print("P3(b) 旧文言（1度でも上がったら違反）では %d件 %s"
           % (len(ng_mono_strict), ng_mono_strict if ng_mono_strict else ""))
-    print("P3(b) 単調でない所【ばらつき2×標準誤差を超えた上昇だけ数える・"
-          "＝しげ未承認の読み替え】 = %d件 %s"
-          % (len(ng_mono), ng_mono if ng_mono else ""))
-    print("P3(b) L1〜L3で70%%未満 = %d件 %s" % (len(ng_low), ng_low if ng_low else ""))
 
 
 if __name__ == "__main__":
