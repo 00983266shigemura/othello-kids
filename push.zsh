@@ -28,13 +28,17 @@ REPO_DIR="/Users/shigemurasatoshi/dev/othello-kids"
 ORIGIN_URL="https://github.com/00983266shigemura/othello-kids.git"
 PAGES_URL="https://00983266shigemura.github.io/othello-kids/"
 
-print "== 1/5 ページが部品どおりか（手で直した跡が無いか）を機械で見る =="
+print "== 1/5 記録ずみの中身と部品が一致するかを機械で見る =="
 /usr/bin/python3 "${REPO_DIR}/tools/build_app.py" > /dev/null
 if [ $? -ne 0 ]; then
   print "組み立てに失敗しました。何も公開していません。CCへ知らせてください。"
   exit 1
 fi
 DIRTY=$("$GIT" -C "$REPO_DIR" status --porcelain)
+if [ $? -ne 0 ]; then
+  print "中身の見比べができませんでした。安全のため公開を中止します。CCへ知らせてください。"
+  exit 1
+fi
 if [ -n "$DIRTY" ]; then
   print "部品と ページ が食い違っています（または未保存の直しがあります）。"
   print "安全のため公開を中止しました。次の行をCCへ貼ってください。"
@@ -49,6 +53,12 @@ print "== 2/5 公開先の登録を確かめる =="
 if "$GIT" -C "$REPO_DIR" remote get-url origin > /dev/null 2>&1; then
   NOW=$("$GIT" -C "$REPO_DIR" remote get-url origin)
   print "登録ずみ = ${NOW}"
+  if [ "$NOW" != "$ORIGIN_URL" ]; then
+    print "登録されている公開先が、この台本の知っている場所と違います。"
+    print "この台本が知っている場所 = ${ORIGIN_URL}"
+    print "安全のため公開を中止しました。上の2行をCCへ貼ってください。"
+    exit 1
+  fi
 else
   "$GIT" -C "$REPO_DIR" remote add origin "$ORIGIN_URL"
   if [ $? -ne 0 ]; then
@@ -62,10 +72,12 @@ print "== 3/5 公開へ反映（push） =="
 "$GIT" -C "$REPO_DIR" push -u origin main
 if [ $? -ne 0 ]; then
   print ""
-  print "反映に失敗しました。よくある原因は2つです。"
+  print "反映に失敗しました。よくある原因は3つです。"
   print " ① GitHub に othello-kids の置き場をまだ作っていない"
   print "    → ブラウザで作ってから、この台本をもう一度実行してください"
-  print " ② 置き場の名前や所有者がちがう"
+  print " ② 置き場を作るときに README などを一緒に足した"
+  print "    → 中身がぶつかっています。上の行をそのままCCへ貼ってください"
+  print " ③ 置き場の名前や所有者がちがう"
   print "    → 上の行をそのままCCへ貼ってください"
   exit 1
 fi
