@@ -70,6 +70,19 @@ def check_es5(paths):
         sys.exit('ES5 でない書き方があるので 組み立てを止めました')
 
 
+def check_icon():
+    """ホーム画面の絵が こわれていないか、組み立てるたびに見る。
+    おかえりクエストで こわれた絵（中身の照合値が合わない）を配ってしまった事故があるため
+    （2026-08-19 commit b478010）。絵は tools/make_icon.py で作り直せる。"""
+    cmd = [sys.executable, os.path.join(HERE, 'make_icon.py'), '--check']
+    r = subprocess.run(cmd, capture_output=True, text=True)
+    sys.stdout.write(r.stdout)
+    if r.returncode != 0:
+        sys.stdout.write(r.stderr)
+        sys.exit('ホーム画面の絵に問題があるので 組み立てを止めました'
+                 '（python3 tools/make_icon.py で作り直せます）')
+
+
 def app_version(ui_src):
     m = re.search(r'OKUI\.APP_VERSION\s*=\s*(\d+)\s*;', ui_src)
     if not m:
@@ -84,6 +97,7 @@ def build(silent):
         srcs[mark] = read(os.path.join(HERE, name))
 
     check_es5([os.path.join(HERE, name) for _, name in PARTS])
+    check_icon()
 
     ver = app_version(srcs['__UI__'])
     html = tpl

@@ -15,7 +15,9 @@
 
 ```
 index.html           アプリ本体（1枚で完結）。build_app.py が組み立てる＝手で直さない
+icon.png             ホーム画面の絵（180×180・透明なし）。make_icon.py が作る＝手で置き換えない
 version.txt          版数。index.html の中の APP_VERSION と同じ数字（自動更新の合図）
+push.zsh             公開へ反映する台本。しげが1行で実行する
 hayasa/index.html    工程0.5「はやさ はかり」＝実機の速さを1回測るページ（役目は済み）
 tools/               中身（部品）と、Macで測る・試すための道具
 ```
@@ -34,6 +36,7 @@ tools/               中身（部品）と、Macで測る・試すための道�
 | `tools/text.js` | 画面に出すことば を ぜんぶ ここに集めてある |
 | `tools/ui.js` | 画面・そうさ・おと。相手の読みと採点を setTimeout(0) で少しずつ進める |
 | `tools/app_template.html` | HTMLの骨と見た目（CSS）。部品を差し込む穴が開いている |
+| `tools/make_icon.py` | ホーム画面の絵を作る唯一の道具。色はテンプレートと同じ名札を使う |
 
 古いSafariで動く書き方（ES5）だけで書く。`let` `const` アロー関数 テンプレート文字列 `?.` `??` を
 1文字でも混ぜるとファイル全体が動かない（実測）。組み立てのたびに機械で検査している。
@@ -50,6 +53,12 @@ python3 /Users/shigemurasatoshi/dev/othello-kids/tools/build_app.py
 
 ```bash
 python3 /Users/shigemurasatoshi/dev/othello-kids/tools/build_app.py --silent _test.html
+```
+
+ホーム画面の絵を作り直す（色や形を変えたとき）。
+
+```bash
+python3 /Users/shigemurasatoshi/dev/othello-kids/tools/make_icon.py
 ```
 
 画面の文字に漢字が無いか・絵文字の世代（判定述語P7）。

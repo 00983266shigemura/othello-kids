@@ -4,6 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<!-- ホーム画面のアイコンの下に出る名前。長いと途中で切れるので短くする -->
+<meta name="apple-mobile-web-app-title" content="オセロ">
+<!-- ホーム画面の絵。tools/make_icon.py だけが作る＝手で置き換えない -->
+<link rel="apple-touch-icon" sizes="180x180" href="icon.png">
 <title>つよくなるオセロ</title>
 <style>
   /* いろ＝赤と緑を「意味の区別」に使わない（設計書4.9章）。
@@ -1905,7 +1910,7 @@ var OKUI = {};
 
   /* このファイルを直したら この数字を +1 する。version.txt にも同じ数字が書かれる
      （build_app.py が自動で書く）＝古いファイルを持っている端末が取り直せる。 */
-  OKUI.APP_VERSION = 1;
+  OKUI.APP_VERSION = 2;
 
   /* まけた わけの しらべ を、何ミリ秒ぶん まとめて 進めてから 息をつぐか。
      0 にすると かたまりは いちばん小さくなるが、60手ぶん 待ち時間が積み上がる。
