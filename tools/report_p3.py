@@ -70,9 +70,20 @@ def main():
         print("%-6s %14s %16s" % ("L%d" % lv, cells[0], cells[1]))
 
     print("\n--- 判定 ---")
-    print("P3(a)【設計書の文言どおり＝隣り合う各組が60%%以上】 = %s（60%%未満 %d件）%s"
-          % ("合格" if not ng_a else "不合格", len(ng_a), ng_a if ng_a else ""))
-    print("  ↓以下は合否ではなく、なぜ満たせないかを見るための参考値")
+    # P3(a) の述語＝2026-09-21 しげ裁定「問い1もA案で承認」で次の形に確定した。
+    #   ①19組の平均勝率が60%以上  ②どの組も測り値50%以上（＝逆転が1つも無い）
+    # 旧文言（各組が60%以上）は20段では満たしようがないことが計算で確定したため置き換えた。
+    avg = sum(pair[k]["aScore"] for k in pair) / len(pair)
+    worst = min(pair[k]["aScore"] for k in pair)
+    worst_pair = min(pair, key=lambda k: pair[k]["aScore"])
+    c1, c2 = avg >= 0.60, worst >= 0.50
+    print("P3(a)【2026-09-21しげ承認の述語】 = %s" % ("合格" if (c1 and c2) else "不合格"))
+    print("   ①19組の平均勝率 %.3f ≧ 0.60 → %s" % (avg, "OK" if c1 else "NG"))
+    print("   ②いちばん低い組 L%d→L%d = %.3f ≧ 0.50（逆転ゼロ） → %s"
+          % (worst_pair, worst_pair + 1, worst, "OK" if c2 else "NG"))
+    print("  ↓以下は合否ではなく参考値（旧文言での状況と、その理由）")
+    print("P3(a) 旧文言（隣り合う各組が60%%以上）では 60%%未満 %d件 %s"
+          % (len(ng_a), ng_a if ng_a else ""))
     print("P3(a) 逆転を否定できない段（95%%はんいの下限が5割以下） = %d件 %s"
           % (len(ng_rev), ng_rev if ng_rev else ""))
     print("P3(a) 19段の平均勝率 = %.3f"

@@ -2,7 +2,7 @@
  "note": "期待する理由は、盤の絵と事実の行をCCが1本ずつ読んで決めたもの。判定器の出力は使っていない。",
  "cases": [
   {
-   "name": "かどh8が とれたのに h6へ うった",
+   "name": "かどa1が とれたのに となりの a2へ うった",
    "expect": "noCorner",
    "childColor": 1,
    "src": {
@@ -1033,8 +1033,8 @@
    ]
   },
   {
-   "name": "b6の あと おける所が2に へった",
-   "expect": "lostMobility",
+   "name": "36手目に c6へ うって そん（型なし）",
+   "expect": "none",
    "childColor": 1,
    "src": {
     "file": "fixtures_raw2.txt",

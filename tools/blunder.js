@@ -26,7 +26,7 @@ var OKB = {};
      そこだけ損の単位が変わる（終局の値は石差×1000で、途中の見積りは数百のため）。
      実測＝じょうずな打ちての手に、あき10マスでは最悪53,541の「損」が出た。
      あき12マスにすると中盤の読みは終局に届かず、最悪156に収まる。よって12マスにする。 */
-  var JUDGE_DEPTH = 5;
+  var JUDGE_DEPTH = 4;
   var JUDGE_END_EMPTIES = 12;
 
   /* しきい値。終盤は石の数そのもの、中盤は見積りの目もり。
@@ -38,8 +38,8 @@ var OKB = {};
      4石にすると出る理由の45.8%が「さいごの かぞえ」に偏った（実測 type_dist.js）。
      8石にすると「かど」の話が46.9%・「さいごの かぞえ」が18.8%になり、
      終盤の手数の割合（子の手の14%）と釣り合う。 */
-  var END_LOSS_MIN = 8;    /* 終盤＝最善手より8石以上そんをしたら悪手 */
-  var MID_LOSS_MIN = 60;   /* 中盤＝見積りで60目もり以上そんをしたら悪手 */
+  var END_LOSS_MIN = 12;   /* 終盤＝最善手より12石以上そんをしたら悪手 */
+  var MID_LOSS_MIN = 100;  /* 中盤＝見積りで100目もり以上そんをしたら悪手 */
 
   OKB.JUDGE_DEPTH = JUDGE_DEPTH;
   OKB.JUDGE_END_EMPTIES = JUDGE_END_EMPTIES;
@@ -133,7 +133,7 @@ var OKB = {};
      時間ではなく読む局面の数で決める＝端末に依らない。
      換算は工程0.5の実測（中盤＝1秒20,276局面／終盤＝1秒166,938局面）。
      1局ぶんの上限＝実機で約3秒ぶん。使い切ったら、そこから先の手は採点しない。 */
-  var JUDGE_MS_CAP = 8000;
+  var JUDGE_MS_CAP = 5000;
   /* 終盤の1手ぶんの上限（局面の数）＝実機で約0.9秒 */
   var END_MOVE_BUDGET = 150000;
   var IPAD_MID_NPS = 20276;
@@ -151,6 +151,8 @@ var OKB = {};
   OKB.judge = function (moves, childColor) {
     OKB.lastCost = { mid: 0, end: 0 };
     OKB.lastCappedAt = -1;
+    /* 採点のあいだだけ、中盤の読みの終局値を ふつうの見積り に揃える（単位をそろえるため） */
+    OK.setMidTerminalAsEval(true);
     var nBefore, spentMs = 0;
     var b = OK.initBoard(), p = OK.BLACK;
     var blunders = [], mi = 0, legal, sq, empties, best, played, loss, phase, rec;
@@ -242,6 +244,7 @@ var OKB = {};
       mi++;
     }
 
+    OK.setMidTerminalAsEval(false);   /* 採点はここまで＝対局用の見方へ戻す */
     if (blunders.length === 0) { return { blunders: [], worst: null }; }
 
     var i, worst = blunders[0];

@@ -148,6 +148,15 @@ var OK = {};
   /* 読みの打ち切り（節点予算）＝読んだ局面の数が上限を超えたら、そこで読むのをやめる。
      上限は「局面の数」で書く＝時間ではないので、Macでも2012年のiPadでも同じ所で止まる。
      既定は -1（＝上限なし）＝工程0.5で測ったときと同じ動き。 */
+  /* 中盤の読みが「両方とも打てない＝終局」に届いたとき、何を返すか。
+     既定（false）＝石差×1000。勝ち負けを見積りより重く見る＝対局で使う形。
+     true＝ふつうの見積り。損（最善手との差）を測るときはこちらを使う＝
+     石差×1000（最大64,000）と見積り（±700ほど）が混ざると、
+     損の大きさが場面によって100倍ちがう数字になり、比べられなくなるため。
+     対局中は常に false なので、梯子の強さの測定には影響しない。 */
+  var midTerminalAsEval = false;
+  OK.setMidTerminalAsEval = function (on) { midTerminalAsEval = !!on; };
+
   var budget = -1;
   var BUDGET_STOP = { stop: 'budget' };
   OK.BUDGET_STOP = BUDGET_STOP;
@@ -171,7 +180,9 @@ var OK = {};
     if (depth === 0) { return evalBoard(b, p); }
     var moves = legalMoves(b, p), i, sq, flipped, v;
     if (moves.length === 0) {
-      if (passed) { return 1000 * discDiff(b, p); }
+      if (passed) {
+        return midTerminalAsEval ? evalBoard(b, p) : 1000 * discDiff(b, p);
+      }
       return -searchMid(b, other(p), depth, -beta, -alpha, true);
     }
     for (i = 0; i < moves.length; i++) {

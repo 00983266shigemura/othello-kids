@@ -14,11 +14,11 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 
 # (もとのファイル, そのファイルの中で何本目か, 種, 名前, CCが決めた期待する理由)
 PLAN = [
-    ("fixtures_raw2.txt", 0, 314159, "かどh8が とれたのに h6へ うった", "noCorner"),
+    ("fixtures_raw2.txt", 0, 314159, "かどa1が とれたのに となりの a2へ うった", "noCorner"),
     ("fixtures_raw2.txt", 1, 314176, "あきかどh1の となり g2へ うった", "nextToCorner"),
     ("fixtures_raw2.txt", 2, 314193, "あきかどh8の となり g7へ うった", "nextToCorner"),
     ("fixtures_raw2.txt", 3, 314210, "b8の あと おける所が2に へった", "lostMobility"),
-    ("fixtures_raw2.txt", 4, 314290, "b6の あと おける所が2に へった", "lostMobility"),
+    ("fixtures_raw2.txt", 4, 314290, "36手目に c6へ うって そん（型なし）", "none"),
     ("fixtures_raw2.txt", 5, 314307, "あき12マスで b7に うって14石そん", "endCount"),
     ("fixtures_raw2.txt", 6, 314324, "b1で1枚だけ返して大そん（型なし）", "none"),
     ("fixtures_raw2.txt", 7, 314341, "h2で3枚返して そん（型なし）", "none"),

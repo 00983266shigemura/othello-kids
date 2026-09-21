@@ -33,6 +33,8 @@ for (g = 0; g < nGames; g++) {
     color === OK.BLACK ? opp : { type: 'cfg', cfg: strong },
     777000 + g * 7919, 4);
 
+  /* ここから採点＝判定器と同じ見方にそろえる（対局中は もとの見方のまま） */
+  OK.setMidTerminalAsEval(true);
   b = OK.initBoard(); p = OK.BLACK; mi = 0;
   while (mi < r.moves.length) {
     legal = OK.legalMoves(b, p);
@@ -53,6 +55,7 @@ for (g = 0; g < nGames; g++) {
     OK.applyMove(b, sq, p);
     p = OK.other(p); mi++;
   }
+  OK.setMidTerminalAsEval(false);
 }
 
 function show(name, xs) {

@@ -23,6 +23,8 @@ if (A.depth || A.end) {
   OKB.setJudgeSearch(A.depth ? parseInt(A.depth, 10) : undefined,
                      A.end ? parseInt(A.end, 10) : undefined);
 }
+/* cap=999999 で上限を実質なしにして「素の重さ」を測れる */
+if (A.cap) { OKB.setJudgeCap(parseInt(A.cap, 10)); }
 
 /* 工程0.5の実測 */
 var IPAD_MID_NPS = 20276;

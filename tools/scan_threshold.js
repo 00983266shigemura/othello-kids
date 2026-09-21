@@ -38,6 +38,8 @@ for (g = 0; g < games; g++) {
     seed0 * 1000003 + g * 7919 + 1, 4);
 
   var gMid = [], gEnd = [];
+  /* ここから採点＝判定器と同じ見方にそろえる（対局中は もとの見方のまま） */
+  OK.setMidTerminalAsEval(true);
   b = OK.initBoard(); p = OK.BLACK; mi = 0;
   while (mi < r.moves.length) {
     legal = OK.legalMoves(b, p);
@@ -60,6 +62,7 @@ for (g = 0; g < games; g++) {
     OK.applyMove(b, sq, p);
     p = OK.other(p); mi++;
   }
+  OK.setMidTerminalAsEval(false);
   perGame.push({
     lost: (r.winner !== 0 && r.winner !== childColor),
     draw: r.winner === 0,
