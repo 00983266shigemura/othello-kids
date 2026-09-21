@@ -799,7 +799,10 @@ var OKUI = {};
         appendCell(tr, 'td', g.res === 'w' ? OKT.grown.colWin
           : (g.res === 'l' ? OKT.grown.colLose : OKT.grown.colDraw));
         appendCell(tr, 'td', g.mine + ' - ' + g.theirs);
-        appendCell(tr, 'td', g.reason && OKB.TYPES[g.reason] ? OKB.TYPES[g.reason].name : '');
+        /* 型の名前が無い「ここは そんを した」も、上の表と同じ言い方で出す
+           （上の表は文、この表は空白、と食い違っていた＝査読2026-09-21） */
+        appendCell(tr, 'td', g.reason && OKB.TYPES[g.reason]
+          ? (OKB.TYPES[g.reason].name || OKB.TYPES[g.reason].why) : '');
         tbl.appendChild(tr);
       }
       box.appendChild(tbl);
