@@ -67,6 +67,7 @@
   .head h1{float:left;}
   #grown-btn{float:right; font-size:15px; min-height:0; padding:6px 12px; background:var(--nashi);}
   .help{clear:both; color:var(--ink-soft); font-size:16px; margin:2px 0 10px;}
+  .help.small{font-size:14px;}
 
   /* ---- れべるの ちず ---- */
   #map-grid{overflow:hidden;}
@@ -142,6 +143,10 @@
   .msg{margin:10px 0; padding:10px 12px; border-radius:10px; font-size:19px;
        background:var(--ao-bg); color:var(--ao);}
   .msg.warn{background:var(--daidai-bg); color:var(--daidai-ink); border:2px solid var(--daidai);}
+  /* 保存できないときの ひとこと（けっかの画面。空のときは 場所を とらない） */
+  .saveng:empty{display:none;}
+  .saveng{margin:10px 0; padding:8px 12px; border-radius:10px; font-size:17px;
+          background:var(--daidai-bg); color:var(--daidai-ink); border:2px solid var(--daidai);}
   #lecture{margin:10px 0; padding:10px 12px; border:2px solid var(--daidai);
            background:var(--daidai-bg); border-radius:10px;}
   #lecture-text{color:var(--daidai-ink); font-weight:bold;}
@@ -225,6 +230,7 @@
   </div>
   <p id="map-title" class="help"></p>
   <p id="map-help" class="help"></p>
+  <p id="map-enter-how" class="help small"></p>
   <div id="map-grid"></div>
   <div id="map-stamps"></div>
 </div>
@@ -260,11 +266,13 @@
   <div id="res-reason" style="display:none;">
     <p id="res-reason-title" class="help"></p>
     <div id="res-mini"></div>
+    <p id="res-mini-note" class="help"></p>
     <p id="res-why"></p>
     <p id="res-next-title" class="help"></p>
     <p id="res-next"></p>
   </div>
   <div id="res-unlock"></div>
+  <p id="res-saveng" class="saveng"></p>
   <p>
     <button id="res-again"></button>
     <button id="res-back" class="sub"></button>
@@ -301,6 +309,7 @@
       <button id="g-openall" class="sub"></button>
       <button id="g-wipe" class="sub"></button>
     </p>
+    <p id="g-openall-note" class="help"></p>
     <div id="grown-body"></div>
     <button id="grown-close" class="sub"></button>
   </div>
@@ -1213,10 +1222,14 @@ var OKB = {};
      上限が無いと、実機で最悪21.5秒ほど画面が止まる。
      時間ではなく読む局面の数で決める＝端末に依らない。
      換算は工程0.5の実測（中盤＝1秒20,276局面／終盤＝1秒166,938局面）。
-     1局ぶんの上限＝実機で約3秒ぶん。使い切ったら、そこから先の手は採点しない。 */
-  var JUDGE_MS_CAP = 5000;
-  /* 終盤の1手ぶんの上限（局面の数）＝実機で約0.9秒 */
+     1局ぶんの上限＝実機で約4秒ぶん。使い切ったら、そこから先の手は採点しない。
+     上限を見るのは「次の1手を採点する前」なので、最悪は この上限＋1手ぶん（約1.0秒）
+     ＝約5.0秒。判定述語P9前半（5秒）に収まるよう 4,000 にしてある（査読2026-09-21）。 */
+  var JUDGE_MS_CAP = 4000;
+  /* 1手ぶんの上限（局面の数）＝終盤は実機で約0.90秒、中盤は約0.99秒。
+     1手を採点するあいだに走る読みは ぜんぶ この上限の内側で走らせる（査読2026-09-21）。 */
   var END_MOVE_BUDGET = 150000;
+  var MID_MOVE_BUDGET = 20000;
   var IPAD_MID_NPS = 20276;
   var IPAD_END_NPS = 166938;
   OKB.JUDGE_MS_CAP = JUDGE_MS_CAP;
@@ -1231,7 +1244,7 @@ var OKB = {};
 
   /* ---- 途中で止められる形（工程2・判定述語P9「そのあいだ画面が固まらない」） ----
      step() を1回呼ぶと 棋譜の1手ぶんだけ進める。まだ終わっていなければ false を返す。
-     いちばん重い1手（終盤の完全読み）でも上限150,000局面＝実機で約0.9秒なので、
+     いちばん重い1手でも上限（終盤150,000局面＝約0.90秒／中盤20,000局面＝約0.99秒）なので、
      その合間に setTimeout(0) で画面が息をつげる。
      採点の道すじはこの1本だけ＝下の judge（いままでの呼び方）は、
      これを最後まで回すだけの薄い皮。Macの試験と画面のアプリが別物にならない。 */
@@ -1247,6 +1260,9 @@ var OKB = {};
     this.mi = 0;
     this.passes = 0;
     this.spentMs = 0;
+    /* いま採点している手の どこまで進んだか＝0 よい手さがし／1 安い見わけ／2 値の出し直し */
+    this.stage = 0;
+    this.pend = null;
     this.blunders = [];
     this.boards = [];   /* 各手を打つ前の盤の写し（絵に使う） */
     this.turns = [];    /* 各手の手番 */
@@ -1270,7 +1286,7 @@ var OKB = {};
   Judger.prototype.step = function () {
     var moves = this.moves, childColor = this.childColor;
     var b = this.b, p = this.p;
-    var legal, sq, empties, best, played, loss, phase, nBefore;
+    var legal, sq, empties, best, played, loss, phase;
 
     if (this.finished) { return true; }
     if (this.mi >= moves.length) { return this.wrapUp(); }
@@ -1291,62 +1307,85 @@ var OKB = {};
          これは作り手向けの合図であって、子どもには見せない文である。 */
       throw new Error('kifu no teban ga awanai ply=' + this.mi);
     }
-    this.boards.push(OK.copyBoard(b));
-    this.turns.push(p);
+    if (this.stage === 0) {     /* 1手につき1回だけ写す（採点を分けても増やさない） */
+      this.boards.push(OK.copyBoard(b));
+      this.turns.push(p);
+    }
 
     /* 上限を使い切ったら、そこから先の手は採点しない（画面を止めないため）。
-       採点した範囲の中で いちばん損の大きい手を出す。 */
-    if (p === childColor && legal.length >= 2 && this.spentMs < JUDGE_MS_CAP) {
-      empties = 64 - OK.discCount(b);
-      nBefore = OK.getNodes();
-      if (empties <= JUDGE_END_EMPTIES) {
-        phase = 'end';
-        /* 1手ぶんの上限も置く＝重い局面1つで上限を大きく飛び越さないため。
-           上限に当たった手は採点しない（悪手として扱わない）。 */
-        var snap = OK.copyBoard(b), gaveUp = false;
-        OK.setBudget(END_MOVE_BUDGET);
-        OK.resetNodes();
-        nBefore = 0;          /* 数え直したので、この手の起点も0に合わせる */
-        try {
-          best = OK.bestMoveEnd(b, p).value;
-        } catch (e2) {
-          OK.clearBudget();
-          if (e2 !== OK.BUDGET_STOP) { throw e2; }
-          for (var ri = 0; ri < 64; ri++) { b[ri] = snap[ri]; }
-          gaveUp = true;
-        }
-        if (gaveUp) {
-          OKB.lastCost.end += END_MOVE_BUDGET;
-          OK.applyMove(b, sq, p);
-          this.p = OK.other(p);
-          this.mi++;
-          return false;
-        }
-        OK.clearBudget();
-        /* 中盤と同じく、まず「しきい値ぶん損をしているか」だけを安く調べる */
-        if (OK.moveValueAtMostEnd(b, p, sq, best - END_LOSS_MIN)) {
-          played = OK.valueOfMoveEnd(b, p, sq);
-        } else {
-          played = best;
-        }
-        OKB.lastCost.end += OK.getNodes() - nBefore;
-      } else {
-        phase = 'mid';
-        best = OK.bestMoveMid(b, p, JUDGE_DEPTH).value;
-        /* まず「しきい値ぶん損をしているか」だけを安く調べ、
-           損をしている手だけ、値そのものを出し直す（重い読みを減らすため） */
-        if (OK.moveValueAtMostMid(b, p, sq, JUDGE_DEPTH, best - MID_LOSS_MIN)) {
-          played = OK.valueOfMoveMid(b, p, sq, JUDGE_DEPTH);
-        } else {
-          played = best;   /* 悪手ではない＝損0として扱う */
-        }
-        OKB.lastCost.mid += OK.getNodes() - nBefore;
+       採点した範囲の中で いちばん損の大きい手を出す。
+       採点を始めた手は、始めた以上 最後まで見る（this.stage > 0）。 */
+    if (p === childColor && legal.length >= 2
+        && (this.stage > 0 || this.spentMs < JUDGE_MS_CAP)) {
+      /* 1手の採点は「よい手さがし」→「安い見わけ」→「値の出し直し」の3つに分ける。
+         1回の step で走らせるのは このうち1つだけ＝どれも1手ぶんの上限の内側なので、
+         画面が止まる いちばん長い時間が 上限を超えない（査読2026-09-21）。
+         もとは 後ろの2つが上限の外に出ていて、最悪1.55秒 止まっていた。
+         分けただけなので、読む中身と 採点の結果は 前と1つも変わらない。 */
+      if (this.stage === 0) {
+        empties = 64 - OK.discCount(b);
+        this.pend = { isEnd: (empties <= JUDGE_END_EMPTIES) };
       }
+      if (this.spentMs >= JUDGE_MS_CAP) {
+        /* 途中で1局ぶんの上限に達した＝この手は採点しないで先へ進む */
+        this.stage = 0;
+        this.pend = null;
+        OK.applyMove(b, sq, p);
+        this.p = OK.other(p);
+        this.mi++;
+        return false;
+      }
+      var isEnd = this.pend.isEnd, snap = OK.copyBoard(b), gaveUp = false, ri;
+      var budget = isEnd ? END_MOVE_BUDGET : MID_MOVE_BUDGET;
+      OK.setBudget(budget);
+      OK.resetNodes();
+      try {
+        if (this.stage === 0) {
+          this.pend.best = isEnd ? OK.bestMoveEnd(b, p).value
+                                 : OK.bestMoveMid(b, p, JUDGE_DEPTH).value;
+        } else if (this.stage === 1) {
+          /* まず「しきい値ぶん損をしているか」だけを安く調べ、
+             損をしている手だけ、値そのものを出し直す（重い読みを減らすため） */
+          this.pend.big = isEnd
+            ? OK.moveValueAtMostEnd(b, p, sq, this.pend.best - END_LOSS_MIN)
+            : OK.moveValueAtMostMid(b, p, sq, JUDGE_DEPTH, this.pend.best - MID_LOSS_MIN);
+        } else {
+          this.pend.played = isEnd ? OK.valueOfMoveEnd(b, p, sq)
+                                   : OK.valueOfMoveMid(b, p, sq, JUDGE_DEPTH);
+        }
+      } catch (e2) {
+        OK.clearBudget();
+        if (e2 !== OK.BUDGET_STOP) { throw e2; }
+        for (ri = 0; ri < 64; ri++) { b[ri] = snap[ri]; }
+        gaveUp = true;
+      }
+      OK.clearBudget();
+      if (isEnd) { OKB.lastCost.end += gaveUp ? budget : OK.getNodes(); }
+      else { OKB.lastCost.mid += gaveUp ? budget : OK.getNodes(); }
       this.spentMs = OKB.lastCost.mid / IPAD_MID_NPS * 1000
                    + OKB.lastCost.end / IPAD_END_NPS * 1000;
       if (this.spentMs >= JUDGE_MS_CAP && OKB.lastCappedAt < 0) {
         OKB.lastCappedAt = this.mi;
       }
+      if (gaveUp) {
+        /* 上限に当たった手は採点しない（悪手として扱わない） */
+        this.stage = 0;
+        this.pend = null;
+        OK.applyMove(b, sq, p);
+        this.p = OK.other(p);
+        this.mi++;
+        return false;
+      }
+      if (this.stage === 0) { this.stage = 1; return false; }
+      if (this.stage === 1) {
+        if (this.pend.big) { this.stage = 2; return false; }
+        this.pend.played = this.pend.best;   /* 悪手ではない＝損0として扱う */
+      }
+      phase = isEnd ? 'end' : 'mid';
+      best = this.pend.best;
+      played = this.pend.played;
+      this.stage = 0;
+      this.pend = null;
       loss = best - played;
       if (loss >= (phase === 'end' ? END_LOSS_MIN : MID_LOSS_MIN)) {
         this.blunders.push({
@@ -1530,6 +1569,29 @@ var OKR = {};
     if (typeof base.won !== 'object') { base.won = {}; }
     if (typeof base.stamps !== 'object') { base.stamps = {}; }
     if (Object.prototype.toString.call(base.games) !== '[object Array]') { base.games = []; }
+    /* 中身の形まで整える＝壊れた記録を読ませても落ちない（査読2026-09-21） */
+    var kk, clean = {}, arr = [], i;
+    for (kk in base.won) {
+      if (base.won.hasOwnProperty(kk)) {
+        clean[kk] = {
+          black: !!(base.won[kk] && base.won[kk].black),
+          white: !!(base.won[kk] && base.won[kk].white)
+        };
+      }
+    }
+    base.won = clean;
+    clean = {};
+    for (kk in base.stamps) {
+      if (base.stamps.hasOwnProperty(kk)) {
+        clean[kk] = (typeof base.stamps[kk] === 'number' && base.stamps[kk] > 0)
+          ? Math.floor(base.stamps[kk]) : 0;
+      }
+    }
+    base.stamps = clean;
+    for (i = 0; i < base.games.length; i++) {
+      if (base.games[i] && typeof base.games[i] === 'object') { arr.push(base.games[i]); }
+    }
+    base.games = arr;
     base.sound = !!base.sound;
     base.openAll = !!base.openAll;
     return base;
@@ -1656,7 +1718,7 @@ var OKR = {};
   OKR.reasonCounts = function (s) {
     var out = {}, i, r;
     for (i = 0; i < s.games.length; i++) {
-      r = s.games[i].reason;
+      r = s.games[i] && s.games[i].reason;   /* 壊れた記録が混じっていても落ちない */
       if (r) { out[r] = (out[r] || 0) + 1; }
     }
     return out;
@@ -1700,7 +1762,8 @@ var OKT = {};
   OKT.map = {
     title: 'きょうは どの あいてと たたかう？',
     help: 'くろでも しろでも かつと つぎの あいてが ひらくよ',
-    locked: 'まだ',
+    /* 「まだ」だけだと あいての 名前に 見えるので、文にした（査読2026-09-21） */
+    locked: 'まだ あそべない',
     levelWord: 'れべる',
     pickTitle: 'どっちの いろで たたかう？',
     pickBlack: 'くろで たたかう',
@@ -1743,6 +1806,9 @@ var OKT = {};
     needOther: 'もういっぽうの いろでも かつと つぎが ひらくよ',
     drawNote: 'ひきわけでは つぎは ひらかないよ',
     reasonTitle: 'ここが わかれめ',
+    /* 小さい ばん の しるしの いみ＝「✕」に せつめいが 無かった（査読2026-09-21） */
+    miniNote: '！＝きみが おいた ところ',
+    miniNoteTaken: '！＝きみが おいた ところ　✕＝あいてに とられた かど',
     nextTitle: 'つぎは こうしよう',
     stampGot: 'できた こと が ふえた',
     /* やり方の承認＝行動の事実を1つだけ。人格のことばは使わない（設計書4.5章） */
@@ -1757,13 +1823,19 @@ var OKT = {};
   /* ---- おうちのひと（大人むけ・ここも漢字は使わない＝判定述語P7） ---- */
   OKT.grown = {
     enter: 'おうちのひと',
+    /* 3びょう ながおし でしか 開かないことを 画面にも書く（査読2026-09-21） */
+    enterHow: '「おうちのひと」は 3びょう おす',
     lockTitle: 'たしざんを といてください',
     lockNg: 'ちがいます',
     close: 'とじる',
     title: 'おうちのひと の ページ',
-    soundOn: 'おとを ならす',
-    soundOff: 'おとを ならさない',
+    /* いまの ようす＋おしたら どうなるか、の両方を書く
+       （もとは「おとを ならす」だけで、いまの ようす なのか おした けっか なのか
+         読み分けられなかった＝査読2026-09-21） */
+    soundOn: 'いま おとは なる（おすと ならなく なる）',
+    soundOff: 'いま おとは ならない（おすと なる）',
     openAll: 'すべての れべるを ひらく',
+    openAllNote: 'おすと かたないでも ぜんぶ えらべる ように なります',
     openAllDone: 'すべて ひらきました',
     wipe: 'きろくを ぜんぶ けす',
     wipeAsk: 'きろくを けしますか？ もとには もどせません',
@@ -1772,6 +1844,9 @@ var OKT = {};
     wipeDone: 'きろくを けしました',
     gamesTitle: 'あそんだ きろく（あたらしい じゅん・50きょくまで）',
     gamesNone: 'まだ きろくが ありません',
+    /* 「まけた わけ」の表が 空のときは、記録の有無ではなく 負けの有無を書く
+       （もとは「まだ きろくが ありません」を 使い回していた＝査読2026-09-21） */
+    reasonsNone: 'まだ まけた わけは ありません',
     reasonsTitle: 'まけた わけの かいすう',
     stampsTitle: 'できた こと の かいすう',
     voiceTitle: 'きょうの こえかけ',
@@ -1799,7 +1874,8 @@ var OKT = {};
   OKT.error = {
     title: 'ごめんなさい。うまく うごきませんでした',
     body: 'いちど とじて、もういちど ひらいて みてください',
-    saveNg: 'この きたいでは きろくを のこせません。あそぶことは できます'
+    /* 「きたい（機器）」は6さいの ことばでは ないので やめた（査読2026-09-21） */
+    saveNg: 'きろくが のこせませんでした。あそぶことは できます'
   };
 })();
 
@@ -1855,6 +1931,13 @@ var OKUI = {};
   function delClass(node, c) {
     node.className = (' ' + node.className + ' ').split(' ' + c + ' ').join(' ')
       .replace(/^\s+|\s+$/g, '');
+  }
+  /* 見た目の計算をその場でやり直させる合図＝同じ動きをもう一度 走らせたいときに使う */
+  function reflow(node) { var dummy; if (node) { dummy = node.offsetWidth; } return dummy; }
+  /* 端末の中の保存箱。設定によっては さわるだけで つまずくので、ここで受けとめる
+     （査読2026-09-21＝つまずくと 起動そのものが失敗していた） */
+  function store() {
+    try { return window.localStorage; } catch (e) { return null; }
   }
 
   /* ================= いまの ようす ================= */
@@ -2099,6 +2182,7 @@ var OKUI = {};
     var grid = el('map-grid'), i, cell, no, nm, marks, mb, mw, cfg, open, done;
     setText(el('map-title'), OKT.map.title);
     setText(el('map-help'), OKT.map.help);
+    setText(el('map-enter-how'), OKT.grown.enterHow);
     while (grid.firstChild) { grid.removeChild(grid.firstChild); }
     for (i = 1; i <= OKR.LEVELS; i++) {
       cfg = OKAI.cfgOf(i);
@@ -2202,6 +2286,9 @@ var OKUI = {};
     turnLabel();
     if (legal.length === 0) {
       if (S.passedLast) { endGame(); return; }
+      /* 相手も打てない＝ここで おしまい。終わりの場面で「パス！」（つづく合図）を
+         出さない（査読2026-09-21）。盤が うまった ときも ここを通る */
+      if (OK.legalMoves(S.board, OK.other(S.player)).length === 0) { endGame(); return; }
       S.passedLast = true;
       say(S.player === S.childColor ? OKT.game.passYou : OKT.game.passAi, 'warn');
       S.busy = true;
@@ -2252,7 +2339,12 @@ var OKUI = {};
         turnLoop();
         return;
       }
-      S.stones[flipped[i]].className = 'st ' + (p === BLACK ? 'b' : 'w') + ' flip';
+      /* いちど flip を外して 計算をやり直させてから 付け直す＝
+         2回目に返る石でも ひっくり返る動きが もう一度 走る（査読2026-09-21） */
+      var st = S.stones[flipped[i]], base = 'st ' + (p === BLACK ? 'b' : 'w');
+      st.className = base;
+      reflow(st);
+      st.className = base + ' flip';
       i++;
       renderCounts();
       later(flipOne, step);
@@ -2438,7 +2530,10 @@ var OKUI = {};
       reason: (reason && reason.hasReason) ? reason.type : ''
     };
     OKR.addGame(S.save, rec);
-    if (!OKR.save(window.localStorage, S.save)) { say(OKT.error.saveNg, 'warn'); }
+    /* 保存できないことは 結果の画面に書く＝#msg は たいきょくの画面の中にあり、
+       ここでは親ごと隠れていて見えないため（査読2026-09-21） */
+    setText(el('res-saveng'), '');
+    if (!OKR.save(store(), S.save)) { setText(el('res-saveng'), OKT.error.saveNg); }
 
     if (opened > 0) {
       setText(el('res-unlock'), OKT.result.unlocked);
@@ -2477,6 +2572,8 @@ var OKUI = {};
       }
       box.appendChild(c);
     }
+    setText(el('res-mini-note'),
+      (oppCorner >= 0) ? OKT.result.miniNoteTaken : OKT.result.miniNote);
   }
 
   /* かち の かみふぶき（2〜3秒・はですぎない） */
@@ -2521,6 +2618,7 @@ var OKUI = {};
     setText(el('grown-close'), OKT.grown.close);
     setText(el('g-sound'), S.save.sound ? OKT.grown.soundOn : OKT.grown.soundOff);
     setText(el('g-openall'), S.save.openAll ? OKT.grown.openAllDone : OKT.grown.openAll);
+    setText(el('g-openall-note'), S.save.openAll ? '' : OKT.grown.openAllNote);
     setText(el('g-wipe'), OKT.grown.wipe);
     while (box.firstChild) { box.removeChild(box.firstChild); }
 
@@ -2550,7 +2648,7 @@ var OKUI = {};
     }
     if (any) { box.appendChild(tbl); } else {
       d = mk('p', null);
-      setText(d, OKT.grown.gamesNone);
+      setText(d, OKT.grown.reasonsNone);
       box.appendChild(d);
     }
 
@@ -2579,6 +2677,7 @@ var OKUI = {};
       tbl = mk('table', 'gtbl');
       for (i = 0; i < S.save.games.length; i++) {
         g = S.save.games[i];
+        if (!g) { continue; }   /* 壊れた記録が混じっていても 落ちない（査読2026-09-21） */
         tr = mk('tr', null);
         appendCell(tr, 'td', OKT.map.levelWord + ' ' + g.lv);
         appendCell(tr, 'td', g.color === 'b' ? OKT.grown.colBlack : OKT.grown.colWhite);
@@ -2607,6 +2706,7 @@ var OKUI = {};
     var i, g;
     for (i = 0; i < S.save.games.length; i++) {
       g = S.save.games[i];
+      if (!g) { continue; }   /* 壊れた記録が混じっていても 落ちない（査読2026-09-21） */
       if (g.res === 'l') {
         if (g.reason && OKT.grown.voice[g.reason]) { return OKT.grown.voice[g.reason]; }
         return OKT.grown.voice.none;
@@ -2637,6 +2737,9 @@ var OKUI = {};
         part = String(last).split(':');
         if (part[0] === String(v) && (now - parseInt(part[1], 10)) < 30000) { return; }
       }
+      /* あそんでいる さいちゅうに 取り直すと 局が消えるので、ちずに いるときだけ
+         取り直す（査読2026-09-21）。対局中なら 次に ちずへ もどった ときに 取り直す */
+      if (S.screen !== 'map') { return; }
       try { sessionStorage.setItem(UPD_KEY, v + ':' + now); } catch (e4) { /* 無くても進む */ }
       location.replace('./?v=' + v);
     };
@@ -2654,6 +2757,15 @@ var OKUI = {};
       n++;
     }
     return -1;
+  }
+
+  /* いまの指の位置にある マスを 取る（無ければ -1） */
+  function sqFromTouch(ev) {
+    var t = ev.touches && ev.touches[0], node;
+    if (!t || !document.elementFromPoint) { return S.pressSq; }
+    node = document.elementFromPoint(t.clientX, t.clientY);
+    if (!node) { return -1; }
+    return sqFromEvent({ target: node });
   }
 
   function bind() {
@@ -2680,7 +2792,9 @@ var OKUI = {};
       if (ev.preventDefault) { ev.preventDefault(); }   /* 2回たたきの拡大を止める */
     };
     board.ontouchmove = function (ev) {
-      var sq = sqFromEvent(ev);
+      /* 指で さわっているときの ev.target は 最初のマスのまま 変わらないので、
+         いまの指の位置から マスを 取り直す（査読2026-09-21） */
+      var sq = sqFromTouch(ev);
       if (S.pressSq >= 0 && sq !== S.pressSq) {
         delClass(S.cells[S.pressSq], 'press');
         S.pressSq = -1;   /* 指がマスの外へ動いた＝置かない */
@@ -2764,14 +2878,15 @@ var OKUI = {};
 
     el('g-sound').onclick = function () {
       S.save.sound = !S.save.sound;
-      OKR.save(window.localStorage, S.save);
+      OKR.save(store(), S.save);
       setText(el('g-sound'), S.save.sound ? OKT.grown.soundOn : OKT.grown.soundOff);
       if (S.save.sound) { unlockAudio(); SND.place(); }
     };
     el('g-openall').onclick = function () {
       S.save.openAll = true;
-      OKR.save(window.localStorage, S.save);
+      OKR.save(store(), S.save);
       setText(el('g-openall'), OKT.grown.openAllDone);
+      setText(el('g-openall-note'), '');
       buildMap();
     };
     el('g-wipe').onclick = function () {
@@ -2782,11 +2897,12 @@ var OKUI = {};
     };
     el('wipe-yes').onclick = function () {
       /* 自分の鍵だけを消す＝clear() は使わない（同じ公開先の他のアプリを壊さない） */
-      S.save = OKR.wipe(window.localStorage);
+      S.save = OKR.wipe(store());
       show(el('wipe'), false);
       buildMap();
       buildGrown();
       setText(el('g-openall'), OKT.grown.openAll);
+      setText(el('g-openall-note'), OKT.grown.openAllNote);
     };
     el('wipe-no').onclick = function () { show(el('wipe'), false); };
 
@@ -2797,7 +2913,7 @@ var OKUI = {};
   /* ================= はじまり ================= */
   OKUI.start = function () {
     try {
-      S.save = OKR.load(window.localStorage);
+      S.save = OKR.load(store());
       setText(el('app-name'), OKT.appName);
       buildBoard();
       buildMap();

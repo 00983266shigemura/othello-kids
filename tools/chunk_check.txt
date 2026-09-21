@@ -1,15 +1,15 @@
 れべる 1  1かたまり最悪 148ms  1手ぜんぶ最悪 148ms  しらべ1かたまり最悪 924ms  しらべぜんぶ最悪 2400ms  上限に当たった局 0/4
-れべる 4  1かたまり最悪 154ms  1手ぜんぶ最悪 154ms  しらべ1かたまり最悪 926ms  しらべぜんぶ最悪 2029ms  上限に当たった局 0/4
-れべる 8  1かたまり最悪 0ms  1手ぜんぶ最悪 0ms  しらべ1かたまり最悪 899ms  しらべぜんぶ最悪 1948ms  上限に当たった局 0/4
-れべる 9  1かたまり最悪 579ms  1手ぜんぶ最悪 780ms  しらべ1かたまり最悪 1079ms  しらべぜんぶ最悪 1888ms  上限に当たった局 0/4
-れべる 12  1かたまり最悪 586ms  1手ぜんぶ最悪 888ms  しらべ1かたまり最悪 909ms  しらべぜんぶ最悪 1848ms  上限に当たった局 0/4
-れべる 16  1かたまり最悪 899ms  1手ぜんぶ最悪 1088ms  しらべ1かたまり最悪 917ms  しらべぜんぶ最悪 1854ms  上限に当たった局 0/4
-れべる 20  1かたまり最悪 899ms  1手ぜんぶ最悪 1259ms  しらべ1かたまり最悪 922ms  しらべぜんぶ最悪 2410ms  上限に当たった局 0/4
+れべる 4  1かたまり最悪 154ms  1手ぜんぶ最悪 154ms  しらべ1かたまり最悪 899ms  しらべぜんぶ最悪 2029ms  上限に当たった局 0/4
+れべる 8  1かたまり最悪 0ms  1手ぜんぶ最悪 0ms  しらべ1かたまり最悪 926ms  しらべぜんぶ最悪 1948ms  上限に当たった局 0/4
+れべる 9  1かたまり最悪 579ms  1手ぜんぶ最悪 780ms  しらべ1かたまり最悪 902ms  しらべぜんぶ最悪 1888ms  上限に当たった局 0/4
+れべる 12  1かたまり最悪 586ms  1手ぜんぶ最悪 888ms  しらべ1かたまり最悪 912ms  しらべぜんぶ最悪 1848ms  上限に当たった局 0/4
+れべる 16  1かたまり最悪 899ms  1手ぜんぶ最悪 1088ms  しらべ1かたまり最悪 923ms  しらべぜんぶ最悪 1854ms  上限に当たった局 0/4
+れべる 20  1かたまり最悪 899ms  1手ぜんぶ最悪 1259ms  しらべ1かたまり最悪 927ms  しらべぜんぶ最悪 2410ms  上限に当たった局 0/4
 
 === 2012年のiPadに直した 最悪値（28局・段1/4/8/9/12/16/20） ===
 ①相手の1手の ひとかたまり 最悪 = 899 ミリ秒（れべる16・おわりの完全読み）
 ②相手の1手 ぜんぶ 最悪 = 1259 ミリ秒（れべる20・9かたまり）  → P5（2秒以内）= みたす
-③しらべの ひとかたまり 最悪 = 1079 ミリ秒（れべる9）
+③しらべの ひとかたまり 最悪 = 927 ミリ秒（れべる20）
 ④しらべ ぜんぶ 最悪 = 2410 ミリ秒（れべる20）  → P9前半（5秒以内）= みたす
 
-{"rows":[{"lv":1,"chunkMs":148,"moveMs":148,"judgeChunkMs":924,"judgeTotalMs":2400,"capped":0},{"lv":4,"chunkMs":154,"moveMs":154,"judgeChunkMs":926,"judgeTotalMs":2029,"capped":0},{"lv":8,"chunkMs":0,"moveMs":0,"judgeChunkMs":899,"judgeTotalMs":1948,"capped":0},{"lv":9,"chunkMs":579,"moveMs":780,"judgeChunkMs":1079,"judgeTotalMs":1888,"capped":0},{"lv":12,"chunkMs":586,"moveMs":888,"judgeChunkMs":909,"judgeTotalMs":1848,"capped":0},{"lv":16,"chunkMs":899,"moveMs":1088,"judgeChunkMs":917,"judgeTotalMs":1854,"capped":0},{"lv":20,"chunkMs":899,"moveMs":1259,"judgeChunkMs":922,"judgeTotalMs":2410,"capped":0}]}
+{"rows":[{"lv":1,"chunkMs":148,"moveMs":148,"judgeChunkMs":924,"judgeTotalMs":2400,"capped":0},{"lv":4,"chunkMs":154,"moveMs":154,"judgeChunkMs":899,"judgeTotalMs":2029,"capped":0},{"lv":8,"chunkMs":0,"moveMs":0,"judgeChunkMs":926,"judgeTotalMs":1948,"capped":0},{"lv":9,"chunkMs":579,"moveMs":780,"judgeChunkMs":902,"judgeTotalMs":1888,"capped":0},{"lv":12,"chunkMs":586,"moveMs":888,"judgeChunkMs":912,"judgeTotalMs":1848,"capped":0},{"lv":16,"chunkMs":899,"moveMs":1088,"judgeChunkMs":923,"judgeTotalMs":1854,"capped":0},{"lv":20,"chunkMs":899,"moveMs":1259,"judgeChunkMs":927,"judgeTotalMs":2410,"capped":0}]}

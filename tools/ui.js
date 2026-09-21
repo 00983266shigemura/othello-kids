@@ -47,6 +47,13 @@ var OKUI = {};
     node.className = (' ' + node.className + ' ').split(' ' + c + ' ').join(' ')
       .replace(/^\s+|\s+$/g, '');
   }
+  /* 見た目の計算をその場でやり直させる合図＝同じ動きをもう一度 走らせたいときに使う */
+  function reflow(node) { var dummy; if (node) { dummy = node.offsetWidth; } return dummy; }
+  /* 端末の中の保存箱。設定によっては さわるだけで つまずくので、ここで受けとめる
+     （査読2026-09-21＝つまずくと 起動そのものが失敗していた） */
+  function store() {
+    try { return window.localStorage; } catch (e) { return null; }
+  }
 
   /* ================= いまの ようす ================= */
   var S = {
@@ -290,6 +297,7 @@ var OKUI = {};
     var grid = el('map-grid'), i, cell, no, nm, marks, mb, mw, cfg, open, done;
     setText(el('map-title'), OKT.map.title);
     setText(el('map-help'), OKT.map.help);
+    setText(el('map-enter-how'), OKT.grown.enterHow);
     while (grid.firstChild) { grid.removeChild(grid.firstChild); }
     for (i = 1; i <= OKR.LEVELS; i++) {
       cfg = OKAI.cfgOf(i);
@@ -393,6 +401,9 @@ var OKUI = {};
     turnLabel();
     if (legal.length === 0) {
       if (S.passedLast) { endGame(); return; }
+      /* 相手も打てない＝ここで おしまい。終わりの場面で「パス！」（つづく合図）を
+         出さない（査読2026-09-21）。盤が うまった ときも ここを通る */
+      if (OK.legalMoves(S.board, OK.other(S.player)).length === 0) { endGame(); return; }
       S.passedLast = true;
       say(S.player === S.childColor ? OKT.game.passYou : OKT.game.passAi, 'warn');
       S.busy = true;
@@ -443,7 +454,12 @@ var OKUI = {};
         turnLoop();
         return;
       }
-      S.stones[flipped[i]].className = 'st ' + (p === BLACK ? 'b' : 'w') + ' flip';
+      /* いちど flip を外して 計算をやり直させてから 付け直す＝
+         2回目に返る石でも ひっくり返る動きが もう一度 走る（査読2026-09-21） */
+      var st = S.stones[flipped[i]], base = 'st ' + (p === BLACK ? 'b' : 'w');
+      st.className = base;
+      reflow(st);
+      st.className = base + ' flip';
       i++;
       renderCounts();
       later(flipOne, step);
@@ -629,7 +645,10 @@ var OKUI = {};
       reason: (reason && reason.hasReason) ? reason.type : ''
     };
     OKR.addGame(S.save, rec);
-    if (!OKR.save(window.localStorage, S.save)) { say(OKT.error.saveNg, 'warn'); }
+    /* 保存できないことは 結果の画面に書く＝#msg は たいきょくの画面の中にあり、
+       ここでは親ごと隠れていて見えないため（査読2026-09-21） */
+    setText(el('res-saveng'), '');
+    if (!OKR.save(store(), S.save)) { setText(el('res-saveng'), OKT.error.saveNg); }
 
     if (opened > 0) {
       setText(el('res-unlock'), OKT.result.unlocked);
@@ -668,6 +687,8 @@ var OKUI = {};
       }
       box.appendChild(c);
     }
+    setText(el('res-mini-note'),
+      (oppCorner >= 0) ? OKT.result.miniNoteTaken : OKT.result.miniNote);
   }
 
   /* かち の かみふぶき（2〜3秒・はですぎない） */
@@ -712,6 +733,7 @@ var OKUI = {};
     setText(el('grown-close'), OKT.grown.close);
     setText(el('g-sound'), S.save.sound ? OKT.grown.soundOn : OKT.grown.soundOff);
     setText(el('g-openall'), S.save.openAll ? OKT.grown.openAllDone : OKT.grown.openAll);
+    setText(el('g-openall-note'), S.save.openAll ? '' : OKT.grown.openAllNote);
     setText(el('g-wipe'), OKT.grown.wipe);
     while (box.firstChild) { box.removeChild(box.firstChild); }
 
@@ -741,7 +763,7 @@ var OKUI = {};
     }
     if (any) { box.appendChild(tbl); } else {
       d = mk('p', null);
-      setText(d, OKT.grown.gamesNone);
+      setText(d, OKT.grown.reasonsNone);
       box.appendChild(d);
     }
 
@@ -770,6 +792,7 @@ var OKUI = {};
       tbl = mk('table', 'gtbl');
       for (i = 0; i < S.save.games.length; i++) {
         g = S.save.games[i];
+        if (!g) { continue; }   /* 壊れた記録が混じっていても 落ちない（査読2026-09-21） */
         tr = mk('tr', null);
         appendCell(tr, 'td', OKT.map.levelWord + ' ' + g.lv);
         appendCell(tr, 'td', g.color === 'b' ? OKT.grown.colBlack : OKT.grown.colWhite);
@@ -798,6 +821,7 @@ var OKUI = {};
     var i, g;
     for (i = 0; i < S.save.games.length; i++) {
       g = S.save.games[i];
+      if (!g) { continue; }   /* 壊れた記録が混じっていても 落ちない（査読2026-09-21） */
       if (g.res === 'l') {
         if (g.reason && OKT.grown.voice[g.reason]) { return OKT.grown.voice[g.reason]; }
         return OKT.grown.voice.none;
@@ -828,6 +852,9 @@ var OKUI = {};
         part = String(last).split(':');
         if (part[0] === String(v) && (now - parseInt(part[1], 10)) < 30000) { return; }
       }
+      /* あそんでいる さいちゅうに 取り直すと 局が消えるので、ちずに いるときだけ
+         取り直す（査読2026-09-21）。対局中なら 次に ちずへ もどった ときに 取り直す */
+      if (S.screen !== 'map') { return; }
       try { sessionStorage.setItem(UPD_KEY, v + ':' + now); } catch (e4) { /* 無くても進む */ }
       location.replace('./?v=' + v);
     };
@@ -845,6 +872,15 @@ var OKUI = {};
       n++;
     }
     return -1;
+  }
+
+  /* いまの指の位置にある マスを 取る（無ければ -1） */
+  function sqFromTouch(ev) {
+    var t = ev.touches && ev.touches[0], node;
+    if (!t || !document.elementFromPoint) { return S.pressSq; }
+    node = document.elementFromPoint(t.clientX, t.clientY);
+    if (!node) { return -1; }
+    return sqFromEvent({ target: node });
   }
 
   function bind() {
@@ -871,7 +907,9 @@ var OKUI = {};
       if (ev.preventDefault) { ev.preventDefault(); }   /* 2回たたきの拡大を止める */
     };
     board.ontouchmove = function (ev) {
-      var sq = sqFromEvent(ev);
+      /* 指で さわっているときの ev.target は 最初のマスのまま 変わらないので、
+         いまの指の位置から マスを 取り直す（査読2026-09-21） */
+      var sq = sqFromTouch(ev);
       if (S.pressSq >= 0 && sq !== S.pressSq) {
         delClass(S.cells[S.pressSq], 'press');
         S.pressSq = -1;   /* 指がマスの外へ動いた＝置かない */
@@ -955,14 +993,15 @@ var OKUI = {};
 
     el('g-sound').onclick = function () {
       S.save.sound = !S.save.sound;
-      OKR.save(window.localStorage, S.save);
+      OKR.save(store(), S.save);
       setText(el('g-sound'), S.save.sound ? OKT.grown.soundOn : OKT.grown.soundOff);
       if (S.save.sound) { unlockAudio(); SND.place(); }
     };
     el('g-openall').onclick = function () {
       S.save.openAll = true;
-      OKR.save(window.localStorage, S.save);
+      OKR.save(store(), S.save);
       setText(el('g-openall'), OKT.grown.openAllDone);
+      setText(el('g-openall-note'), '');
       buildMap();
     };
     el('g-wipe').onclick = function () {
@@ -973,11 +1012,12 @@ var OKUI = {};
     };
     el('wipe-yes').onclick = function () {
       /* 自分の鍵だけを消す＝clear() は使わない（同じ公開先の他のアプリを壊さない） */
-      S.save = OKR.wipe(window.localStorage);
+      S.save = OKR.wipe(store());
       show(el('wipe'), false);
       buildMap();
       buildGrown();
       setText(el('g-openall'), OKT.grown.openAll);
+      setText(el('g-openall-note'), OKT.grown.openAllNote);
     };
     el('wipe-no').onclick = function () { show(el('wipe'), false); };
 
@@ -988,7 +1028,7 @@ var OKUI = {};
   /* ================= はじまり ================= */
   OKUI.start = function () {
     try {
-      S.save = OKR.load(window.localStorage);
+      S.save = OKR.load(store());
       setText(el('app-name'), OKT.appName);
       buildBoard();
       buildMap();

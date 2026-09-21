@@ -67,6 +67,7 @@
   .head h1{float:left;}
   #grown-btn{float:right; font-size:15px; min-height:0; padding:6px 12px; background:var(--nashi);}
   .help{clear:both; color:var(--ink-soft); font-size:16px; margin:2px 0 10px;}
+  .help.small{font-size:14px;}
 
   /* ---- れべるの ちず ---- */
   #map-grid{overflow:hidden;}
@@ -142,6 +143,10 @@
   .msg{margin:10px 0; padding:10px 12px; border-radius:10px; font-size:19px;
        background:var(--ao-bg); color:var(--ao);}
   .msg.warn{background:var(--daidai-bg); color:var(--daidai-ink); border:2px solid var(--daidai);}
+  /* 保存できないときの ひとこと（けっかの画面。空のときは 場所を とらない） */
+  .saveng:empty{display:none;}
+  .saveng{margin:10px 0; padding:8px 12px; border-radius:10px; font-size:17px;
+          background:var(--daidai-bg); color:var(--daidai-ink); border:2px solid var(--daidai);}
   #lecture{margin:10px 0; padding:10px 12px; border:2px solid var(--daidai);
            background:var(--daidai-bg); border-radius:10px;}
   #lecture-text{color:var(--daidai-ink); font-weight:bold;}
@@ -225,6 +230,7 @@
   </div>
   <p id="map-title" class="help"></p>
   <p id="map-help" class="help"></p>
+  <p id="map-enter-how" class="help small"></p>
   <div id="map-grid"></div>
   <div id="map-stamps"></div>
 </div>
@@ -260,11 +266,13 @@
   <div id="res-reason" style="display:none;">
     <p id="res-reason-title" class="help"></p>
     <div id="res-mini"></div>
+    <p id="res-mini-note" class="help"></p>
     <p id="res-why"></p>
     <p id="res-next-title" class="help"></p>
     <p id="res-next"></p>
   </div>
   <div id="res-unlock"></div>
+  <p id="res-saveng" class="saveng"></p>
   <p>
     <button id="res-again"></button>
     <button id="res-back" class="sub"></button>
@@ -301,6 +309,7 @@
       <button id="g-openall" class="sub"></button>
       <button id="g-wipe" class="sub"></button>
     </p>
+    <p id="g-openall-note" class="help"></p>
     <div id="grown-body"></div>
     <button id="grown-close" class="sub"></button>
   </div>

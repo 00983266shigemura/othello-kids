@@ -43,6 +43,29 @@ var OKR = {};
     if (typeof base.won !== 'object') { base.won = {}; }
     if (typeof base.stamps !== 'object') { base.stamps = {}; }
     if (Object.prototype.toString.call(base.games) !== '[object Array]') { base.games = []; }
+    /* 中身の形まで整える＝壊れた記録を読ませても落ちない（査読2026-09-21） */
+    var kk, clean = {}, arr = [], i;
+    for (kk in base.won) {
+      if (base.won.hasOwnProperty(kk)) {
+        clean[kk] = {
+          black: !!(base.won[kk] && base.won[kk].black),
+          white: !!(base.won[kk] && base.won[kk].white)
+        };
+      }
+    }
+    base.won = clean;
+    clean = {};
+    for (kk in base.stamps) {
+      if (base.stamps.hasOwnProperty(kk)) {
+        clean[kk] = (typeof base.stamps[kk] === 'number' && base.stamps[kk] > 0)
+          ? Math.floor(base.stamps[kk]) : 0;
+      }
+    }
+    base.stamps = clean;
+    for (i = 0; i < base.games.length; i++) {
+      if (base.games[i] && typeof base.games[i] === 'object') { arr.push(base.games[i]); }
+    }
+    base.games = arr;
     base.sound = !!base.sound;
     base.openAll = !!base.openAll;
     return base;
@@ -169,7 +192,7 @@ var OKR = {};
   OKR.reasonCounts = function (s) {
     var out = {}, i, r;
     for (i = 0; i < s.games.length; i++) {
-      r = s.games[i].reason;
+      r = s.games[i] && s.games[i].reason;   /* 壊れた記録が混じっていても落ちない */
       if (r) { out[r] = (out[r] || 0) + 1; }
     }
     return out;
