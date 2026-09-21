@@ -16,3 +16,13 @@ tools/p3_v4.log
 
 # macOS
 .DS_Store
+
+# 工程2＝試験・目視用の複製（build_app.py --silent がいつでも作り直せる）
+_test.html
+_preview*.html
+
+# 作り替え前後の動きの写し（大きいうえ、diff_behavior.py で毎回作り直せる）
+tools/behavior_before.json
+tools/behavior_after.json
+tools/behavior_before.err
+tools/behavior_after.err

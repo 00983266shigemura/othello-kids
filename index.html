@@ -1,0 +1,2841 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>つよくなるオセロ</title>
+<style>
+  /* いろ＝赤と緑を「意味の区別」に使わない（設計書4.9章）。
+     ばん＝緑青 ／ ちゅうい＝橙＋！ ／ かち＝青＋✓ ／ まけ＝紫＋…
+     ばんと いしの いろは、暗い画面設定でも変えない＝オセロの くろ・しろ が入れ替わると
+     ゲームそのものが読めなくなるため。変えるのは まわりの 紙と 文字だけ。 */
+  :root{
+    color-scheme: light dark;
+    --ground:#fbfaf7; --card:#ffffff; --card2:#f2f4f6; --locked:#f1f1ef;
+    --ink:#1b1b1b; --ink-soft:#55606b; --line:#d6d8dc;
+    --ao:#0072B2; --ryokuao:#009E73; --ryokuao-dark:#00654a;
+    --daidai:#E69F00; --daidai-ink:#8a5a00; --murasaki:#CC79A7; --mizu:#56B4E9;
+    --daidai-bg:#fdf3e2; --ao-bg:#eaf3fa;
+    --nashi:#9aa5ae; --on-accent:#ffffff;
+    --kuro:#141414; --shiro:#fdfdfb;
+    --press:rgba(255,255,255,0.22); --veil:rgba(20,20,20,0.55);
+    --sheen-light:rgba(255,255,255,0.18); --sheen-dark:rgba(0,0,0,0.20);
+    --track:#e6e6e2;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --ground:#14191f; --card:#1c232b; --card2:#232c36; --locked:#232830;
+      --ink:#e8edf2; --ink-soft:#a7b4c0; --line:#38434e;
+      --ao:#56B4E9; --daidai:#f2b544; --daidai-ink:#f2b544; --murasaki:#e9a3c8;
+      --daidai-bg:#3d3010; --ao-bg:#12354a;
+      --nashi:#5b6672; --on-accent:#10151a;
+      --track:#2b333c;
+      /* ここから下の6つは わざと 明るい画面と同じ値にしてある。
+         オセロの ばん と いし の いろを 暗い画面で入れ替えると、
+         くろ と しろ が どちらか 分からなくなり、ゲームそのものが読めなくなるため。
+         （機械の検査が「再定義されていない」と言うので、同じ値を明に書いて意図を残す） */
+      --ryokuao:#009E73; --kuro:#141414; --shiro:#fdfdfb; --mizu:#56B4E9;
+      --press:rgba(255,255,255,0.22); --veil:rgba(20,20,20,0.55);
+    }
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0; padding:0;}
+  body{
+    background:var(--ground); color:var(--ink);
+    font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
+    font-size:20px; line-height:1.7;
+    -webkit-text-size-adjust:100%;
+    -webkit-user-select:none; user-select:none;
+    -webkit-tap-highlight-color:rgba(0,0,0,0);
+  }
+  .screen{padding:10px 14px 24px;}
+  h1{font-size:26px; margin:0; padding:0;}
+  h2{font-size:22px; margin:6px 0;}
+  h3{font-size:19px; margin:14px 0 4px; border-left:8px solid var(--ao); padding-left:8px;}
+  p{margin:6px 0;}
+  button{
+    font-family:inherit; font-size:20px; -webkit-appearance:none; appearance:none;
+    border:0; border-radius:10px; padding:12px 18px;
+    color:var(--on-accent); background:var(--ao);
+    cursor:pointer; min-height:56px;
+  }
+  button.sub{background:var(--nashi);}
+
+  /* ---- あたま ---- */
+  .head{overflow:hidden; padding-bottom:4px;}
+  .head h1{float:left;}
+  #grown-btn{float:right; font-size:15px; min-height:0; padding:6px 12px; background:var(--nashi);}
+  .help{clear:both; color:var(--ink-soft); font-size:16px; margin:2px 0 10px;}
+
+  /* ---- れべるの ちず ---- */
+  #map-grid{overflow:hidden;}
+  .lv{
+    float:left; width:19%; margin:0 0.5% 8px; padding:8px 4px; text-align:center;
+    background:var(--card); border:3px solid var(--line); border-radius:12px;
+  }
+  .lv.open{border-color:var(--ryokuao); cursor:pointer;}
+  .lv.done{background:var(--ao-bg); border-color:var(--ao);}
+  .lv.locked{color:var(--nashi); background:var(--locked);}
+  .lv-no{font-size:22px; font-weight:bold;}
+  .lv-name{font-size:15px; line-height:1.3; min-height:2.6em;}
+  .lv-marks{font-size:18px;}
+  .lv-marks .m{display:inline-block; width:1.4em; color:var(--nashi);}
+  .lv-marks .m.on{color:var(--ao); font-weight:bold;}
+  #map-stamps{clear:both; padding-top:8px;}
+  .stamp-title{font-size:16px; color:var(--ink-soft);}
+  .stamp{
+    display:inline-block; margin:3px 6px 3px 0; padding:3px 10px; font-size:16px;
+    color:var(--daidai-ink);
+    background:var(--daidai-bg); border:1px solid var(--daidai); border-radius:20px;
+  }
+  .stamp.none{background:none; border:0; color:var(--ink-soft);}
+
+  /* ---- ばん ---- */
+  #scr-game{overflow:hidden;}
+  /* 余白を持たない入れもの＝ここの はば を測って ばん の大きさを決める（ui.js の layout） */
+  #game-row{overflow:hidden; padding:0; margin:0;}
+  #board-wrap{position:relative; margin:0 12px 10px 0;}
+  #board{position:relative; background:var(--ryokuao); border:4px solid var(--ryokuao-dark);
+         border-radius:6px;}
+  .cell{position:absolute; border:1px solid var(--ryokuao-dark);}
+  .cell.press{background:var(--press);}
+  .st{
+    width:82%; height:82%; margin:9%; border-radius:50%; background:transparent;
+    -webkit-transition:background-color 0.12s linear; transition:background-color 0.12s linear;
+  }
+  .st.b{background:var(--kuro); box-shadow:inset 0 -3px 5px var(--sheen-light);}
+  .st.w{background:var(--shiro); box-shadow:inset 0 -3px 5px var(--sheen-dark);}
+  .st.put{-webkit-animation:pop 0.22s ease-out; animation:pop 0.22s ease-out;}
+  .st.flip{-webkit-animation:flip 0.2s ease-out; animation:flip 0.2s ease-out;}
+  @-webkit-keyframes pop{from{-webkit-transform:scale(0.3);}to{-webkit-transform:scale(1);}}
+  @keyframes pop{from{transform:scale(0.3);}to{transform:scale(1);}}
+  @-webkit-keyframes flip{from{-webkit-transform:scaleX(0.1);}to{-webkit-transform:scaleX(1);}}
+  @keyframes flip{from{transform:scaleX(0.1);}to{transform:scaleX(1);}}
+  .cell.shake{-webkit-animation:shake 0.34s; animation:shake 0.34s;}
+  @-webkit-keyframes shake{
+    0%,100%{-webkit-transform:translateX(0);}
+    25%{-webkit-transform:translateX(-5px);}
+    75%{-webkit-transform:translateX(5px);}
+  }
+  @keyframes shake{
+    0%,100%{transform:translateX(0);}
+    25%{transform:translateX(-5px);}
+    75%{transform:translateX(5px);}
+  }
+
+  /* ---- よこの しらせ ---- */
+  #side{padding:0;}
+  .turn{font-size:23px; font-weight:bold; padding:8px 10px; border-radius:10px;
+        background:var(--ao-bg); color:var(--ao);}
+  .turn.ai{background:var(--daidai-bg); color:var(--daidai-ink);}
+  .cnt{margin:10px 0;}
+  .cnt-label{font-size:16px; color:var(--ink-soft);}
+  .cnt-row{line-height:0; padding:2px 0;}
+  /* 石の列＝ふちを くろ にも つける。暗い画面では くろい 石が 紙と 同じ色になって
+     見えなくなるため（数だけでなく 長さ でも 比べられるようにする・しげ裁定Q4） */
+  .dot{display:inline-block; width:11px; height:11px; margin:1px; border-radius:50%;
+       border:1px solid var(--line);}
+  .dot.b{background:var(--kuro);}
+  .dot.w{background:var(--shiro);}
+  .cnt-num{font-size:17px; color:var(--ink-soft);}
+  .msg{margin:10px 0; padding:10px 12px; border-radius:10px; font-size:19px;
+       background:var(--ao-bg); color:var(--ao);}
+  .msg.warn{background:var(--daidai-bg); color:var(--daidai-ink); border:2px solid var(--daidai);}
+  #lecture{margin:10px 0; padding:10px 12px; border:2px solid var(--daidai);
+           background:var(--daidai-bg); border-radius:10px;}
+  #lecture-text{color:var(--daidai-ink); font-weight:bold;}
+  #lecture-how{font-size:16px; color:var(--daidai-ink);}
+  #rule-strip{padding:6px 0; line-height:0;}
+  .rs{display:inline-block; width:30px; height:30px; margin:2px; border-radius:50%;
+      border:2px solid var(--ryokuao-dark); background:var(--ryokuao);}
+  .rs.b{background:var(--kuro);}
+  .rs.w{background:var(--shiro);}
+  #give-up{background:var(--nashi); font-size:17px; min-height:0; padding:10px 14px;}
+
+  /* ---- けっか ---- */
+  .res-head{font-size:30px; font-weight:bold; margin:4px 0 8px;}
+  .res-head.win{color:var(--ao);}
+  .res-head.lose{color:var(--murasaki);}
+  .res-head.draw{color:var(--ink-soft);}
+  #res-counts{overflow:hidden;}
+  #res-counts .cnt{float:left; margin-right:28px;}
+  #res-praise{clear:both; font-size:20px; padding:8px 12px; background:var(--ao-bg);
+              color:var(--ao); border-radius:10px; display:inline-block;}
+  #res-judging{margin:12px 0;}
+  #judge-track{height:14px; background:var(--track); border-radius:7px; overflow:hidden;}
+  #judge-bar{height:14px; width:0; background:var(--mizu);}
+  #res-reason{margin:12px 0; padding:10px 14px; border:2px solid var(--daidai);
+              background:var(--daidai-bg); border-radius:12px; color:var(--ink);}
+  #res-mini{width:232px; line-height:0; background:var(--ryokuao);
+            border:3px solid var(--ryokuao-dark); border-radius:4px; margin:6px 0;}
+  .mc{display:inline-block; width:27px; height:27px; border:1px solid var(--ryokuao-dark);
+      position:relative; vertical-align:top;}
+  .mc.b:after,.mc.w:after{
+    content:''; position:absolute; left:14%; top:14%; width:72%; height:72%; border-radius:50%;
+  }
+  .mc.b:after{background:var(--kuro);}
+  .mc.w:after{background:var(--shiro);}
+  .mc.mark{background:var(--daidai);}
+  .mc.taken{background:var(--murasaki);}
+  .bang{position:absolute; left:0; top:0; width:100%; height:100%; line-height:25px;
+        text-align:center; font-size:17px; font-weight:bold; color:var(--on-accent); z-index:2;}
+  #res-why{font-size:21px; font-weight:bold;}
+  #res-next{font-size:19px;}
+  #res-unlock{font-size:22px; font-weight:bold; color:var(--ao); margin:10px 0;}
+  #res-again{margin-right:12px;}
+
+  /* ---- かみふぶき ---- */
+  #confetti{position:fixed; left:0; top:0; width:100%; height:100%; pointer-events:none; z-index:40;}
+  .cf{position:absolute; top:-20px; width:10px; height:16px; border-radius:2px;
+      -webkit-animation:fall 2.2s linear; animation:fall 2.2s linear;}
+  @-webkit-keyframes fall{from{-webkit-transform:translateY(0) rotate(0);}
+    to{-webkit-transform:translateY(100vh) rotate(420deg);}}
+  @keyframes fall{from{transform:translateY(0) rotate(0);}
+    to{transform:translateY(100vh) rotate(420deg);}}
+
+  /* ---- まど（いろえらび・たしざん・おうちのひと） ---- */
+  .veil{position:fixed; left:0; top:0; width:100%; height:100%;
+        background:var(--veil); z-index:50; overflow:auto;}
+  .box{background:var(--card); color:var(--ink); max-width:560px; margin:8% auto;
+       padding:18px 20px; border-radius:14px;}
+  .box.wide{max-width:760px; margin:3% auto;}
+  .box button{margin:6px 8px 6px 0; display:block; width:100%;}
+  .box.wide button{display:inline-block; width:auto;}
+  #lock-input{font-size:26px; width:140px; padding:8px; border:2px solid var(--line);
+              border-radius:8px; background:var(--card); color:var(--ink);}
+  #lock-ok{display:inline-block; width:auto;}
+  #lock-q{font-size:28px;}
+  #lock-ng{color:var(--murasaki); font-weight:bold;}
+  .gtbl{border-collapse:collapse; width:100%; font-size:17px; margin:4px 0 10px;}
+  .gtbl th,.gtbl td{border:1px solid var(--line); padding:4px 8px; text-align:left;}
+  .gtbl th{background:var(--card2); white-space:nowrap;}
+  .voice{background:var(--ao-bg); color:var(--ao); padding:8px 12px; border-radius:10px;}
+  .ver{color:var(--ink-soft); font-size:15px;}
+  #fatal{padding:24px; color:var(--murasaki);}
+</style>
+</head>
+<body>
+
+<!-- ① れべるの ちず -->
+<div id="scr-map" class="screen">
+  <div class="head">
+    <h1 id="app-name">つよくなるオセロ</h1>
+    <button id="grown-btn">おうちのひと</button>
+  </div>
+  <p id="map-title" class="help"></p>
+  <p id="map-help" class="help"></p>
+  <div id="map-grid"></div>
+  <div id="map-stamps"></div>
+</div>
+
+<!-- ② たいきょく -->
+<div id="scr-game" class="screen" style="display:none;">
+ <div id="game-row">
+  <div id="board-wrap"><div id="board"></div></div>
+  <div id="side">
+    <div id="turn" class="turn"></div>
+    <div id="count-you" class="cnt"></div>
+    <div id="count-ai" class="cnt"></div>
+    <div id="msg" class="msg" style="display:none;"></div>
+    <div id="lecture" style="display:none;">
+      <p id="lecture-text"></p>
+      <div id="rule-strip"></div>
+      <p id="lecture-how"></p>
+    </div>
+    <button id="give-up" style="display:none;"></button>
+  </div>
+ </div>
+</div>
+
+<!-- ③ けっか -->
+<div id="scr-result" class="screen" style="display:none;">
+  <div id="res-head" class="res-head"></div>
+  <div id="res-counts"></div>
+  <p id="res-praise"></p>
+  <div id="res-judging" style="display:none;">
+    <p id="judge-text"></p>
+    <div id="judge-track"><div id="judge-bar"></div></div>
+  </div>
+  <div id="res-reason" style="display:none;">
+    <p id="res-reason-title" class="help"></p>
+    <div id="res-mini"></div>
+    <p id="res-why"></p>
+    <p id="res-next-title" class="help"></p>
+    <p id="res-next"></p>
+  </div>
+  <div id="res-unlock"></div>
+  <p>
+    <button id="res-again"></button>
+    <button id="res-back" class="sub"></button>
+  </p>
+</div>
+
+<!-- いろを えらぶ まど -->
+<div id="pick" class="veil" style="display:none;">
+  <div class="box">
+    <h2 id="pick-title"></h2>
+    <button id="pick-black"></button>
+    <button id="pick-white"></button>
+    <button id="pick-back" class="sub"></button>
+  </div>
+</div>
+
+<!-- たしざんの かぎ（おうちのひと用） -->
+<div id="lock" class="veil" style="display:none;">
+  <div class="box">
+    <h2 id="lock-title"></h2>
+    <p id="lock-q"></p>
+    <p><input id="lock-input" type="tel"> <button id="lock-ok">OK</button></p>
+    <p id="lock-ng"></p>
+    <button id="lock-close" class="sub"></button>
+  </div>
+</div>
+
+<!-- おうちのひと の ページ -->
+<div id="grown" class="veil" style="display:none;">
+  <div class="box wide">
+    <h2 id="grown-title"></h2>
+    <p>
+      <button id="g-sound"></button>
+      <button id="g-openall" class="sub"></button>
+      <button id="g-wipe" class="sub"></button>
+    </p>
+    <div id="grown-body"></div>
+    <button id="grown-close" class="sub"></button>
+  </div>
+</div>
+
+<!-- きろくを けす かくにん -->
+<div id="wipe" class="veil" style="display:none;">
+  <div class="box">
+    <p id="wipe-ask"></p>
+    <button id="wipe-yes"></button>
+    <button id="wipe-no" class="sub"></button>
+  </div>
+</div>
+
+<div id="confetti" style="display:none;"></div>
+
+<div id="fatal" style="display:none;">
+  <h2 id="fatal-title"></h2>
+  <p id="fatal-body"></p>
+</div>
+
+<script>
+/* つよくなるオセロ ── はやさ はかり の中身（ES5のみ・DOMを使わない）
+   2026-09-21 工程0.5。
+   目的＝同じ計算を Mac と 2012年のiPad で走らせ、速さの倍率を実測で出す。
+   約束事＝let/const/アロー/クラス/テンプレート文字列を使わない（Safari 10.1 で動く形）。
+   盤は 0〜63 の配列。0=あき 1=くろ 2=しろ。 */
+
+var OK = {};
+
+(function () {
+  'use strict';
+
+  var EMPTY = 0, BLACK = 1, WHITE = 2;
+  OK.EMPTY = EMPTY; OK.BLACK = BLACK; OK.WHITE = WHITE;
+
+  /* ---- 8方向の光線を先に作る（当たり判定を毎回計算しない） ---- */
+  var DR = [-1, -1, -1, 0, 0, 1, 1, 1];
+  var DC = [-1, 0, 1, -1, 1, -1, 0, 1];
+  var RAYS = [];   /* RAYS[sq] = [ 方向ごとのマス列 ] */
+  (function buildRays() {
+    var sq, d, r, c, ray;
+    for (sq = 0; sq < 64; sq++) {
+      RAYS[sq] = [];
+      for (d = 0; d < 8; d++) {
+        ray = [];
+        r = (sq >> 3) + DR[d];
+        c = (sq & 7) + DC[d];
+        while (r >= 0 && r < 8 && c >= 0 && c < 8) {
+          ray.push(r * 8 + c);
+          r += DR[d];
+          c += DC[d];
+        }
+        RAYS[sq].push(ray);
+      }
+    }
+  })();
+
+  /* ---- 盤の作りかた ---- */
+  function initBoard() {
+    var b = [], i;
+    for (i = 0; i < 64; i++) { b.push(EMPTY); }
+    b[27] = WHITE; b[28] = BLACK;
+    b[35] = BLACK; b[36] = WHITE;
+    return b;
+  }
+  OK.initBoard = initBoard;
+
+  function other(p) { return p === BLACK ? WHITE : BLACK; }
+  OK.other = other;
+
+  /* 置けるなら裏返る枚数、置けないなら0 */
+  function countFlips(b, sq, p) {
+    if (b[sq] !== EMPTY) { return 0; }
+    var opp = other(p), total = 0, d, ray, i, n, seen;
+    for (d = 0; d < 8; d++) {
+      ray = RAYS[sq][d];
+      n = ray.length;
+      seen = 0;
+      for (i = 0; i < n; i++) {
+        if (b[ray[i]] === opp) { seen++; continue; }
+        if (b[ray[i]] === p && seen > 0) { total += seen; }
+        break;
+      }
+    }
+    return total;
+  }
+  OK.countFlips = countFlips;
+
+  /* 置いて裏返す。戻り値＝裏返したマスの配列（戻すときに使う） */
+  function applyMove(b, sq, p) {
+    var opp = other(p), flipped = [], d, ray, i, n, run, j;
+    for (d = 0; d < 8; d++) {
+      ray = RAYS[sq][d];
+      n = ray.length;
+      run = 0;
+      for (i = 0; i < n; i++) {
+        if (b[ray[i]] === opp) { run++; continue; }
+        if (b[ray[i]] === p && run > 0) {
+          for (j = 0; j < run; j++) { flipped.push(ray[j]); }
+        }
+        break;
+      }
+    }
+    for (i = 0; i < flipped.length; i++) { b[flipped[i]] = p; }
+    b[sq] = p;
+    return flipped;
+  }
+  OK.applyMove = applyMove;
+
+  function undoMove(b, sq, p, flipped) {
+    var opp = other(p), i;
+    for (i = 0; i < flipped.length; i++) { b[flipped[i]] = opp; }
+    b[sq] = EMPTY;
+  }
+  OK.undoMove = undoMove;
+
+  /* 置ける場所の一覧。角・辺を先に見る並び（読みを早く切るため・端末に依らない固定順） */
+  var ORDER = [
+    0, 7, 56, 63,
+    2, 3, 4, 5, 16, 24, 32, 40, 23, 31, 39, 47, 58, 59, 60, 61,
+    18, 19, 20, 21, 26, 27, 28, 29, 34, 35, 36, 37, 42, 43, 44, 45,
+    10, 11, 12, 13, 17, 22, 25, 30, 33, 38, 41, 46, 50, 51, 52, 53,
+    1, 6, 8, 15, 48, 55, 57, 62,
+    9, 14, 49, 54
+  ];
+  function legalMoves(b, p) {
+    var out = [], i, sq;
+    for (i = 0; i < 64; i++) {
+      sq = ORDER[i];
+      if (countFlips(b, sq, p) > 0) { out.push(sq); }
+    }
+    return out;
+  }
+  OK.legalMoves = legalMoves;
+
+  function discDiff(b, p) {
+    var mine = 0, theirs = 0, i;
+    for (i = 0; i < 64; i++) {
+      if (b[i] === p) { mine++; }
+      else if (b[i] !== EMPTY) { theirs++; }
+    }
+    return mine - theirs;
+  }
+  OK.discDiff = discDiff;
+
+  function discCount(b) {
+    var n = 0, i;
+    for (i = 0; i < 64; i++) { if (b[i] !== EMPTY) { n++; } }
+    return n;
+  }
+  OK.discCount = discCount;
+
+  /* ---- 手の良さの見積り（中盤）＝マスの重み＋置ける手数 ---- */
+  var W = [
+    120, -20, 20, 5, 5, 20, -20, 120,
+    -20, -40, -5, -5, -5, -5, -40, -20,
+    20, -5, 15, 3, 3, 15, -5, 20,
+    5, -5, 3, 3, 3, 3, -5, 5,
+    5, -5, 3, 3, 3, 3, -5, 5,
+    20, -5, 15, 3, 3, 15, -5, 20,
+    -20, -40, -5, -5, -5, -5, -40, -20,
+    120, -20, 20, 5, 5, 20, -20, 120
+  ];
+
+  var nodes = 0;
+  OK.getNodes = function () { return nodes; };
+  OK.resetNodes = function () { nodes = 0; };
+
+  /* 読みの打ち切り（節点予算）＝読んだ局面の数が上限を超えたら、そこで読むのをやめる。
+     上限は「局面の数」で書く＝時間ではないので、Macでも2012年のiPadでも同じ所で止まる。
+     既定は -1（＝上限なし）＝工程0.5で測ったときと同じ動き。 */
+  /* 中盤の読みが「両方とも打てない＝終局」に届いたとき、何を返すか。
+     既定（false）＝石差×1000。勝ち負けを見積りより重く見る＝対局で使う形。
+     true＝ふつうの見積り。損（最善手との差）を測るときはこちらを使う＝
+     石差×1000（最大64,000）と見積り（±700ほど）が混ざると、
+     損の大きさが場面によって100倍ちがう数字になり、比べられなくなるため。
+     対局中は常に false なので、梯子の強さの測定には影響しない。 */
+  var midTerminalAsEval = false;
+  OK.setMidTerminalAsEval = function (on) { midTerminalAsEval = !!on; };
+
+  var budget = -1;
+  var BUDGET_STOP = { stop: 'budget' };
+  OK.BUDGET_STOP = BUDGET_STOP;
+  OK.setBudget = function (n) { budget = (typeof n === 'number' && n > 0) ? n : -1; };
+  OK.clearBudget = function () { budget = -1; };
+
+  function evalBoard(b, p) {
+    var opp = other(p), s = 0, i;
+    for (i = 0; i < 64; i++) {
+      if (b[i] === p) { s += W[i]; }
+      else if (b[i] === opp) { s -= W[i]; }
+    }
+    return s + 3 * (legalMoves(b, p).length - legalMoves(b, opp).length);
+  }
+  OK.evalBoard = evalBoard;
+
+  /* ---- 中盤の先読み（深さ指定・アルファベータ） ---- */
+  function searchMid(b, p, depth, alpha, beta, passed) {
+    nodes++;
+    if (budget > 0 && nodes > budget) { throw BUDGET_STOP; }
+    if (depth === 0) { return evalBoard(b, p); }
+    var moves = legalMoves(b, p), i, sq, flipped, v;
+    if (moves.length === 0) {
+      if (passed) {
+        return midTerminalAsEval ? evalBoard(b, p) : 1000 * discDiff(b, p);
+      }
+      return -searchMid(b, other(p), depth, -beta, -alpha, true);
+    }
+    for (i = 0; i < moves.length; i++) {
+      sq = moves[i];
+      flipped = applyMove(b, sq, p);
+      v = -searchMid(b, other(p), depth - 1, -beta, -alpha, false);
+      undoMove(b, sq, p, flipped);
+      if (v > alpha) { alpha = v; }
+      if (alpha >= beta) { return alpha; }
+    }
+    return alpha;
+  }
+
+  /* 最善手と値を返す（実際の対局で使う形＝この時間を測る） */
+  OK.bestMoveMid = function (b, p, depth) {
+    var moves = legalMoves(b, p), best = -1, bestV = -1e9, i, sq, flipped, v;
+    for (i = 0; i < moves.length; i++) {
+      sq = moves[i];
+      flipped = applyMove(b, sq, p);
+      v = -searchMid(b, other(p), depth - 1, -1e9, -bestV, false);
+      undoMove(b, sq, p, flipped);
+      if (v > bestV) { bestV = v; best = sq; }
+    }
+    return { move: best, value: bestV };
+  };
+
+  /* ---- 終盤の完全読み（最後まで読む・石差そのもの） ---- */
+  function searchEnd(b, p, alpha, beta, passed) {
+    nodes++;
+    if (budget > 0 && nodes > budget) { throw BUDGET_STOP; }
+    var moves = legalMoves(b, p), i, sq, flipped, v;
+    if (moves.length === 0) {
+      if (passed) { return discDiff(b, p); }
+      return -searchEnd(b, other(p), -beta, -alpha, true);
+    }
+    for (i = 0; i < moves.length; i++) {
+      sq = moves[i];
+      flipped = applyMove(b, sq, p);
+      v = -searchEnd(b, other(p), -beta, -alpha, false);
+      undoMove(b, sq, p, flipped);
+      if (v > alpha) { alpha = v; }
+      if (alpha >= beta) { return alpha; }
+    }
+    return alpha;
+  }
+  OK.solveEnd = function (b, p) {
+    return searchEnd(b, p, -64, 64, false);
+  };
+
+  /* 終盤の完全読みで「どこに置くか」まで返す（対局で使う形） */
+  OK.bestMoveEnd = function (b, p) {
+    var moves = legalMoves(b, p), best = -1, bestV = -65, i, sq, flipped, v;
+    for (i = 0; i < moves.length; i++) {
+      sq = moves[i];
+      flipped = applyMove(b, sq, p);
+      v = -searchEnd(b, other(p), -64, -bestV, false);
+      undoMove(b, sq, p, flipped);
+      if (v > bestV) { bestV = v; best = sq; }
+    }
+    return { move: best, value: bestV };
+  };
+
+  /* 盤の写し（読みを途中でやめたときに元へ戻すために使う） */
+  OK.copyBoard = function (b) {
+    var out = [], i;
+    for (i = 0; i < 64; i++) { out.push(b[i]); }
+    return out;
+  };
+
+  /* 打った1手の「よさ」を返す（悪手の判定に使う＝最善手との差を取るため）。
+     窓を広くとるので最善手さがしより遅い＝対局中には呼ばず、対局が終わってから呼ぶ。 */
+  OK.valueOfMoveMid = function (b, p, sq, depth) {
+    var flipped = applyMove(b, sq, p);
+    var v = -searchMid(b, other(p), depth - 1, -1e9, 1e9, false);
+    undoMove(b, sq, p, flipped);
+    return v;
+  };
+
+  /* 「打った手の値が bound 以下か」だけを、窓を1目もりに絞って安く調べる。
+     悪手かどうかの ふるい に使う＝ほとんどの手はここで落ちるので、
+     値そのものを出す重い読み（valueOfMoveMid）は残った手にだけ使えばよい。 */
+  OK.moveValueAtMostMid = function (b, p, sq, depth, bound) {
+    var flipped = applyMove(b, sq, p);
+    var r = searchMid(b, other(p), depth - 1, -(bound + 1), -bound, false);
+    undoMove(b, sq, p, flipped);
+    return -r <= bound;
+  };
+
+  /* 終盤版の ふるい＝窓を1石ぶんに絞って「bound 以下か」だけを安く調べる */
+  OK.moveValueAtMostEnd = function (b, p, sq, bound) {
+    var flipped = applyMove(b, sq, p);
+    var r = searchEnd(b, other(p), -(bound + 1), -bound, false);
+    undoMove(b, sq, p, flipped);
+    return -r <= bound;
+  };
+
+  OK.valueOfMoveEnd = function (b, p, sq) {
+    var flipped = applyMove(b, sq, p);
+    var v = -searchEnd(b, other(p), -64, 64, false);
+    undoMove(b, sq, p, flipped);
+    return v;
+  };
+
+  /* ---- 決まった局面を作る（同じ種＝MacでもiPadでも同じ盤になる） ---- */
+  function minstd(seed) {
+    var s = seed;
+    return function () {
+      s = (s * 16807) % 2147483647;   /* 2^53 を超えないので端末に依らず同じ値 */
+      return s / 2147483647;
+    };
+  }
+
+  /* 石が targetDiscs 枚になるまで、決まった乱数で打ち進めた局面を返す */
+  OK.makePos = function (targetDiscs, seed) {
+    var b = initBoard(), p = BLACK, rnd = minstd(seed || 12345);
+    var passed = false, moves, sq;
+    while (discCount(b) < targetDiscs) {
+      moves = legalMoves(b, p);
+      if (moves.length === 0) {
+        if (passed) { break; }
+        passed = true;
+        p = other(p);
+        continue;
+      }
+      passed = false;
+      sq = moves[Math.floor(rnd() * moves.length)];
+      applyMove(b, sq, p);
+      p = other(p);
+    }
+    return { board: b, player: p, discs: discCount(b) };
+  };
+
+  OK.now = function () {
+    if (typeof performance !== 'undefined' && performance && performance.now) {
+      return performance.now();
+    }
+    return Date.now();
+  };
+
+  /* ================= はかる中身 ================= */
+
+  /* ①1秒に読める局面の数＝深さ5の先読みを1回して、局面数÷秒 */
+  OK.measureNps = function () {
+    var pos = OK.makePos(20), t0, t1;
+    OK.resetNodes();
+    t0 = OK.now();
+    OK.bestMoveMid(pos.board, pos.player, 5);
+    t1 = OK.now();
+    var ms = t1 - t0;
+    return { ms: ms, nodes: OK.getNodes(), nps: Math.round(OK.getNodes() / (ms / 1000)) };
+  };
+
+  /* ②5手先読みが いちばん遅いとき（石数のちがう6局面の最悪値） */
+  var MID_DISCS = [12, 20, 28, 36, 44, 52];
+  OK.midCases = MID_DISCS;
+  OK.measureMidOne = function (i, depth) {
+    var pos = OK.makePos(MID_DISCS[i]), t0, t1, n0;
+    n0 = OK.getNodes();
+    t0 = OK.now();
+    OK.bestMoveMid(pos.board, pos.player, depth);
+    t1 = OK.now();
+    return { discs: MID_DISCS[i], ms: t1 - t0, nodes: OK.getNodes() - n0 };
+  };
+
+  /* ③終盤の完全読み（あき N マス） */
+  OK.measureEndOne = function (empties) {
+    var pos = OK.makePos(64 - empties), t0, t1, n0, v;
+    n0 = OK.getNodes();
+    t0 = OK.now();
+    v = OK.solveEnd(pos.board, pos.player);
+    t1 = OK.now();
+    return { empties: empties, ms: t1 - t0, nodes: OK.getNodes() - n0, value: v };
+  };
+
+  /* 別スレッド（Web Worker）が使えるかだけ見る＝設計の予備案の確認 */
+  OK.workerOk = function () {
+    try {
+      if (typeof Worker === 'undefined') { return 'つかえない（Worker なし）'; }
+      if (typeof Blob === 'undefined' || typeof URL === 'undefined' || !URL.createObjectURL) {
+        return 'あやしい（Blob URL がない）';
+      }
+      return 'つかえそう（Worker＋Blob URL あり）';
+    } catch (e) {
+      return 'しらべられなかった';
+    }
+  };
+})();
+
+if (typeof module !== 'undefined' && module.exports) { module.exports = OK; }
+
+</script>
+<script>
+/* つよくなるオセロ ── 相手の打ちかた（20段の梯子）
+   2026-09-21 工程1。ES5のみ・DOMを使わない。core.js を先に load すること。
+
+   段の決め方は「端末に依らない形」だけで書く＝
+     よみのふかさ（depth）／おわりの完全読みを始めるあきマス数（endEmpties）／
+     わざと下手を打つ確率（eps）／わざと一番わるい手を打つ確率（bad）／
+     かどを取る確率（cornerP）／読む局面の数の上限（budget）。
+   時間では書かない＝Macでの自己対戦と2012年のiPadで別物にならないため
+   （設計書4.4章・査読の致命指摘）。 */
+
+var OKAI = {};
+
+(function () {
+  'use strict';
+
+  /* ---- 決まった乱数（種を渡せば Mac でも iPad でも同じ並び） ---- */
+  OKAI.makeRnd = function (seed) {
+    var s = seed % 2147483647;
+    if (s <= 0) { s += 2147483646; }
+    return function () {
+      s = (s * 16807) % 2147483647;
+      return s / 2147483647;
+    };
+  };
+
+  var CORNERS = [0, 7, 56, 63];
+  function isCorner(sq) {
+    return sq === 0 || sq === 7 || sq === 56 || sq === 63;
+  }
+  OKAI.CORNERS = CORNERS;
+  OKAI.isCorner = isCorner;
+
+  /* ================= 20段の梯子 =================
+     呼び名は設計書4.3章の例に合わせる。
+     つまみは2つ。梯子は2つの帯でできている。
+       ①L1〜L8＝bad（わざと損をする手を打つ確率）を 1.000 から 0 へ下げる。
+          badDepth=4（4手先まで読んで、自分が一番損をする手を選ぶ）はL1〜L7で同じ。
+          L8は bad=0 ＝ ただのでたらめ（badDepthは使わない）。
+       ②L9〜L20＝ふかさ6＋あき12マスから完全読み で固定し、
+          eps（たまに でたらめを打つ確率）を 0.933 から 0 へ下げる。
+     「1段ごとに変える数字は1つだけ」が成り立つのは、L1〜L7 の中と L9〜L20 の中だけである。
+     つなぎ目の2か所ではつまみが入れ替わる＝
+       L7→L8＝bad が 0.109→0 になり、同時に badDepth が消える
+       L8→L9＝でたらめ から 先読み へ、つまみそのものが変わる
+     ここは逆転しないことを自己対戦で直に確かめる（設計書4.4章の「一度に変える要素は1つ」を、
+     つなぎ目では満たしていない。実測で担保する）。
+     数字の決め方＝2026-09-21のMac実測（p3_result_v2.json ＝ひとつ前の梯子を200局ずつ測った
+     19組の勝率をイロ点に直した曲線）から、強さが等間隔になるよう逆算した。 */
+  var LADDER = [
+    /* 帯①＝わざと損をする確率（bad）。説明は上のヘッダに1か所だけ書く */
+    { level: 1, name: 'たまご', kind: 'random', bad: 1.000, badDepth: 4 },
+    { level: 2, name: 'ひな', kind: 'random', bad: 0.797, badDepth: 4 },
+    { level: 3, name: 'あひる', kind: 'random', bad: 0.640, badDepth: 4 },
+    { level: 4, name: 'ひよこ', kind: 'random', bad: 0.492, badDepth: 4 },
+    { level: 5, name: 'すずめ', kind: 'random', bad: 0.352, badDepth: 4 },
+    { level: 6, name: 'こまどり', kind: 'random', bad: 0.219, badDepth: 4 },
+    { level: 7, name: 'ことり', kind: 'random', bad: 0.109, badDepth: 4 },
+    { level: 8, name: 'つばめ', kind: 'random', bad: 0 },
+    /* ②L9〜L20＝ふかさ6＋あき12マスから完全読み で固定し、eps を 0.933 から 0 へ下げる */
+    { level: 9, name: 'はと', kind: 'search', depth: 6, endEmpties: 12, eps: 0.933 },
+    { level: 10, name: 'かもめ', kind: 'search', depth: 6, endEmpties: 12, eps: 0.852 },
+    { level: 11, name: 'からす', kind: 'search', depth: 6, endEmpties: 12, eps: 0.735 },
+    { level: 12, name: 'ふくろう', kind: 'search', depth: 6, endEmpties: 12, eps: 0.664 },
+    { level: 13, name: 'きつつき', kind: 'search', depth: 6, endEmpties: 12, eps: 0.596 },
+    { level: 14, name: 'くじゃく', kind: 'search', depth: 6, endEmpties: 12, eps: 0.481 },
+    { level: 15, name: 'つる', kind: 'search', depth: 6, endEmpties: 12, eps: 0.401 },
+    { level: 16, name: 'わし', kind: 'search', depth: 6, endEmpties: 12, eps: 0.316 },
+    { level: 17, name: 'たか', kind: 'search', depth: 6, endEmpties: 12, eps: 0.243 },
+    { level: 18, name: 'はやぶさ', kind: 'search', depth: 6, endEmpties: 12, eps: 0.171 },
+    { level: 19, name: 'ドラゴン', kind: 'search', depth: 6, endEmpties: 12, eps: 0.093 },
+    { level: 20, name: 'おうさま', kind: 'search', depth: 6, endEmpties: 12, eps: 0 }
+  ];
+  OKAI.LADDER = LADDER;
+
+  OKAI.cfgOf = function (level) {
+    var c = LADDER[level - 1];
+    if (!c) { throw new Error('そのレベルはない: ' + level); }
+    return c;
+  };
+
+  /* ---- わざと一番わるい手（bad 用）＝見積りが最小になる手を選ぶ。
+         badDepth＝どれだけ先を読んで「わるさ」を測るか。1＝置いた直後の見積りだけ。
+         2以上＝先まで読んで、自分が本当に損をする手を選ぶ＝もっと弱くなる。 ---- */
+  function worstMoveShallow(b, p, moves) {
+    var i, sq, flipped, v, worstV = 1e9, worst = moves[0];
+    for (i = 0; i < moves.length; i++) {
+      sq = moves[i];
+      flipped = OK.applyMove(b, sq, p);
+      v = OK.evalBoard(b, p);
+      OK.undoMove(b, sq, p, flipped);
+      if (v < worstV) { worstV = v; worst = sq; }
+    }
+    return worst;
+  }
+
+  function worstMove(b, p, moves, badDepth) {
+    var d = badDepth && badDepth > 1 ? badDepth : 1;
+    if (d === 1) { return worstMoveShallow(b, p, moves); }
+    /* 先まで読む形も、読む局面の数に上限をかける。
+       上限に当たったら、置いた直後の見積りだけで選ぶ形に落とす */
+    var snapshot = OK.copyBoard(b);
+    var i, v, worstV = 1e9, worst = moves[0];
+    OK.setBudget(MID_BUDGET);
+    OK.resetNodes();
+    try {
+      for (i = 0; i < moves.length; i++) {
+        v = OK.valueOfMoveMid(b, p, moves[i], d);
+        if (v < worstV) { worstV = v; worst = moves[i]; }
+      }
+    } catch (e) {
+      OK.clearBudget();
+      if (e !== OK.BUDGET_STOP) { throw e; }
+      restore(b, snapshot);
+      OKAI.lastCost.mid = OK.getNodes();
+      return worstMoveShallow(b, p, moves);
+    }
+    OK.clearBudget();
+    OKAI.lastCost.mid = OK.getNodes();
+    return worst;
+  }
+
+  /* ================= 読む局面の上限（P5＝実機で1手2秒以内を守るため） =================
+     時間ではなく「読む局面の数」で決める＝MacでもiPadでも同じ所で止まる。
+     換算（工程0.5の実測 othello_kids_speed_20260921.html）＝
+       中盤の読み＝1秒に 20,276局面 ／ 終盤の完全読み＝1秒に 166,938局面
+     上限の決め方＝
+       終盤 150,000局面 → 実機で約0.90秒
+       中盤  18,000局面 → 実機で約0.89秒
+       終盤の完全読みが上限に当たって中盤の読みへ落ちる場合でも、合計 約1.79秒で2秒に収まる。
+     なぜ上限が要るか＝実戦の局面は工程0.5で測った見本より重い。
+     実測（node_dist.js・25局×3種）＝ふかさ6の中盤は中央7,643局面だが最悪190,800局面（9.4秒）、
+     あき12マスの完全読みは中央98,029局面だが最悪906,901局面（5.4秒）。 */
+  var END_BUDGET = 150000;
+  var MID_BUDGET = 18000;
+  /* 時間の安全弁（ミリ秒）＝端末が見込みより遅かったときだけ効く保険。
+     ふつうは上の節点予算が先に効くので、Macでの自己対戦の結果はこれに左右されない。 */
+  var TIME_GUARD_MS = 1200;
+  OKAI.END_BUDGET = END_BUDGET;
+  OKAI.MID_BUDGET = MID_BUDGET;
+  OKAI.TIME_GUARD_MS = TIME_GUARD_MS;
+
+  /* 盤を写しから戻す（読みを途中でやめると盤が読みの途中の形で残るため） */
+  function restore(b, snapshot) {
+    var i;
+    for (i = 0; i < 64; i++) { b[i] = snapshot[i]; }
+  }
+
+  /* 終盤の完全読み＋上限。上限に当たったら move=-1 を返す＝中盤の読みへ落とす */
+  function bestMoveEndBudgeted(b, p, budget) {
+    var snapshot = OK.copyBoard(b), r;
+    OK.setBudget(budget);
+    OK.resetNodes();
+    try {
+      r = OK.bestMoveEnd(b, p);
+    } catch (e) {
+      OK.clearBudget();
+      if (e !== OK.BUDGET_STOP) { throw e; }
+      restore(b, snapshot);
+      return { move: -1, gaveUp: true, nodes: OK.getNodes() };
+    }
+    OK.clearBudget();
+    return { move: r.move, gaveUp: false, nodes: OK.getNodes() };
+  }
+  OKAI.bestMoveEndBudgeted = bestMoveEndBudgeted;
+
+  /* ================= 1手を選ぶ（対局で呼ぶ入口） =================
+     b＝盤 / p＝手番 / cfg＝段の設定 / rnd＝決まった乱数
+     戻り値＝置くマス（0〜63）。置ける所が無ければ -1。 */
+  /* 直前の1手で何局面読んだか（終盤ぶん・中盤ぶんに分けて記録する）。
+     終盤をあきらめて中盤の読みへ落ちた手は両方に数が入る＝時間の見積りに使う。 */
+  OKAI.lastCost = { end: 0, mid: 0 };
+
+  /* ---- 途中で止められる形（工程2・判定述語P9の後半「画面が固まらない」） ----
+     step() を1回呼ぶと「ひとかたまり」だけ読み、まだ決まっていなければ false を返す。
+     かたまりの大きさ＝終盤の完全読み1回（上限150,000局面＝実機で約0.9秒）か、
+     反復深化のふかさ1つぶん。そのあいだに画面は setTimeout(0) で息をつげる。
+     打ち手を決める道すじはこの1本だけにした＝下の chooseMove（いままでの呼び方）は、
+     これを最後まで回すだけの薄い皮。Macの自己対戦と画面のアプリが別物にならない。 */
+  function Chooser(b, p, cfg, rnd) {
+    this.b = b; this.p = p; this.cfg = cfg; this.rnd = rnd;
+    this.phase = 'init';
+    this.move = -1;
+    this.moves = null;
+    this.depth = 0;
+    this.best = -1;
+    this.spentMs = 0;
+    this.snapshot = null;
+  }
+
+  Chooser.prototype.done = function (sq) {
+    this.move = sq;
+    this.phase = 'done';
+    return true;
+  };
+
+  /* 反復深化を打ち切って、いままでで一番よい手を返す */
+  Chooser.prototype.endMid = function () {
+    OKAI.lastCost.mid = OK.getNodes();
+    return this.done(this.best >= 0 ? this.best : this.moves[0]);
+  };
+
+  Chooser.prototype.step = function () {
+    var cfg = this.cfg, b = this.b, p = this.p, rnd = this.rnd;
+    var moves, empties, i, r, cs, t0;
+
+    if (this.phase === 'init') {
+      OKAI.lastCost = { end: 0, mid: 0 };
+      moves = OK.legalMoves(b, p);
+      this.moves = moves;
+      if (moves.length === 0) { return this.done(-1); }
+      if (moves.length === 1) { return this.done(moves[0]); }
+
+      empties = 64 - OK.discCount(b);
+
+      /* 先読みの段＝でたらめを打つかどうかは、1手につき1回だけ引く。
+         （以前は終盤でもう1回引いていたため、eps の意味が終盤だけ違っていた＝査読で判明） */
+      if (cfg.kind === 'search' && cfg.eps && rnd() < cfg.eps) {
+        return this.done(moves[Math.floor(rnd() * moves.length)]);
+      }
+      /* おわりの完全読み＝あきマスが少なくなったら最後まで読む。
+         読む局面が上限を超えたら あきらめて、中盤の読みへ落ちる（時間を守るため） */
+      if (cfg.kind === 'search' && cfg.endEmpties && empties <= cfg.endEmpties) {
+        this.phase = 'end';
+        return false;
+      }
+      this.phase = (cfg.kind === 'random') ? 'random' : 'mid';
+      return false;
+    }
+
+    if (this.phase === 'end') {
+      r = bestMoveEndBudgeted(b, p, cfg.endBudget || END_BUDGET);
+      OKAI.lastCost.end = r.nodes;
+      if (r.move >= 0) { return this.done(r.move); }
+      this.phase = 'mid';
+      return false;
+    }
+
+    if (this.phase === 'random') {
+      moves = this.moves;
+      /* かどが取れるなら、決めた確率で取る */
+      if (cfg.cornerP) {
+        cs = [];
+        for (i = 0; i < moves.length; i++) {
+          if (isCorner(moves[i])) { cs.push(moves[i]); }
+        }
+        if (cs.length > 0 && rnd() < cfg.cornerP) {
+          return this.done(cs[Math.floor(rnd() * cs.length)]);
+        }
+      }
+      /* わざと一番わるい手を打つ（一番よわい段を作るため） */
+      if (cfg.bad && rnd() < cfg.bad) {
+        return this.done(worstMove(b, p, moves, cfg.badDepth));
+      }
+      return this.done(moves[Math.floor(rnd() * moves.length)]);
+    }
+
+    /* mid＝反復深化＋読む局面の上限。1回の step で ふかさ1つぶんだけ読む。
+       上限に当たったら1つ前のふかさの手を返す */
+    if (this.snapshot === null) {
+      this.snapshot = OK.copyBoard(b);
+      this.depth = 0;
+      this.best = -1;
+      this.spentMs = 0;
+      OK.resetNodes();
+    }
+    this.depth++;
+    /* 時間の安全弁（設計書4.4・4.10章）＝段の指定は局面の数のままにしつつ、
+       端末が思ったより遅かったときのために、次の深さへ進む前に時計を見る。
+       ふつうは節点予算のほうが先に効くので、ここは効かない。
+       数えるのは読みに使った時間だけ＝息をついだ時間は入れない（分割しても同じ所で止まる）。 */
+    if (this.depth > 1 && this.spentMs > TIME_GUARD_MS) { return this.endMid(); }
+    if (this.depth > cfg.depth) { return this.endMid(); }
+    OK.setBudget(cfg.budget || MID_BUDGET);
+    t0 = OK.now();
+    try {
+      r = OK.bestMoveMid(b, p, this.depth);
+      if (r.move >= 0) { this.best = r.move; }
+    } catch (e) {
+      OK.clearBudget();
+      if (e !== OK.BUDGET_STOP) { throw e; }
+      /* 途中でやめた＝盤が読みの途中の形で残っているので写しから戻す */
+      restore(b, this.snapshot);
+      return this.endMid();
+    }
+    OK.clearBudget();
+    this.spentMs += OK.now() - t0;
+    return false;
+  };
+
+  /* 画面から使う入口＝1手ぶんの「読み係」を作る */
+  OKAI.makeChooser = function (b, p, cfg, rnd) { return new Chooser(b, p, cfg, rnd); };
+
+  /* Macの測定台本から使う入口＝止めずに最後まで読む */
+  OKAI.chooseMove = function (b, p, cfg, rnd) {
+    var c = new Chooser(b, p, cfg, rnd);
+    while (!c.step()) { /* 決まるまで回す */ }
+    return c.move;
+  };
+
+  /* ================= 子ども代理（6歳の打ちかたの見立て・設計書P3(b)） ================= */
+
+  /* ①「たくさん取る」＝一番多くひっくり返る手を選ぶ（同点なら乱数） */
+  function proxyGreedy(b, p, rnd) {
+    var moves = OK.legalMoves(b, p);
+    if (moves.length === 0) { return -1; }
+    var best = [], bestN = -1, i, n;
+    for (i = 0; i < moves.length; i++) {
+      n = OK.countFlips(b, moves[i], p);
+      if (n > bestN) { bestN = n; best = [moves[i]]; }
+      else if (n === bestN) { best.push(moves[i]); }
+    }
+    return best[Math.floor(rnd() * best.length)];
+  }
+
+  /* ②「たくさん取る＋かどが取れるときは必ず取る」 */
+  function proxyGreedyCorner(b, p, rnd) {
+    var moves = OK.legalMoves(b, p);
+    if (moves.length === 0) { return -1; }
+    var cs = [], i;
+    for (i = 0; i < moves.length; i++) {
+      if (isCorner(moves[i])) { cs.push(moves[i]); }
+    }
+    if (cs.length > 0) { return cs[Math.floor(rnd() * cs.length)]; }
+    return proxyGreedy(b, p, rnd);
+  }
+
+  OKAI.PROXIES = {
+    greedy: { key: 'greedy', name: 'たくさん とる', fn: proxyGreedy },
+    greedyCorner: { key: 'greedyCorner', name: 'たくさん とる＋かど', fn: proxyGreedyCorner }
+  };
+
+  /* ================= 1局うつ =================
+     black / white ＝ { type:'level', level:n } または { type:'proxy', key:'greedy' }
+     openingPlies ＝ 最初の何手かを乱数で打って、同じ相手どうしでも別の将棋にする数
+     戻り値＝ { winner: 1|2|0, blackDiscs, whiteDiscs, moves:[{sq,player}] } */
+  function pickBy(spec, b, p, rnd) {
+    if (spec.type === 'proxy') { return OKAI.PROXIES[spec.key].fn(b, p, rnd); }
+    if (spec.type === 'cfg') { return OKAI.chooseMove(b, p, spec.cfg, rnd); }
+    return OKAI.chooseMove(b, p, OKAI.cfgOf(spec.level), rnd);
+  }
+  OKAI.pickBy = pickBy;
+
+  OKAI.playGame = function (black, white, seed, openingPlies) {
+    var b = OK.initBoard(), p = OK.BLACK, rnd = OKAI.makeRnd(seed);
+    var passed = false, ply = 0, moves = [], sq, legal;
+    var op = (typeof openingPlies === 'number') ? openingPlies : 0;
+    while (true) {
+      legal = OK.legalMoves(b, p);
+      if (legal.length === 0) {
+        if (passed) { break; }
+        passed = true;
+        p = OK.other(p);
+        continue;
+      }
+      passed = false;
+      if (ply < op) {
+        sq = legal[Math.floor(rnd() * legal.length)];
+      } else {
+        sq = pickBy(p === OK.BLACK ? black : white, b, p, rnd);
+        if (sq < 0) { sq = legal[0]; }
+      }
+      OK.applyMove(b, sq, p);
+      moves.push({ sq: sq, player: p });
+      ply++;
+      p = OK.other(p);
+    }
+    var nb = 0, nw = 0, i;
+    for (i = 0; i < 64; i++) {
+      if (b[i] === OK.BLACK) { nb++; }
+      else if (b[i] === OK.WHITE) { nw++; }
+    }
+    return {
+      winner: nb > nw ? OK.BLACK : (nw > nb ? OK.WHITE : 0),
+      blackDiscs: nb, whiteDiscs: nw, moves: moves, board: b
+    };
+  };
+})();
+
+if (typeof module !== 'undefined' && module.exports) { module.exports = OKAI; }
+
+</script>
+<script>
+/* つよくなるオセロ ── 悪手の判定器（負けたときの説明のもと）
+   2026-09-21 工程1。ES5のみ。core.js を先に load すること。
+
+   設計書4.5章の仕組み＝
+     ①対局が終わってから、子の打った手を いちばん強い読み で採点する
+     ②最善手との差（損）が しきい値 以上の手だけを「悪手」とする
+     ③悪手の中で いちばん損の大きい1手を選ぶ
+     ④その手に「型の名前」を付ける。当てはまらなければ名前を付けずに絵と1行だけ出す
+     ⑤悪手が1つも無ければ、理由を言わない
+   列挙型の条件（「隅の隣に打った→隅を取られた」等）を単独で使わないのは、
+   他に手が無い局面でも発火して、避けようのない手を叱るため（査読の致命指摘）。
+   採点方式なら、置ける手が全部同じ損の局面は自動的に悪手にならない。 */
+
+var OKB = {};
+
+(function () {
+  'use strict';
+
+  /* 採点に使う読み。
+     梯子の最上段と同じ「ふかさ6・あき12マス」で採点すると、1局の採点に
+     まん中598,984局面・最悪933,155局面かかる＝2012年のiPadで30〜46秒（実測 judge_cost.js）。
+     子どもを待たせられないので、採点はこれより浅くする。
+     浅くしても、大きな損（かどを渡した等）は見つかる＝P4の試験で確かめる。
+     設計書4.5章は「5手読み・終盤10マス完全読み」と書いていた。
+     あき10マスにすると、中盤の読み（ふかさ5）が終局まで届いてしまう局面があり、
+     そこだけ損の単位が変わる（終局の値は石差×1000で、途中の見積りは数百のため）。
+     実測＝じょうずな打ちての手に、あき10マスでは最悪53,541の「損」が出た。
+     あき12マスにすると中盤の読みは終局に届かず、最悪156に収まる。よって12マスにする。 */
+  var JUDGE_DEPTH = 4;
+  var JUDGE_END_EMPTIES = 12;
+
+  /* しきい値。終盤は石の数そのもの、中盤は見積りの目もり。
+     中盤のしきい値は、判定器自身の見立て違いより大きく取る。
+     実測（judge_noise.js・16局）＝じょうずな打ちての手に出た「損」は
+     まん中0・p90=8・p95=17・p99=48。60ならこの誤差の外側になる。
+     終盤のしきい値は、中盤と厳しさを揃える。設計書3.2章の「石差4以上」は
+     セオリーの型の定義であって、悪手のしきい値としては中盤より緩く、
+     4石にすると出る理由の45.8%が「さいごの かぞえ」に偏った（実測 type_dist.js）。
+     8石にすると「かど」の話が46.9%・「さいごの かぞえ」が18.8%になり、
+     終盤の手数の割合（子の手の14%）と釣り合う。 */
+  var END_LOSS_MIN = 12;   /* 終盤＝最善手より12石以上そんをしたら悪手 */
+  var MID_LOSS_MIN = 100;  /* 中盤＝見積りで100目もり以上そんをしたら悪手 */
+
+  OKB.JUDGE_DEPTH = JUDGE_DEPTH;
+  OKB.JUDGE_END_EMPTIES = JUDGE_END_EMPTIES;
+  OKB.setJudgeSearch = function (depth, endEmpties) {
+    if (typeof depth === 'number') { JUDGE_DEPTH = depth; }
+    if (typeof endEmpties === 'number') { JUDGE_END_EMPTIES = endEmpties; }
+  };
+  OKB.getJudgeSearch = function () {
+    return { depth: JUDGE_DEPTH, endEmpties: JUDGE_END_EMPTIES };
+  };
+  OKB.setThresholds = function (mid, end) {
+    if (typeof mid === 'number') { MID_LOSS_MIN = mid; }
+    if (typeof end === 'number') { END_LOSS_MIN = end; }
+  };
+  OKB.getThresholds = function () { return { mid: MID_LOSS_MIN, end: END_LOSS_MIN }; };
+
+  /* かどの となり（X・C）と、そのかど */
+  var NEXT_TO_CORNER = {
+    1: 0, 8: 0, 9: 0,
+    6: 7, 15: 7, 14: 7,
+    48: 56, 57: 56, 49: 56,
+    55: 63, 62: 63, 54: 63
+  };
+  var CORNERS = [0, 7, 56, 63];
+
+  function cornerMovesFor(b, p) {
+    var out = [], i;
+    for (i = 0; i < CORNERS.length; i++) {
+      if (OK.countFlips(b, CORNERS[i], p) > 0) { out.push(CORNERS[i]); }
+    }
+    return out;
+  }
+
+  /* ================= 型の名前を付ける =================
+     手がかりは「その手を打つ前の盤」「打ったマス」「その後の実際の進行」。 */
+  var TYPES = {
+    noCorner: {
+      key: 'noCorner', name: 'かどを とらなかった',
+      why: 'ここに おいた。でも かどが とれたよ',
+      next: 'つぎは かどが とれるとき とろう'
+    },
+    nextToCorner: {
+      key: 'nextToCorner', name: 'かどの となり（とられた）',
+      why: 'ここに おいて、かどを とられた',
+      next: 'つぎは かどの となりは あけておこう'
+    },
+    /* あきかどの となりに打ったが、そのあと相手がかどを取らなかった場合。
+       「とられた」と言うと事実とちがう（6歳にうその理由を教える）ので文を分ける。 */
+    nextToCornerSafe: {
+      key: 'nextToCornerSafe', name: 'かどの となり',
+      why: 'ここは あいている かどの となり',
+      next: 'つぎは かどの となりは あけておこう'
+    },
+    gaveCorner: {
+      key: 'gaveCorner', name: 'かどを わたした',
+      why: 'この てで あいてに かどを あげた',
+      next: 'つぎは かどを わたさない てを さがそう'
+    },
+    lostMobility: {
+      key: 'lostMobility', name: 'おける ばしょが なくなった',
+      why: 'この あと おける ところが へった',
+      next: 'つぎは おける ばしょを のこそう'
+    },
+    tookTooMany: {
+      key: 'tookTooMany', name: 'たくさん とりすぎ',
+      why: 'ここで たくさん とりすぎた',
+      next: 'さいしょは すこしだけ とろう'
+    },
+    endCount: {
+      key: 'endCount', name: 'さいごの かぞえ',
+      why: 'さいごの ところで そんを した',
+      next: 'さいごは ゆっくり かぞえよう'
+    },
+    none: {
+      key: 'none', name: '',
+      why: 'ここは そんを した',
+      next: 'つぎは べつの ところも みてみよう'
+    }
+  };
+  OKB.TYPES = TYPES;
+
+  OKB.NO_BLUNDER_TEXT = 'あいてが つよかった。もういっかい やろう';
+
+  /* ================= 採点にかける上限 =================
+     判定述語P5は「相手の1手」しか縛っていないが、採点は対局が終わったあとに
+     まとめて走るので、そこにも上限が要る（査読の致命指摘・2026-09-21）。
+     上限が無いと、実機で最悪21.5秒ほど画面が止まる。
+     時間ではなく読む局面の数で決める＝端末に依らない。
+     換算は工程0.5の実測（中盤＝1秒20,276局面／終盤＝1秒166,938局面）。
+     1局ぶんの上限＝実機で約3秒ぶん。使い切ったら、そこから先の手は採点しない。 */
+  var JUDGE_MS_CAP = 5000;
+  /* 終盤の1手ぶんの上限（局面の数）＝実機で約0.9秒 */
+  var END_MOVE_BUDGET = 150000;
+  var IPAD_MID_NPS = 20276;
+  var IPAD_END_NPS = 166938;
+  OKB.JUDGE_MS_CAP = JUDGE_MS_CAP;
+  OKB.setJudgeCap = function (ms) {
+    if (typeof ms === 'number' && ms > 0) { JUDGE_MS_CAP = ms; }
+  };
+
+  /* 1局の採点で読んだ局面の数（中盤ぶん・終盤ぶんに分けて記録する）＝実機の時間の見積りに使う */
+  OKB.lastCost = { mid: 0, end: 0 };
+  /* 上限に当たって、途中で採点をやめたかどうか */
+  OKB.lastCappedAt = -1;
+
+  /* ---- 途中で止められる形（工程2・判定述語P9「そのあいだ画面が固まらない」） ----
+     step() を1回呼ぶと 棋譜の1手ぶんだけ進める。まだ終わっていなければ false を返す。
+     いちばん重い1手（終盤の完全読み）でも上限150,000局面＝実機で約0.9秒なので、
+     その合間に setTimeout(0) で画面が息をつげる。
+     採点の道すじはこの1本だけ＝下の judge（いままでの呼び方）は、
+     これを最後まで回すだけの薄い皮。Macの試験と画面のアプリが別物にならない。 */
+  function Judger(moves, childColor) {
+    OKB.lastCost = { mid: 0, end: 0 };
+    OKB.lastCappedAt = -1;
+    /* 採点のあいだだけ、中盤の読みの終局値を ふつうの見積り に揃える（単位をそろえるため） */
+    OK.setMidTerminalAsEval(true);
+    this.moves = moves;
+    this.childColor = childColor;
+    this.b = OK.initBoard();
+    this.p = OK.BLACK;
+    this.mi = 0;
+    this.passes = 0;
+    this.spentMs = 0;
+    this.blunders = [];
+    this.boards = [];   /* 各手を打つ前の盤の写し（絵に使う） */
+    this.turns = [];    /* 各手の手番 */
+    this.finished = false;
+  }
+
+  /* どこまで進んだか（0〜1）＝画面の「しらべちゅう」の目もりに使う */
+  Judger.prototype.progress = function () {
+    if (this.moves.length === 0) { return 1; }
+    return this.mi / this.moves.length;
+  };
+
+  /* 途中でやめる（画面を離れたとき）＝読みの見方を対局用へ戻す */
+  Judger.prototype.cancel = function () {
+    if (!this.finished) {
+      this.finished = true;
+      OK.setMidTerminalAsEval(false);
+    }
+  };
+
+  Judger.prototype.step = function () {
+    var moves = this.moves, childColor = this.childColor;
+    var b = this.b, p = this.p;
+    var legal, sq, empties, best, played, loss, phase, nBefore;
+
+    if (this.finished) { return true; }
+    if (this.mi >= moves.length) { return this.wrapUp(); }
+
+    legal = OK.legalMoves(b, p);
+    if (legal.length === 0) {
+      /* 両方とも打てないのに手が残っている＝棋譜が壊れている。
+         無限に回らないよう、ここで止める（正しい棋譜では起きない）。 */
+      this.passes++;
+      if (this.passes >= 2) { return this.wrapUp(); }
+      this.p = OK.other(p);
+      return false;
+    }
+    this.passes = 0;
+    sq = moves[this.mi].sq;
+    if (moves[this.mi].player !== p) {
+      /* 文はローマ字で書く＝画面の文字に漢字を1字も出さないため（判定述語P7）。
+         これは作り手向けの合図であって、子どもには見せない文である。 */
+      throw new Error('kifu no teban ga awanai ply=' + this.mi);
+    }
+    this.boards.push(OK.copyBoard(b));
+    this.turns.push(p);
+
+    /* 上限を使い切ったら、そこから先の手は採点しない（画面を止めないため）。
+       採点した範囲の中で いちばん損の大きい手を出す。 */
+    if (p === childColor && legal.length >= 2 && this.spentMs < JUDGE_MS_CAP) {
+      empties = 64 - OK.discCount(b);
+      nBefore = OK.getNodes();
+      if (empties <= JUDGE_END_EMPTIES) {
+        phase = 'end';
+        /* 1手ぶんの上限も置く＝重い局面1つで上限を大きく飛び越さないため。
+           上限に当たった手は採点しない（悪手として扱わない）。 */
+        var snap = OK.copyBoard(b), gaveUp = false;
+        OK.setBudget(END_MOVE_BUDGET);
+        OK.resetNodes();
+        nBefore = 0;          /* 数え直したので、この手の起点も0に合わせる */
+        try {
+          best = OK.bestMoveEnd(b, p).value;
+        } catch (e2) {
+          OK.clearBudget();
+          if (e2 !== OK.BUDGET_STOP) { throw e2; }
+          for (var ri = 0; ri < 64; ri++) { b[ri] = snap[ri]; }
+          gaveUp = true;
+        }
+        if (gaveUp) {
+          OKB.lastCost.end += END_MOVE_BUDGET;
+          OK.applyMove(b, sq, p);
+          this.p = OK.other(p);
+          this.mi++;
+          return false;
+        }
+        OK.clearBudget();
+        /* 中盤と同じく、まず「しきい値ぶん損をしているか」だけを安く調べる */
+        if (OK.moveValueAtMostEnd(b, p, sq, best - END_LOSS_MIN)) {
+          played = OK.valueOfMoveEnd(b, p, sq);
+        } else {
+          played = best;
+        }
+        OKB.lastCost.end += OK.getNodes() - nBefore;
+      } else {
+        phase = 'mid';
+        best = OK.bestMoveMid(b, p, JUDGE_DEPTH).value;
+        /* まず「しきい値ぶん損をしているか」だけを安く調べ、
+           損をしている手だけ、値そのものを出し直す（重い読みを減らすため） */
+        if (OK.moveValueAtMostMid(b, p, sq, JUDGE_DEPTH, best - MID_LOSS_MIN)) {
+          played = OK.valueOfMoveMid(b, p, sq, JUDGE_DEPTH);
+        } else {
+          played = best;   /* 悪手ではない＝損0として扱う */
+        }
+        OKB.lastCost.mid += OK.getNodes() - nBefore;
+      }
+      this.spentMs = OKB.lastCost.mid / IPAD_MID_NPS * 1000
+                   + OKB.lastCost.end / IPAD_END_NPS * 1000;
+      if (this.spentMs >= JUDGE_MS_CAP && OKB.lastCappedAt < 0) {
+        OKB.lastCappedAt = this.mi;
+      }
+      loss = best - played;
+      if (loss >= (phase === 'end' ? END_LOSS_MIN : MID_LOSS_MIN)) {
+        this.blunders.push({
+          ply: this.mi, sq: sq, loss: loss, phase: phase,
+          /* しきい値で割った値＝中盤と終盤の損を同じものさしで比べるため */
+          ratio: loss / (phase === 'end' ? END_LOSS_MIN : MID_LOSS_MIN),
+          legalCount: legal.length, flips: OK.countFlips(b, sq, p)
+        });
+      }
+    }
+    OK.applyMove(b, sq, p);
+    this.p = OK.other(p);
+    this.mi++;
+    return false;
+  };
+
+  Judger.prototype.wrapUp = function () {
+    this.finished = true;
+    OK.setMidTerminalAsEval(false);   /* 採点はここまで＝対局用の見方へ戻す */
+    return true;
+  };
+
+  /* ================= 1局を採点する =================
+     moves ＝ playGame が返す [{sq, player}]／ childColor ＝ OK.BLACK か OK.WHITE
+     戻り値＝ { blunders:[…], worst:{…}|null } */
+  Judger.prototype.result = function () {
+    var blunders = this.blunders, i, worst;
+    if (blunders.length === 0) { return { blunders: [], worst: null }; }
+    worst = blunders[0];
+    for (i = 1; i < blunders.length; i++) {
+      if (blunders[i].ratio > worst.ratio) { worst = blunders[i]; }
+    }
+    worst.type = nameType(worst, this.boards, this.turns, this.moves, this.childColor);
+    worst.boardBefore = this.boards[worst.ply];
+    worst.oppCorner = cornerTakenAfter(this.moves, worst.ply, this.childColor);
+    return { blunders: blunders, worst: worst };
+  };
+
+  /* 画面から使う入口＝1局ぶんの「採点係」を作る */
+  OKB.makeJudger = function (moves, childColor) { return new Judger(moves, childColor); };
+
+  /* Macの試験台本から使う入口＝止めずに最後まで採点する */
+  OKB.judge = function (moves, childColor) {
+    var j = new Judger(moves, childColor);
+    while (!j.step()) { /* 終わるまで回す */ }
+    return j.result();
+  };
+
+  /* その手のあと4手いないに、相手がかどを取ったか（絵に印を付けるため） */
+  function cornerTakenAfter(moves, ply, childColor) {
+    var i, m;
+    for (i = ply + 1; i < moves.length && i <= ply + 4; i++) {
+      m = moves[i];
+      if (m.player !== childColor && NEXT_TO_CORNER[m.sq] === undefined) {
+        if (m.sq === 0 || m.sq === 7 || m.sq === 56 || m.sq === 63) { return m.sq; }
+      }
+    }
+    return -1;
+  }
+
+  function nameType(bl, boards, turns, moves, childColor) {
+    var b0 = boards[bl.ply], p = childColor, opp = OK.other(p), sq = bl.sq;
+
+    /* ①かどが取れたのに取らなかった */
+    var cm = cornerMovesFor(b0, p);
+    if (cm.length > 0 && !(sq === 0 || sq === 7 || sq === 56 || sq === 63)) {
+      return TYPES.noCorner;
+    }
+
+    /* 打った後の盤を作る */
+    var b1 = OK.copyBoard(b0);
+    OK.applyMove(b1, sq, p);
+
+    /* ②かどの となり に打って、あいたかどを相手に取られた */
+    var c = NEXT_TO_CORNER[sq];
+    if (c !== undefined && b0[c] === OK.EMPTY) {
+      if (cornerTakenAfter(moves, bl.ply, childColor) >= 0) { return TYPES.nextToCorner; }
+      return TYPES.nextToCornerSafe;
+    }
+
+    /* ③この手で、相手がかどに打てるようになった */
+    var before = cornerMovesFor(b0, opp).length;
+    var after = cornerMovesFor(b1, opp).length;
+    if (after > before) { return TYPES.gaveCorner; }
+
+    /* ④終盤の数えそこない */
+    if (bl.phase === 'end') { return TYPES.endCount; }
+
+    /* ⑤この手の後、自分の置ける場所が減った（相手が1手返した時点で2つ以下、またはパス） */
+    var myNext = legalCountAfterReply(moves, bl.ply, childColor, b1);
+    if (myNext >= 0 && myNext <= 2) { return TYPES.lostMobility; }
+
+    /* ⑥序盤でたくさん取りすぎた＝20手目まで（設計書3.2「さいしょは すこしだけ とる」） */
+    if (bl.ply < 20 && bl.flips >= 4) { return TYPES.tookTooMany; }
+
+    return TYPES.none;
+  }
+
+  /* 子が打ち、相手が1手返した時点で、子に置ける場所がいくつ残っているか。
+     0＝パス（打つ所が無い）。相手の手が棋譜に無ければ -1（判定しない）。 */
+  function legalCountAfterReply(moves, ply, childColor, boardAfterChildMove) {
+    var i, b = OK.copyBoard(boardAfterChildMove), opp = OK.other(childColor);
+    for (i = ply + 1; i < moves.length; i++) {
+      if (moves[i].player === opp) {
+        OK.applyMove(b, moves[i].sq, opp);
+        return OK.legalMoves(b, childColor).length;
+      }
+      /* 次が自分の手＝相手がパスした＝相手の手は無い */
+      return OK.legalMoves(b, childColor).length;
+    }
+    return -1;
+  }
+
+  /* ================= 画面に出す形にする（設計書4.5章の4部品） ================= */
+  OKB.describe = function (result) {
+    if (!result.worst) {
+      return { hasReason: false, why: OKB.NO_BLUNDER_TEXT, next: '', type: '' };
+    }
+    var w = result.worst;
+    return {
+      hasReason: true,
+      type: w.type.key,
+      typeName: w.type.name,
+      why: w.type.why,
+      next: w.type.next,
+      sq: w.sq,
+      loss: w.loss,
+      phase: w.phase,
+      board: w.boardBefore,
+      oppCorner: w.oppCorner
+    };
+  };
+})();
+
+if (typeof module !== 'undefined' && module.exports) { module.exports = OKB; }
+
+</script>
+<script>
+/* つよくなるオセロ ── 記録ときまり（画面に触らない部分）
+   2026-09-21 工程2。ES5のみ・DOMを使わない＝Macの試験台本からそのまま動かせる。
+   core.js を先に load すること。
+
+   ここに置くもの＝レベルの開きかた（判定述語P2）・端末内の保存・できたことスタンプ・
+   置けないマスを押したときの段階（判定述語P1）。
+   画面の組み立て（ui.js）と分けてあるのは、ここだけを jsc で試験できるようにするため。 */
+
+var OKR = {};
+
+(function () {
+  'use strict';
+
+  var LEVELS = 20;
+  OKR.LEVELS = LEVELS;
+
+  /* 端末内の保存の鍵。othelloKids_ で始まる鍵しか使わない＝
+     同じ公開先に住む「おかえりクエスト」の記録を壊さないため（設計書2.1章）。
+     localStorage.clear() は全消去になるので、この道具では1度も使わない。 */
+  var KEY = 'othelloKids_save';
+  OKR.KEY = KEY;
+  OKR.KEYS = [KEY];
+
+  /* ---- まっさらな記録 ---- */
+  OKR.newSave = function () {
+    return {
+      v: 1,
+      won: {},        /* won[レベル] = { black: true/false, white: true/false } */
+      stamps: {},     /* stamps[しるしの名] = 回数 */
+      games: [],      /* 終わった対局の記録（新しい順・50局まで） */
+      sound: true,
+      openAll: false  /* おうちのひと画面で「ぜんぶ ひらく」を押したか */
+    };
+  };
+
+  /* 古い形・壊れた形でも落ちないように整える */
+  OKR.normalize = function (s) {
+    var base = OKR.newSave(), k;
+    if (!s || typeof s !== 'object') { return base; }
+    for (k in base) {
+      if (base.hasOwnProperty(k) && s[k] !== undefined && s[k] !== null) { base[k] = s[k]; }
+    }
+    if (typeof base.won !== 'object') { base.won = {}; }
+    if (typeof base.stamps !== 'object') { base.stamps = {}; }
+    if (Object.prototype.toString.call(base.games) !== '[object Array]') { base.games = []; }
+    base.sound = !!base.sound;
+    base.openAll = !!base.openAll;
+    return base;
+  };
+
+  /* ---- 読み書き（try-catch で囲む＝私的ブラウズでは書けないことがある） ---- */
+  OKR.load = function (store) {
+    var raw = null;
+    try { raw = store.getItem(KEY); } catch (e) { return OKR.newSave(); }
+    if (!raw) { return OKR.newSave(); }
+    try { return OKR.normalize(JSON.parse(raw)); } catch (e2) { return OKR.newSave(); }
+  };
+
+  OKR.save = function (store, s) {
+    try { store.setItem(KEY, JSON.stringify(s)); return true; } catch (e) { return false; }
+  };
+
+  /* やりなおし＝自分の鍵だけを消す。clear() は使わない（他のアプリの記録まで消えるため） */
+  OKR.wipe = function (store) {
+    var i;
+    for (i = 0; i < OKR.KEYS.length; i++) {
+      try { store.removeItem(OKR.KEYS[i]); } catch (e) { /* 消せなくても進む */ }
+    }
+    return OKR.newSave();
+  };
+
+  /* ================= レベルの開きかた（判定述語P2） ================= */
+
+  OKR.wonWith = function (s, level, color) {
+    var w = s.won[String(level)];
+    if (!w) { return false; }
+    return color === OK.BLACK ? !!w.black : !!w.white;
+  };
+
+  /* そのレベルは「くろでも しろでも 勝った」か */
+  OKR.isCleared = function (s, level) {
+    return OKR.wonWith(s, level, OK.BLACK) && OKR.wonWith(s, level, OK.WHITE);
+  };
+
+  /* そのレベルで遊べるか＝1段目はいつでも／それ以外は1つ前を両方の色で勝っていること */
+  OKR.isOpen = function (s, level) {
+    if (level < 1 || level > LEVELS) { return false; }
+    if (s.openAll) { return true; }
+    if (level === 1) { return true; }
+    return OKR.isCleared(s, level - 1);
+  };
+
+  OKR.openCount = function (s) {
+    var n = 0, i;
+    for (i = 1; i <= LEVELS; i++) { if (OKR.isOpen(s, i)) { n++; } }
+    return n;
+  };
+
+  /* 勝ちを書き込む。戻り値＝この1勝で新しく開いたレベル（開かなければ0） */
+  OKR.markWin = function (s, level, color) {
+    var key = String(level), openedBefore = OKR.isOpen(s, level + 1);
+    if (!s.won[key]) { s.won[key] = { black: false, white: false }; }
+    if (color === OK.BLACK) { s.won[key].black = true; } else { s.won[key].white = true; }
+    if (!openedBefore && OKR.isOpen(s, level + 1) && level + 1 <= LEVELS) { return level + 1; }
+    return 0;
+  };
+
+  /* ================= できたこと スタンプ（勝ち負けと別に貯まる） ================= */
+  var STAMPS = [
+    { key: 'corner', name: 'かどを とった' },
+    { key: 'edge', name: 'はしを つかった' },
+    { key: 'pass', name: 'パスさせた' },
+    { key: 'last', name: 'さいごまで うった' }
+  ];
+  OKR.STAMPS = STAMPS;
+
+  function isCorner(sq) { return sq === 0 || sq === 7 || sq === 56 || sq === 63; }
+  function isEdge(sq) {
+    var r = sq >> 3, c = sq & 7;
+    if (isCorner(sq)) { return false; }
+    return r === 0 || r === 7 || c === 0 || c === 7;
+  }
+
+  /* 終わった1局から、その局で取れたスタンプの名を出す。
+     moves ＝ [{sq, player}]（最後まで打ち切った棋譜）／ childColor ＝ 子の色 */
+  OKR.stampsOf = function (moves, childColor) {
+    var got = {}, i, prevPlayer = -1;
+    for (i = 0; i < moves.length; i++) {
+      if (moves[i].player === childColor) {
+        if (isCorner(moves[i].sq)) { got.corner = true; }
+        if (isEdge(moves[i].sq)) { got.edge = true; }
+        /* 自分の手が2回つづいた＝あいてに置く所が無かった＝パスさせた */
+        if (prevPlayer === childColor) { got.pass = true; }
+      }
+      prevPlayer = moves[i].player;
+    }
+    got.last = true;   /* 最後まで打ち切った局でしか呼ばない */
+    var out = [], k;
+    for (k = 0; k < STAMPS.length; k++) {
+      if (got[STAMPS[k].key]) { out.push(STAMPS[k].key); }
+    }
+    return out;
+  };
+
+  OKR.addStamps = function (s, keys) {
+    var i, k;
+    for (i = 0; i < keys.length; i++) {
+      k = keys[i];
+      s.stamps[k] = (s.stamps[k] || 0) + 1;
+    }
+  };
+
+  OKR.stampName = function (key) {
+    var i;
+    for (i = 0; i < STAMPS.length; i++) { if (STAMPS[i].key === key) { return STAMPS[i].name; } }
+    return key;
+  };
+
+  /* ================= 対局の記録（おうちのひと画面で見る） ================= */
+  var MAX_GAMES = 50;
+  OKR.MAX_GAMES = MAX_GAMES;
+
+  OKR.addGame = function (s, rec) {
+    s.games.unshift(rec);
+    while (s.games.length > MAX_GAMES) { s.games.pop(); }
+  };
+
+  /* 負け理由の出た回数を数える（おうちのひと画面の表） */
+  OKR.reasonCounts = function (s) {
+    var out = {}, i, r;
+    for (i = 0; i < s.games.length; i++) {
+      r = s.games[i].reason;
+      if (r) { out[r] = (out[r] || 0) + 1; }
+    }
+    return out;
+  };
+
+  /* ================= 置けないマスを押したときの段階（判定述語P1） =================
+     設計書4.2章＝3回つづけて「はさめない所」を押したらルールの絵、6回で「いっしょに さがそう」。
+     場所は絶対に示さない（しげ裁定Q1＝A案）。
+     石のあるマスを押したのは数に入れない＝そちらは別の文が出るため。
+     戻り値 0＝文だけ / 1＝ルールの絵も出す / 2＝「いっしょに さがそう」も出す */
+  OKR.lectureStage = function (missCount) {
+    if (missCount >= 6) { return 2; }
+    if (missCount >= 3) { return 1; }
+    return 0;
+  };
+})();
+
+if (typeof module !== 'undefined' && module.exports) { module.exports = OKR; }
+
+</script>
+<script>
+/* つよくなるオセロ ── 画面に出す ことば を ぜんぶ ここに置く
+   2026-09-21 工程2。ES5のみ・DOMを使わない。
+
+   なぜ1か所に集めるか＝
+     ①漢字が1字も無いこと（判定述語P7）を機械で見るため＝見る場所が1つで済む
+     ②工程3で初見の読みやすさを見てもらうとき、ことば だけを読めばよくするため
+     ③同じ言い回しが2か所に散らばらないようにするため（直し忘れを防ぐ）
+   きまり（設計書4.7章）＝ひらがな・カタカナ・数字だけ。分かち書き。1文10〜15字・1文1事。
+   使わないことば＝「よわい」「にがて」「てんさい」「すごすぎる」。
+   負け理由の文そのものは blunder.js（判定器）が持っている＝そちらが正本。 */
+
+var OKT = {};
+
+(function () {
+  'use strict';
+
+  OKT.appName = 'つよくなるオセロ';
+
+  /* ---- れべるの ちず ---- */
+  OKT.map = {
+    title: 'きょうは どの あいてと たたかう？',
+    help: 'くろでも しろでも かつと つぎの あいてが ひらくよ',
+    locked: 'まだ',
+    levelWord: 'れべる',
+    pickTitle: 'どっちの いろで たたかう？',
+    pickBlack: 'くろで たたかう',
+    pickWhite: 'しろで たたかう',
+    pickBack: 'やめる',
+    doneBlack: 'くろで かった',
+    doneWhite: 'しろで かった',
+    stampTitle: 'できた こと',
+    stampNone: 'まだ ないよ。あそぶと たまるよ'
+  };
+
+  /* ---- たいきょく ---- */
+  OKT.game = {
+    yourTurn: 'きみの ばん',
+    aiTurn: 'かんがえちゅう…',
+    black: 'くろ',
+    white: 'しろ',
+    you: 'きみ',
+    ai: 'あいて',
+    occupied: 'ここには もう いしが あるよ',
+    noFlip: 'ここは はさめないよ',
+    lecture: 'あいての いしを はさもう',
+    lectureHow: 'じぶんの いしで あいての いしを はさむと ひっくりかえる',
+    together: 'むずかしいね。いっしょに さがそう',
+    quit: 'やめて ちずに もどる',
+    passYou: 'おける ところが ないよ。パス！',
+    passAi: 'あいても おける ところが ない。パス！',
+    thinking: 'かんがえちゅう'
+  };
+
+  /* ---- けっか ---- */
+  OKT.result = {
+    win: 'かち！',
+    lose: 'まけ。でも まだ これから',
+    draw: 'ひきわけ',
+    judging: 'まけた わけを しらべて いるよ',
+    again: 'もういっかい',
+    back: 'ちずに もどる',
+    unlocked: 'つぎの あいてが ひらいた！',
+    needOther: 'もういっぽうの いろでも かつと つぎが ひらくよ',
+    drawNote: 'ひきわけでは つぎは ひらかないよ',
+    reasonTitle: 'ここが わかれめ',
+    nextTitle: 'つぎは こうしよう',
+    stampGot: 'できた こと が ふえた',
+    /* やり方の承認＝行動の事実を1つだけ。人格のことばは使わない（設計書4.5章） */
+    praise: {
+      corner: 'かどを とったね',
+      edge: 'はしを つかったね',
+      pass: 'あいてを パスさせたね',
+      last: 'さいごまで じぶんで うったね'
+    }
+  };
+
+  /* ---- おうちのひと（大人むけ・ここも漢字は使わない＝判定述語P7） ---- */
+  OKT.grown = {
+    enter: 'おうちのひと',
+    lockTitle: 'たしざんを といてください',
+    lockNg: 'ちがいます',
+    close: 'とじる',
+    title: 'おうちのひと の ページ',
+    soundOn: 'おとを ならす',
+    soundOff: 'おとを ならさない',
+    openAll: 'すべての れべるを ひらく',
+    openAllDone: 'すべて ひらきました',
+    wipe: 'きろくを ぜんぶ けす',
+    wipeAsk: 'きろくを けしますか？ もとには もどせません',
+    wipeYes: 'けす',
+    wipeNo: 'やめる',
+    wipeDone: 'きろくを けしました',
+    gamesTitle: 'あそんだ きろく（あたらしい じゅん・50きょくまで）',
+    gamesNone: 'まだ きろくが ありません',
+    reasonsTitle: 'まけた わけの かいすう',
+    stampsTitle: 'できた こと の かいすう',
+    voiceTitle: 'きょうの こえかけ',
+    colBlack: 'くろ',
+    colWhite: 'しろ',
+    colWin: 'かち',
+    colLose: 'まけ',
+    colDraw: 'ひきわけ',
+    versionLabel: 'はんすう',
+    /* 負け理由ごとの、大人への声かけの案（設計書4.5章の大人向けの補足） */
+    voice: {
+      noCorner: 'どこに おけば かどが とれたか、いっしょに さがして みてください',
+      nextToCorner: 'かどの となりに おくと どうなるか、きいて みてください',
+      nextToCornerSafe: 'かどの となりは あぶない、と いっしょに たしかめて ください',
+      gaveCorner: 'あいてに かどを わたさない てを、いっしょに さがして みてください',
+      lostMobility: 'おける ばしょが へると どうなるか、はなして みてください',
+      tookTooMany: 'さいしょは すこしだけ とる、を いっしょに ためして みてください',
+      endCount: 'さいごの すうてを、ゆっくり かぞえて みてください',
+      none: 'どこが わかれめだったか、いっしょに ばんを みて みてください',
+      noLose: 'まけた きろくが まだ ありません'
+    }
+  };
+
+  /* ---- こまったとき（白い画面にしないための文・設計書4.10章） ---- */
+  OKT.error = {
+    title: 'ごめんなさい。うまく うごきませんでした',
+    body: 'いちど とじて、もういちど ひらいて みてください',
+    saveNg: 'この きたいでは きろくを のこせません。あそぶことは できます'
+  };
+})();
+
+if (typeof module !== 'undefined' && module.exports) { module.exports = OKT; }
+
+</script>
+<script>
+/* つよくなるオセロ ── 画面と そうさ と おと
+   2026-09-21 工程2。ES5のみ（2012年のiPad・Safari 10.1で動く書き方だけ）。
+   core.js / ai.js / blunder.js / rules.js / text.js を先に load すること。
+
+   この中の いちばん だいじな仕組み＝「ひとかたまり ずつ 読ませて、あいだに 息をつぐ」。
+   相手の1手は最悪 約1.8秒、まけた わけの しらべ は最悪 約3.3秒かかる（実機の見込み）。
+   まとめて走らせると そのあいだ画面が止まり、押しても なにも起きない。
+   そこで ai.js の makeChooser と blunder.js の makeJudger（どちらも工程2で作った
+   「途中で止められる形」）を setTimeout(0) で少しずつ進める＝判定述語P9の後半。 */
+
+var OKUI = {};
+
+(function () {
+  'use strict';
+
+  /* このファイルを直したら この数字を +1 する。version.txt にも同じ数字が書かれる
+     （build_app.py が自動で書く）＝古いファイルを持っている端末が取り直せる。 */
+  OKUI.APP_VERSION = 1;
+
+  /* まけた わけの しらべ を、何ミリ秒ぶん まとめて 進めてから 息をつぐか。
+     0 にすると かたまりは いちばん小さくなるが、60手ぶん 待ち時間が積み上がる。
+     30 にすると、画面が止まる いちばん長い時間は
+     「30ミリ秒＋その最後にはじめた1手ぶん」＝実機で約0.93秒（実測 chunk_check.js）。
+     この最悪値を決めているのは「おわりの完全読み1回（150,000局面＝約0.90秒）」で、
+     完全読みは途中でやめると完全でなくなるため、これ以上は小さくできない。 */
+  OKUI.JUDGE_BATCH_MS = 30;
+
+  var BLACK = 1, WHITE = 2, EMPTY = 0;
+
+  /* ================= 小さな道具 ================= */
+  function el(id) { return document.getElementById(id); }
+  function mk(tag, cls) {
+    var d = document.createElement(tag);
+    if (cls) { d.className = cls; }
+    return d;
+  }
+  function setText(node, s) {
+    if (!node) { return; }
+    while (node.firstChild) { node.removeChild(node.firstChild); }
+    node.appendChild(document.createTextNode(s));
+  }
+  function show(node, on) { if (node) { node.style.display = on ? '' : 'none'; } }
+  function addClass(node, c) {
+    if ((' ' + node.className + ' ').indexOf(' ' + c + ' ') < 0) { node.className += ' ' + c; }
+  }
+  function delClass(node, c) {
+    node.className = (' ' + node.className + ' ').split(' ' + c + ' ').join(' ')
+      .replace(/^\s+|\s+$/g, '');
+  }
+
+  /* ================= いまの ようす ================= */
+  var S = {
+    screen: 'map',
+    save: null,
+    level: 1,
+    childColor: BLACK,
+    board: null,
+    player: BLACK,
+    moves: [],
+    passedLast: false,
+    busy: false,       /* 石がひっくり返っている・相手が考えている＝押しても効かない */
+    missCount: 0,      /* はさめない所を つづけて押した回数（石のある所は数えない） */
+    chooser: null,
+    judger: null,
+    rnd: null,
+    cells: [],
+    stones: [],
+    pressSq: -1,
+    usedTouch: false,
+    timers: []
+  };
+  OKUI.state = S;
+
+  function later(fn, ms) {
+    var t = setTimeout(fn, ms);
+    S.timers.push(t);
+    return t;
+  }
+  function clearTimers() {
+    var i;
+    for (i = 0; i < S.timers.length; i++) { clearTimeout(S.timers[i]); }
+    S.timers = [];
+  }
+
+  /* ================= おと（合成・ファイルは持たない） =================
+     設計書4.6章。webkitAudioContext の接頭辞つき。最初のタップで解錠する。
+     すべての音は ensureAudio() を通る＝試験用の複製は ここを塞ぐだけで無音にできる。 */
+  var actx = null;
+  OKUI.ensureAudio = function () {
+    if (!S.save || !S.save.sound) { return null; }
+    if (actx) { return actx; }
+    try {
+      var C = window.AudioContext || window.webkitAudioContext;
+      if (!C) { return null; }
+      actx = new C();
+    } catch (e) { return null; }
+    return actx;
+  };
+
+  function tone(freq, start, dur, type, vol) {
+    var ctx = OKUI.ensureAudio();
+    if (!ctx) { return; }
+    try {
+      var o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = type || 'triangle';
+      o.frequency.value = freq;
+      g.gain.value = 0;
+      var t0 = ctx.currentTime + start;
+      g.gain.setValueAtTime(0, t0);
+      g.gain.linearRampToValueAtTime(vol === undefined ? 0.18 : vol, t0 + 0.012);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+      o.connect(g);
+      g.connect(ctx.destination);
+      o.start(t0);
+      o.stop(t0 + dur + 0.02);
+    } catch (e2) { /* 鳴らなくても あそべる */ }
+  }
+
+  /* 最初のタップで音の錠を外す（iOS の決まり） */
+  function unlockAudio() {
+    var ctx = OKUI.ensureAudio();
+    if (!ctx) { return; }
+    try {
+      if (ctx.state === 'suspended' && ctx.resume) { ctx.resume(); }
+      var o = ctx.createOscillator(), g = ctx.createGain();
+      g.gain.value = 0;
+      o.connect(g); g.connect(ctx.destination);
+      o.start(ctx.currentTime);
+      o.stop(ctx.currentTime + 0.01);
+    } catch (e) { /* 通らなくても進む */ }
+  }
+
+  var SND = {
+    /* 置いた＝短い前打音→4度上（コイン音の骨格）0.15秒 */
+    place: function () { tone(784, 0, 0.05, 'triangle', 0.16); tone(1047, 0.045, 0.12, 'triangle', 0.16); },
+    /* 置けない＝小さめ・丸い音・2度下がる「ポコッ」0.2秒。ブザーは使わない */
+    deny: function () { tone(330, 0, 0.09, 'sine', 0.10); tone(294, 0.08, 0.12, 'sine', 0.09); },
+    /* かち＝長調の駆け上がり＋きらきら 2〜3秒 */
+    win: function () {
+      var n = [523, 659, 784, 1047], i;
+      for (i = 0; i < n.length; i++) { tone(n[i], i * 0.13, 0.35, 'triangle', 0.17); }
+      var sp = [1568, 1319, 1760, 2093, 1568], j;
+      for (j = 0; j < sp.length; j++) { tone(sp[j], 0.6 + j * 0.16, 0.3, 'sine', 0.08); }
+    },
+    /* まけ＝下がる・やわらかい音・こわくしない 1.5秒 */
+    lose: function () {
+      var n = [440, 392, 349, 294], i;
+      for (i = 0; i < n.length; i++) { tone(n[i], i * 0.2, 0.45, 'sine', 0.12); }
+    },
+    /* ひきわけ＝まんなかの音 1つだけ */
+    draw: function () { tone(392, 0, 0.5, 'sine', 0.12); tone(523, 0.18, 0.5, 'sine', 0.10); },
+    /* れべるが ひらいた＝かち音の変奏＋ひとつ高い おわり 2秒 */
+    unlock: function () {
+      var n = [523, 659, 784, 1047, 1319], i;
+      for (i = 0; i < n.length; i++) { tone(n[i], i * 0.12, 0.3, 'triangle', 0.16); }
+      tone(1568, 0.7, 0.8, 'triangle', 0.15);
+    }
+  };
+  OKUI.SND = SND;
+
+  /* ================= 画面の 切りかえ ================= */
+  var SCREENS = ['map', 'game', 'result'];
+  function showScreen(name) {
+    var i;
+    S.screen = name;
+    for (i = 0; i < SCREENS.length; i++) {
+      show(el('scr-' + SCREENS[i]), SCREENS[i] === name);
+    }
+    window.scrollTo(0, 0);
+  }
+
+  /* ================= 大きさを その場で 決める =================
+     CSS の新しい書き方（min() など）は古いSafariに無いので、JSで px を計算して入れる。 */
+  function layout() {
+    var h = window.innerHeight || document.documentElement.clientHeight;
+    var host = el('game-row'), wrap = el('board-wrap'), sideBox = el('side'), board = el('board');
+    var cell, boardPx, availW, sideW, gap = 14;
+    if (!board) { return; }
+    /* 使える横はば＝画面そのものではなく、まわりの余白を引いた中身の幅で測る
+       （余白を数え落とすと、ばんと しらせが 横に並ばず 下へ落ちる） */
+    availW = host.clientWidth || window.innerWidth || 600;
+    /* よこ長のときは ばんを7割にして、のこりに しらせ を置く。
+       0.70 は 2012年のiPad（よこ向き・はば1024）で 1マス約88px＝約1.7cm になる値＝
+       設計書4.1章の「1マス約88pt」に合わせてある。 */
+    cell = Math.floor(Math.min(availW * 0.70, h - 16) / 8);
+    if (cell < 24) { cell = 24; }
+    boardPx = cell * 8;
+    sideW = availW - boardPx - gap;
+    /* しらせの置き場が せますぎるときは、ばんの下へ まわす（たて長のとき） */
+    if (sideW < 190) {
+      cell = Math.floor(Math.min(availW, h * 0.60) / 8);
+      if (cell < 24) { cell = 24; }
+      boardPx = cell * 8;
+      wrap.style.cssFloat = 'none';
+      sideBox.style.cssFloat = 'none';
+      sideBox.style.width = 'auto';
+      wrap.style.marginRight = '0';
+    } else {
+      wrap.style.cssFloat = 'left';
+      sideBox.style.cssFloat = 'left';
+      sideBox.style.width = sideW + 'px';
+      wrap.style.marginRight = gap + 'px';
+    }
+    board.style.width = boardPx + 'px';
+    board.style.height = boardPx + 'px';
+    wrap.style.width = boardPx + 'px';
+    wrap.style.height = boardPx + 'px';
+    var i, c;
+    for (i = 0; i < 64; i++) {
+      c = S.cells[i];
+      if (!c) { continue; }
+      c.style.left = ((i & 7) * cell) + 'px';
+      c.style.top = ((i >> 3) * cell) + 'px';
+      c.style.width = cell + 'px';
+      c.style.height = cell + 'px';
+    }
+  }
+  OKUI.layout = layout;
+
+  /* ================= ばん を 作る ================= */
+  function buildBoard() {
+    var board = el('board'), i, c, st;
+    while (board.firstChild) { board.removeChild(board.firstChild); }
+    S.cells = [];
+    S.stones = [];
+    for (i = 0; i < 64; i++) {
+      c = mk('div', 'cell');
+      c.setAttribute('data-sq', String(i));
+      st = mk('div', 'st');
+      c.appendChild(st);
+      board.appendChild(c);
+      S.cells.push(c);
+      S.stones.push(st);
+    }
+  }
+
+  /* 盤の絵を いまの ようす に合わせる。置ける場所の印は ぜったいに つけない（P1） */
+  function renderBoard() {
+    var i, v;
+    for (i = 0; i < 64; i++) {
+      v = S.board[i];
+      S.stones[i].className = 'st' + (v === BLACK ? ' b' : (v === WHITE ? ' w' : ''));
+    }
+  }
+
+  /* いしの かず を 石の列＋小さい数字 で出す（しげ裁定Q4＝A案） */
+  function renderCounts() {
+    var nb = 0, nw = 0, i;
+    for (i = 0; i < 64; i++) {
+      if (S.board[i] === BLACK) { nb++; }
+      else if (S.board[i] === WHITE) { nw++; }
+    }
+    drawCount(el('count-you'), S.childColor === BLACK ? nb : nw,
+      S.childColor, OKT.game.you);
+    drawCount(el('count-ai'), S.childColor === BLACK ? nw : nb,
+      S.childColor === BLACK ? WHITE : BLACK, OKT.game.ai);
+  }
+
+  function drawCount(box, n, color, label) {
+    var i, row, d;
+    while (box.firstChild) { box.removeChild(box.firstChild); }
+    d = mk('div', 'cnt-label');
+    setText(d, label + ' ' + (color === BLACK ? OKT.game.black : OKT.game.white));
+    box.appendChild(d);
+    row = mk('div', 'cnt-row');
+    for (i = 0; i < n; i++) {
+      row.appendChild(mk('span', 'dot ' + (color === BLACK ? 'b' : 'w')));
+    }
+    box.appendChild(row);
+    d = mk('div', 'cnt-num');
+    setText(d, String(n));
+    box.appendChild(d);
+  }
+
+  /* ================= メッセージ（文は2秒で消す） ================= */
+  var msgTimer = null;
+  function say(s, kind) {
+    var m = el('msg');
+    setText(m, s);
+    m.className = 'msg' + (kind ? ' ' + kind : '');
+    show(m, s !== '');
+    if (msgTimer) { clearTimeout(msgTimer); msgTimer = null; }
+    if (s !== '') {
+      msgTimer = setTimeout(function () { show(m, false); }, 2000);
+    }
+  }
+
+  /* ================= れべるの ちず ================= */
+  function buildMap() {
+    var grid = el('map-grid'), i, cell, no, nm, marks, mb, mw, cfg, open, done;
+    setText(el('map-title'), OKT.map.title);
+    setText(el('map-help'), OKT.map.help);
+    while (grid.firstChild) { grid.removeChild(grid.firstChild); }
+    for (i = 1; i <= OKR.LEVELS; i++) {
+      cfg = OKAI.cfgOf(i);
+      open = OKR.isOpen(S.save, i);
+      done = OKR.isCleared(S.save, i);
+      cell = mk('div', 'lv' + (open ? ' open' : ' locked') + (done ? ' done' : ''));
+      cell.setAttribute('data-lv', String(i));
+      no = mk('div', 'lv-no');
+      setText(no, String(i));
+      cell.appendChild(no);
+      nm = mk('div', 'lv-name');
+      setText(nm, open ? cfg.name : OKT.map.locked);
+      cell.appendChild(nm);
+      marks = mk('div', 'lv-marks');
+      mb = mk('span', 'm b' + (OKR.wonWith(S.save, i, BLACK) ? ' on' : ''));
+      setText(mb, OKR.wonWith(S.save, i, BLACK) ? '✓' : '●');
+      mw = mk('span', 'm w' + (OKR.wonWith(S.save, i, WHITE) ? ' on' : ''));
+      setText(mw, OKR.wonWith(S.save, i, WHITE) ? '✓' : '○');
+      marks.appendChild(mb);
+      marks.appendChild(mw);
+      cell.appendChild(marks);
+      grid.appendChild(cell);
+    }
+    buildStamps();
+  }
+
+  function buildStamps() {
+    var box = el('map-stamps'), i, n, d, any = false, t;
+    while (box.firstChild) { box.removeChild(box.firstChild); }
+    t = mk('div', 'stamp-title');
+    setText(t, OKT.map.stampTitle);
+    box.appendChild(t);
+    for (i = 0; i < OKR.STAMPS.length; i++) {
+      n = S.save.stamps[OKR.STAMPS[i].key] || 0;
+      if (n <= 0) { continue; }
+      any = true;
+      d = mk('span', 'stamp');
+      setText(d, OKR.STAMPS[i].name + ' ' + n);
+      box.appendChild(d);
+    }
+    if (!any) {
+      d = mk('span', 'stamp none');
+      setText(d, OKT.map.stampNone);
+      box.appendChild(d);
+    }
+  }
+
+  /* いろ を えらぶ まど */
+  function askColor(level) {
+    var box = el('pick');
+    setText(el('pick-title'), OKT.map.pickTitle + '（' + OKT.map.levelWord + ' '
+      + level + '・' + OKAI.cfgOf(level).name + '）');
+    setText(el('pick-black'), OKT.map.pickBlack);
+    setText(el('pick-white'), OKT.map.pickWhite);
+    setText(el('pick-back'), OKT.map.pickBack);
+    box.setAttribute('data-lv', String(level));
+    show(box, true);
+  }
+
+  /* ================= たいきょく ================= */
+  function startGame(level, color) {
+    clearTimers();
+    S.level = level;
+    S.childColor = color;
+    S.board = OK.initBoard();
+    S.player = BLACK;
+    S.moves = [];
+    S.passedLast = false;
+    S.missCount = 0;
+    S.busy = false;
+    S.chooser = null;
+    if (S.judger) { S.judger.cancel(); S.judger = null; }
+    /* 種＝いま の 時こく。同じ相手でも毎回ちがう将棋になる */
+    S.rnd = OKAI.makeRnd(((new Date()).getTime() % 2147483000) + 7);
+    show(el('lecture'), false);
+    show(el('give-up'), false);
+    say('');
+    showScreen('game');
+    renderBoard();
+    renderCounts();
+    layout();
+    turnLoop();
+  }
+  OKUI.startGame = startGame;
+
+  function turnLabel() {
+    var t = el('turn');
+    if (S.player === S.childColor) {
+      setText(t, OKT.game.yourTurn + '（'
+        + (S.childColor === BLACK ? OKT.game.black : OKT.game.white) + '）');
+      t.className = 'turn you';
+    } else {
+      setText(t, OKT.game.aiTurn);
+      t.className = 'turn ai';
+    }
+  }
+
+  /* 手番を1つ進める。置ける所が無ければ自動でパス（設計書4.2章） */
+  function turnLoop() {
+    var legal = OK.legalMoves(S.board, S.player);
+    turnLabel();
+    if (legal.length === 0) {
+      if (S.passedLast) { endGame(); return; }
+      S.passedLast = true;
+      say(S.player === S.childColor ? OKT.game.passYou : OKT.game.passAi, 'warn');
+      S.busy = true;
+      later(function () {
+        S.busy = false;
+        S.player = OK.other(S.player);
+        turnLoop();
+      }, 1500);
+      return;
+    }
+    S.passedLast = false;
+    if (S.player === S.childColor) { S.busy = false; return; }
+    aiThink();
+  }
+
+  /* ---- 相手の1手＝ひとかたまりずつ読んで、あいだに息をつぐ（判定述語P5・P9） ---- */
+  function aiThink() {
+    var cfg = OKAI.cfgOf(S.level), t0 = (new Date()).getTime();
+    S.busy = true;
+    S.chooser = OKAI.makeChooser(S.board, S.player, cfg, S.rnd);
+    function pump() {
+      var done;
+      if (S.screen !== 'game' || !S.chooser) { return; }
+      done = S.chooser.step();
+      if (!done) { later(pump, 0); return; }
+      var sq = S.chooser.move, wait;
+      S.chooser = null;
+      if (sq < 0) { S.busy = false; turnLoop(); return; }
+      /* はやすぎると「相手が打った」ことに気づけないので、すこし待つ */
+      wait = 350 - ((new Date()).getTime() - t0);
+      later(function () { doMove(sq); }, wait > 0 ? wait : 0);
+    }
+    later(pump, 0);
+  }
+
+  /* 石を置いて、1枚ずつ返す（0.4秒）。返し終わったら次の手番へ */
+  function doMove(sq) {
+    var p = S.player, flipped = OK.applyMove(S.board, sq, p);
+    S.moves.push({ sq: sq, player: p });
+    S.stones[sq].className = 'st ' + (p === BLACK ? 'b' : 'w') + ' put';
+    SND.place();
+    renderCounts();
+    var i = 0, step = flipped.length > 0 ? Math.max(40, Math.floor(400 / flipped.length)) : 0;
+    function flipOne() {
+      if (i >= flipped.length) {
+        delClass(S.stones[sq], 'put');
+        S.player = OK.other(S.player);
+        turnLoop();
+        return;
+      }
+      S.stones[flipped[i]].className = 'st ' + (p === BLACK ? 'b' : 'w') + ' flip';
+      i++;
+      renderCounts();
+      later(flipOne, step);
+    }
+    S.busy = true;
+    later(flipOne, step);
+  }
+
+  /* ---- 子が ばん を 押したとき（設計書4.2章の表そのまま） ---- */
+  function tapCell(sq) {
+    if (S.busy || S.screen !== 'game' || S.player !== S.childColor) { return; }
+    if (S.board[sq] !== EMPTY) {
+      shake(sq);
+      SND.deny();
+      say(OKT.game.occupied, 'warn');
+      return;
+    }
+    if (OK.countFlips(S.board, sq, S.childColor) === 0) {
+      shake(sq);
+      SND.deny();
+      say(OKT.game.noFlip, 'warn');
+      S.missCount++;
+      applyLecture();
+      return;
+    }
+    S.missCount = 0;
+    show(el('lecture'), false);
+    show(el('give-up'), false);
+    doMove(sq);
+  }
+  OKUI.tapCell = tapCell;
+
+  /* 3回つづけて はさめない所を押したら ルールの絵。6回で「いっしょに さがそう」。
+     どちらでも 置ける場所は ぜったいに 示さない（しげ裁定Q1＝A案） */
+  function applyLecture() {
+    var stage = OKR.lectureStage(S.missCount);
+    if (stage >= 1) {
+      setText(el('lecture-text'), OKT.game.lecture);
+      setText(el('lecture-how'), OKT.game.lectureHow);
+      show(el('lecture'), true);
+      startRuleAnim();
+    }
+    if (stage >= 2) {
+      say(OKT.game.together, 'warn');
+      setText(el('give-up'), OKT.game.quit);
+      show(el('give-up'), true);
+    }
+  }
+
+  /* ルールの絵＝よこ1れつで「くろ・しろ・あき」に置くと返る、小さな うごき */
+  var ruleTimer = null, rulePhase = 0;
+  function startRuleAnim() {
+    var strip = el('rule-strip');
+    if (ruleTimer) { return; }
+    function draw() {
+      var seq, i, d;
+      rulePhase = (rulePhase + 1) % 4;
+      /* 0,1＝くろ ○ ○ あき／2,3＝くろ くろ くろ くろ（はさんで返った形） */
+      seq = (rulePhase < 2) ? ['b', 'w', 'w', 'e'] : ['b', 'b', 'b', 'b'];
+      while (strip.firstChild) { strip.removeChild(strip.firstChild); }
+      for (i = 0; i < seq.length; i++) {
+        d = mk('span', 'rs ' + seq[i]);
+        strip.appendChild(d);
+      }
+    }
+    draw();
+    ruleTimer = setInterval(draw, 900);
+  }
+  function stopRuleAnim() {
+    if (ruleTimer) { clearInterval(ruleTimer); ruleTimer = null; }
+  }
+
+  function shake(sq) {
+    var c = S.cells[sq];
+    addClass(c, 'shake');
+    later(function () { delClass(c, 'shake'); }, 400);
+  }
+
+  /* ================= 対局が おわった ================= */
+  function endGame() {
+    var nb = 0, nw = 0, i, mine, theirs, win, lose;
+    stopRuleAnim();
+    for (i = 0; i < 64; i++) {
+      if (S.board[i] === BLACK) { nb++; }
+      else if (S.board[i] === WHITE) { nw++; }
+    }
+    mine = S.childColor === BLACK ? nb : nw;
+    theirs = S.childColor === BLACK ? nw : nb;
+    win = mine > theirs;
+    lose = mine < theirs;
+    S.result = { nb: nb, nw: nw, mine: mine, theirs: theirs, win: win, lose: lose };
+    showResultHead();
+    showScreen('result');
+    if (lose) {
+      SND.lose();
+      startJudging();
+    } else {
+      finishResult(null);
+      if (win) { /* かちの音は finishResult で れべる解放と ならべて鳴らす */ }
+      else { SND.draw(); }
+    }
+  }
+
+  function showResultHead() {
+    var r = S.result;
+    setText(el('res-head'), r.win ? OKT.result.win : (r.lose ? OKT.result.lose : OKT.result.draw));
+    el('res-head').className = 'res-head ' + (r.win ? 'win' : (r.lose ? 'lose' : 'draw'));
+    var box = el('res-counts');
+    while (box.firstChild) { box.removeChild(box.firstChild); }
+    drawCount(box.appendChild(mk('div', 'cnt')), r.mine, S.childColor, OKT.game.you);
+    drawCount(box.appendChild(mk('div', 'cnt')), r.theirs,
+      S.childColor === BLACK ? WHITE : BLACK, OKT.game.ai);
+    /* やり方の承認＝行動の事実を1つだけ（設計書4.5章） */
+    var got = OKR.stampsOf(S.moves, S.childColor), pick = 'last', i;
+    for (i = 0; i < got.length; i++) {
+      if (got[i] === 'corner') { pick = 'corner'; break; }
+      if (got[i] === 'pass') { pick = 'pass'; }
+      else if (got[i] === 'edge' && pick === 'last') { pick = 'edge'; }
+    }
+    S.gotStamps = got;
+    setText(el('res-praise'), OKT.result.praise[pick]);
+    show(el('res-reason'), false);
+    show(el('res-judging'), false);
+    setText(el('res-unlock'), '');
+    setText(el('res-again'), OKT.result.again);
+    setText(el('res-back'), OKT.result.back);
+  }
+
+  /* ---- まけた わけ を しらべる＝棋譜を1手ずつ。あいだに息をつぐ（判定述語P9） ---- */
+  function startJudging() {
+    var box = el('res-judging'), bar = el('judge-bar');
+    setText(el('judge-text'), OKT.result.judging);
+    show(box, true);
+    bar.style.width = '0%';
+    S.judger = OKB.makeJudger(S.moves, S.childColor);
+    var t0 = (new Date()).getTime();
+    function pump() {
+      var done = false, tick = (new Date()).getTime();
+      if (S.screen !== 'result' || !S.judger) { return; }
+      /* 軽い手は まとめて 進める（1手ごとに息をつぐと 60回も待つことになるため）。
+         重い手は1つで返ってくる＝いちばん重い1手でも上限150,000局面 */
+      while (!done && ((new Date()).getTime() - tick) < OKUI.JUDGE_BATCH_MS) {
+        done = S.judger.step();
+      }
+      bar.style.width = Math.round(S.judger.progress() * 100) + '%';
+      if (!done) { later(pump, 0); return; }
+      var res = S.judger.result();
+      S.judgeMs = (new Date()).getTime() - t0;
+      S.judger = null;
+      show(box, false);
+      finishResult(OKB.describe(res));
+    }
+    later(pump, 0);
+  }
+
+  /* けっか画面の のこり（理由・れべる解放・記録の書き込み） */
+  function finishResult(reason) {
+    var r = S.result, opened = 0, rec;
+    if (reason && reason.hasReason) {
+      setText(el('res-why'), reason.why);
+      setText(el('res-next'), reason.next);
+      setText(el('res-reason-title'), OKT.result.reasonTitle);
+      setText(el('res-next-title'), OKT.result.nextTitle);
+      drawMini(reason.board, reason.sq, reason.oppCorner);
+      show(el('res-reason'), true);
+    } else if (reason) {
+      setText(el('res-why'), OKB.NO_BLUNDER_TEXT);
+      setText(el('res-next'), '');
+      setText(el('res-reason-title'), '');
+      setText(el('res-next-title'), '');
+      show(el('res-mini'), false);
+      show(el('res-reason'), true);
+    }
+
+    if (r.win) { opened = OKR.markWin(S.save, S.level, S.childColor); }
+    OKR.addStamps(S.save, S.gotStamps || []);
+    rec = {
+      t: (new Date()).getTime(),
+      lv: S.level,
+      color: S.childColor === BLACK ? 'b' : 'w',
+      res: r.win ? 'w' : (r.lose ? 'l' : 'd'),
+      mine: r.mine, theirs: r.theirs,
+      reason: (reason && reason.hasReason) ? reason.type : ''
+    };
+    OKR.addGame(S.save, rec);
+    if (!OKR.save(window.localStorage, S.save)) { say(OKT.error.saveNg, 'warn'); }
+
+    if (opened > 0) {
+      setText(el('res-unlock'), OKT.result.unlocked);
+      SND.unlock();
+      confetti();
+    } else if (r.win) {
+      setText(el('res-unlock'),
+        OKR.isCleared(S.save, S.level) ? '' : OKT.result.needOther);
+      SND.win();
+      confetti();
+    } else if (!r.lose) {
+      setText(el('res-unlock'), OKT.result.drawNote);
+    }
+    buildMap();
+  }
+
+  /* 悪手の直前の ばん を 小さく 描く（打ったマスに橙の ！） */
+  function drawMini(board, sq, oppCorner) {
+    var box = el('res-mini'), i, d, c;
+    show(box, true);
+    while (box.firstChild) { box.removeChild(box.firstChild); }
+    for (i = 0; i < 64; i++) {
+      c = mk('div', 'mc');
+      if (board[i] === BLACK) { addClass(c, 'b'); }
+      else if (board[i] === WHITE) { addClass(c, 'w'); }
+      if (i === sq) {
+        addClass(c, 'mark');
+        d = mk('span', 'bang');
+        setText(d, '！');
+        c.appendChild(d);
+      } else if (i === oppCorner && oppCorner >= 0) {
+        addClass(c, 'taken');
+        d = mk('span', 'bang');
+        setText(d, '✕');
+        c.appendChild(d);
+      }
+      box.appendChild(c);
+    }
+  }
+
+  /* かち の かみふぶき（2〜3秒・はですぎない） */
+  function confetti() {
+    var box = el('confetti'), i, d, cols = ['#0072B2', '#E69F00', '#CC79A7', '#56B4E9', '#F0E442'];
+    while (box.firstChild) { box.removeChild(box.firstChild); }
+    show(box, true);
+    for (i = 0; i < 24; i++) {
+      d = mk('span', 'cf');
+      d.style.left = Math.floor(Math.random() * 96) + '%';
+      d.style.background = cols[i % cols.length];
+      d.style.animationDelay = (Math.random() * 0.8) + 's';
+      d.style.webkitAnimationDelay = d.style.animationDelay;
+      box.appendChild(d);
+    }
+    later(function () { show(box, false); }, 2600);
+  }
+
+  /* ================= おうちのひと（大人むけ） ================= */
+  var lockAns = 0, pressTimer = null;
+
+  function askLock() {
+    var a = 3 + Math.floor(Math.random() * 7), b = 4 + Math.floor(Math.random() * 6);
+    lockAns = a + b;
+    setText(el('lock-q'), a + ' + ' + b + ' = ?');
+    setText(el('lock-title'), OKT.grown.lockTitle);
+    setText(el('lock-close'), OKT.grown.close);
+    el('lock-input').value = '';
+    setText(el('lock-ng'), '');
+    show(el('lock'), true);
+  }
+
+  function openGrown() {
+    show(el('lock'), false);
+    buildGrown();
+    show(el('grown'), true);
+  }
+
+  function buildGrown() {
+    var box = el('grown-body'), i, g, d, tbl, tr, counts, k, name, any;
+    setText(el('grown-title'), OKT.grown.title);
+    setText(el('grown-close'), OKT.grown.close);
+    setText(el('g-sound'), S.save.sound ? OKT.grown.soundOn : OKT.grown.soundOff);
+    setText(el('g-openall'), S.save.openAll ? OKT.grown.openAllDone : OKT.grown.openAll);
+    setText(el('g-wipe'), OKT.grown.wipe);
+    while (box.firstChild) { box.removeChild(box.firstChild); }
+
+    /* きょうの こえかけ＝いちばん あたらしい まけ の わけ から選ぶ */
+    d = mk('h3', null);
+    setText(d, OKT.grown.voiceTitle);
+    box.appendChild(d);
+    d = mk('p', 'voice');
+    setText(d, pickVoice());
+    box.appendChild(d);
+
+    /* まけた わけ の かいすう */
+    d = mk('h3', null);
+    setText(d, OKT.grown.reasonsTitle);
+    box.appendChild(d);
+    counts = OKR.reasonCounts(S.save);
+    any = false;
+    tbl = mk('table', 'gtbl');
+    for (k in counts) {
+      if (!counts.hasOwnProperty(k)) { continue; }
+      any = true;
+      tr = mk('tr', null);
+      name = (OKB.TYPES[k] && OKB.TYPES[k].name) ? OKB.TYPES[k].name : k;
+      appendCell(tr, 'th', name === '' ? OKB.TYPES.none.why : name);
+      appendCell(tr, 'td', String(counts[k]));
+      tbl.appendChild(tr);
+    }
+    if (any) { box.appendChild(tbl); } else {
+      d = mk('p', null);
+      setText(d, OKT.grown.gamesNone);
+      box.appendChild(d);
+    }
+
+    /* できた こと の かいすう */
+    d = mk('h3', null);
+    setText(d, OKT.grown.stampsTitle);
+    box.appendChild(d);
+    tbl = mk('table', 'gtbl');
+    for (i = 0; i < OKR.STAMPS.length; i++) {
+      tr = mk('tr', null);
+      appendCell(tr, 'th', OKR.STAMPS[i].name);
+      appendCell(tr, 'td', String(S.save.stamps[OKR.STAMPS[i].key] || 0));
+      tbl.appendChild(tr);
+    }
+    box.appendChild(tbl);
+
+    /* あそんだ きろく */
+    d = mk('h3', null);
+    setText(d, OKT.grown.gamesTitle);
+    box.appendChild(d);
+    if (S.save.games.length === 0) {
+      d = mk('p', null);
+      setText(d, OKT.grown.gamesNone);
+      box.appendChild(d);
+    } else {
+      tbl = mk('table', 'gtbl');
+      for (i = 0; i < S.save.games.length; i++) {
+        g = S.save.games[i];
+        tr = mk('tr', null);
+        appendCell(tr, 'td', OKT.map.levelWord + ' ' + g.lv);
+        appendCell(tr, 'td', g.color === 'b' ? OKT.grown.colBlack : OKT.grown.colWhite);
+        appendCell(tr, 'td', g.res === 'w' ? OKT.grown.colWin
+          : (g.res === 'l' ? OKT.grown.colLose : OKT.grown.colDraw));
+        appendCell(tr, 'td', g.mine + ' - ' + g.theirs);
+        appendCell(tr, 'td', g.reason && OKB.TYPES[g.reason] ? OKB.TYPES[g.reason].name : '');
+        tbl.appendChild(tr);
+      }
+      box.appendChild(tbl);
+    }
+
+    d = mk('p', 'ver');
+    setText(d, OKT.grown.versionLabel + ' ' + OKUI.APP_VERSION);
+    box.appendChild(d);
+  }
+
+  function appendCell(tr, tag, s) {
+    var c = mk(tag, null);
+    setText(c, s);
+    tr.appendChild(c);
+    return c;
+  }
+
+  function pickVoice() {
+    var i, g;
+    for (i = 0; i < S.save.games.length; i++) {
+      g = S.save.games[i];
+      if (g.res === 'l') {
+        if (g.reason && OKT.grown.voice[g.reason]) { return OKT.grown.voice[g.reason]; }
+        return OKT.grown.voice.none;
+      }
+    }
+    return OKT.grown.voice.noLose;
+  }
+
+  /* ================= 版の 取りなおし（設計書4.10章・おかえりクエストと同型） ================= */
+  var UPD_KEY = 'othelloKids_upd';
+  function tidyUrl() {
+    if (!window.history || !history.replaceState) { return; }
+    if (location.search.indexOf('v=') < 0) { return; }
+    try { history.replaceState(null, '', location.pathname); } catch (e) { /* 見ためだけ */ }
+  }
+  function checkUpdate() {
+    var x;
+    if (!window.XMLHttpRequest) { return; }
+    try { x = new XMLHttpRequest(); } catch (e) { return; }
+    try { x.open('GET', 'version.txt?t=' + (new Date()).getTime(), true); } catch (e2) { return; }
+    x.onreadystatechange = function () {
+      if (x.readyState !== 4 || x.status !== 200) { return; }
+      var v = parseInt(String(x.responseText).replace(/[^0-9]/g, ''), 10);
+      var now = (new Date()).getTime(), last = null, part;
+      if (!(v > OKUI.APP_VERSION)) { return; }
+      try { last = sessionStorage.getItem(UPD_KEY); } catch (e3) { /* 無くても進む */ }
+      if (last) {
+        part = String(last).split(':');
+        if (part[0] === String(v) && (now - parseInt(part[1], 10)) < 30000) { return; }
+      }
+      try { sessionStorage.setItem(UPD_KEY, v + ':' + now); } catch (e4) { /* 無くても進む */ }
+      location.replace('./?v=' + v);
+    };
+    try { x.send(null); } catch (e5) { /* 通信できない置き方でも あそべる */ }
+  }
+
+  /* ================= 押したときの 受けとり ================= */
+  function sqFromEvent(ev) {
+    var t = ev.target, n = 0;
+    while (t && n < 4) {
+      if (t.getAttribute && t.getAttribute('data-sq') !== null) {
+        return parseInt(t.getAttribute('data-sq'), 10);
+      }
+      t = t.parentNode;
+      n++;
+    }
+    return -1;
+  }
+
+  function bind() {
+    var board = el('board'), grid = el('map-grid');
+
+    /* 「置く」＝同じマスの中で 触れて 離したとき だけ（設計書4.1章） */
+    board.onmousedown = function (ev) {
+      if (S.usedTouch) { return; }
+      S.pressSq = sqFromEvent(ev);
+      if (S.pressSq >= 0) { addClass(S.cells[S.pressSq], 'press'); }
+    };
+    board.onmouseup = function (ev) {
+      if (S.usedTouch) { return; }
+      var sq = sqFromEvent(ev);
+      if (S.pressSq >= 0) { delClass(S.cells[S.pressSq], 'press'); }
+      unlockAudio();
+      if (sq >= 0 && sq === S.pressSq) { tapCell(sq); }
+      S.pressSq = -1;
+    };
+    board.ontouchstart = function (ev) {
+      S.usedTouch = true;
+      S.pressSq = sqFromEvent(ev);
+      if (S.pressSq >= 0) { addClass(S.cells[S.pressSq], 'press'); }
+      if (ev.preventDefault) { ev.preventDefault(); }   /* 2回たたきの拡大を止める */
+    };
+    board.ontouchmove = function (ev) {
+      var sq = sqFromEvent(ev);
+      if (S.pressSq >= 0 && sq !== S.pressSq) {
+        delClass(S.cells[S.pressSq], 'press');
+        S.pressSq = -1;   /* 指がマスの外へ動いた＝置かない */
+      }
+      if (ev.preventDefault) { ev.preventDefault(); }
+    };
+    board.ontouchend = function (ev) {
+      var sq = S.pressSq;
+      if (sq >= 0) { delClass(S.cells[sq], 'press'); }
+      S.pressSq = -1;
+      unlockAudio();
+      if (sq >= 0) { tapCell(sq); }
+      if (ev.preventDefault) { ev.preventDefault(); }
+    };
+
+    /* ちず＝レベルを えらぶ */
+    grid.onclick = function (ev) {
+      var t = ev.target, n = 0, lv = -1;
+      unlockAudio();
+      while (t && n < 4) {
+        if (t.getAttribute && t.getAttribute('data-lv') !== null) {
+          lv = parseInt(t.getAttribute('data-lv'), 10);
+          break;
+        }
+        t = t.parentNode;
+        n++;
+      }
+      if (lv < 1) { return; }
+      if (!OKR.isOpen(S.save, lv)) { SND.deny(); return; }
+      askColor(lv);
+    };
+
+    el('pick-black').onclick = function () {
+      show(el('pick'), false);
+      startGame(parseInt(el('pick').getAttribute('data-lv'), 10), BLACK);
+    };
+    el('pick-white').onclick = function () {
+      show(el('pick'), false);
+      startGame(parseInt(el('pick').getAttribute('data-lv'), 10), WHITE);
+    };
+    el('pick-back').onclick = function () { show(el('pick'), false); };
+
+    el('give-up').onclick = function () {
+      clearTimers();
+      stopRuleAnim();
+      showScreen('map');   /* その局は すてる（記録に のこさない） */
+    };
+    el('res-again').onclick = function () { startGame(S.level, S.childColor); };
+    el('res-back').onclick = function () {
+      clearTimers();
+      if (S.judger) { S.judger.cancel(); S.judger = null; }
+      showScreen('map');
+    };
+
+    /* おうちのひと＝画面のすみを3秒 長おし → たしざん */
+    var gb = el('grown-btn');
+    setText(gb, OKT.grown.enter);
+    function startPress() {
+      if (pressTimer) { return; }
+      pressTimer = setTimeout(function () { pressTimer = null; askLock(); }, 3000);
+    }
+    function endPress() {
+      if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; }
+    }
+    gb.onmousedown = startPress;
+    gb.onmouseup = endPress;
+    gb.onmouseout = endPress;
+    gb.ontouchstart = function (ev) {
+      startPress();
+      if (ev.preventDefault) { ev.preventDefault(); }
+    };
+    gb.ontouchend = endPress;
+    gb.ontouchcancel = endPress;
+
+    el('lock-ok').onclick = function () {
+      if (parseInt(el('lock-input').value, 10) === lockAns) { openGrown(); }
+      else { setText(el('lock-ng'), OKT.grown.lockNg); }
+    };
+    el('lock-close').onclick = function () { show(el('lock'), false); };
+    el('grown-close').onclick = function () { show(el('grown'), false); };
+
+    el('g-sound').onclick = function () {
+      S.save.sound = !S.save.sound;
+      OKR.save(window.localStorage, S.save);
+      setText(el('g-sound'), S.save.sound ? OKT.grown.soundOn : OKT.grown.soundOff);
+      if (S.save.sound) { unlockAudio(); SND.place(); }
+    };
+    el('g-openall').onclick = function () {
+      S.save.openAll = true;
+      OKR.save(window.localStorage, S.save);
+      setText(el('g-openall'), OKT.grown.openAllDone);
+      buildMap();
+    };
+    el('g-wipe').onclick = function () {
+      setText(el('wipe-ask'), OKT.grown.wipeAsk);
+      setText(el('wipe-yes'), OKT.grown.wipeYes);
+      setText(el('wipe-no'), OKT.grown.wipeNo);
+      show(el('wipe'), true);
+    };
+    el('wipe-yes').onclick = function () {
+      /* 自分の鍵だけを消す＝clear() は使わない（同じ公開先の他のアプリを壊さない） */
+      S.save = OKR.wipe(window.localStorage);
+      show(el('wipe'), false);
+      buildMap();
+      buildGrown();
+      setText(el('g-openall'), OKT.grown.openAll);
+    };
+    el('wipe-no').onclick = function () { show(el('wipe'), false); };
+
+    window.onresize = layout;
+    window.onorientationchange = function () { later(layout, 200); };
+  }
+
+  /* ================= はじまり ================= */
+  OKUI.start = function () {
+    try {
+      S.save = OKR.load(window.localStorage);
+      setText(el('app-name'), OKT.appName);
+      buildBoard();
+      buildMap();
+      bind();
+      showScreen('map');
+      layout();
+      tidyUrl();
+      checkUpdate();
+      setInterval(checkUpdate, 300000);
+    } catch (e) {
+      var box = el('fatal');
+      if (box) {
+        setText(el('fatal-title'), OKT.error.title);
+        /* つまずいた中身は画面に出さない＝そこに漢字が混ざると判定述語P7を破るため */
+        setText(el('fatal-body'), OKT.error.body);
+        show(box, true);
+      }
+    }
+  };
+})();
+
+</script>
+<script>
+
+(function () {
+  'use strict';
+  /* 読み込みで止まったときに白い画面にしない（設計書4.10章） */
+  window.onerror = function () {
+    var box = document.getElementById('fatal');
+    if (!box) { return false; }
+    box.style.display = '';
+    var t = document.getElementById('fatal-title'), b = document.getElementById('fatal-body');
+    if (t) { t.innerHTML = ''; t.appendChild(document.createTextNode('ごめんなさい。うまく うごきませんでした')); }
+    if (b) { b.innerHTML = ''; b.appendChild(document.createTextNode('いちど とじて、もういちど ひらいて みてください')); }
+    return false;
+  };
+  OKUI.start();
+})();
+</script>
+</body>
+</html>

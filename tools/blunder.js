@@ -123,9 +123,6 @@ var OKB = {};
 
   OKB.NO_BLUNDER_TEXT = 'あいてが つよかった。もういっかい やろう';
 
-  /* ================= 1局を採点する =================
-     moves ＝ playGame が返す [{sq, player}]／ childColor ＝ OK.BLACK か OK.WHITE
-     戻り値＝ { blunders:[…], worst:{…}|null } */
   /* ================= 採点にかける上限 =================
      判定述語P5は「相手の1手」しか縛っていないが、採点は対局が終わったあとに
      まとめて走るので、そこにも上限が要る（査読の致命指摘・2026-09-21）。
@@ -148,113 +145,170 @@ var OKB = {};
   /* 上限に当たって、途中で採点をやめたかどうか */
   OKB.lastCappedAt = -1;
 
-  OKB.judge = function (moves, childColor) {
+  /* ---- 途中で止められる形（工程2・判定述語P9「そのあいだ画面が固まらない」） ----
+     step() を1回呼ぶと 棋譜の1手ぶんだけ進める。まだ終わっていなければ false を返す。
+     いちばん重い1手（終盤の完全読み）でも上限150,000局面＝実機で約0.9秒なので、
+     その合間に setTimeout(0) で画面が息をつげる。
+     採点の道すじはこの1本だけ＝下の judge（いままでの呼び方）は、
+     これを最後まで回すだけの薄い皮。Macの試験と画面のアプリが別物にならない。 */
+  function Judger(moves, childColor) {
     OKB.lastCost = { mid: 0, end: 0 };
     OKB.lastCappedAt = -1;
     /* 採点のあいだだけ、中盤の読みの終局値を ふつうの見積り に揃える（単位をそろえるため） */
     OK.setMidTerminalAsEval(true);
-    var nBefore, spentMs = 0;
-    var b = OK.initBoard(), p = OK.BLACK;
-    var blunders = [], mi = 0, legal, sq, empties, best, played, loss, phase, rec;
-    var boards = [];   /* 各手を打つ前の盤の写し（絵に使う） */
-    var turns = [];    /* 各手の手番 */
+    this.moves = moves;
+    this.childColor = childColor;
+    this.b = OK.initBoard();
+    this.p = OK.BLACK;
+    this.mi = 0;
+    this.passes = 0;
+    this.spentMs = 0;
+    this.blunders = [];
+    this.boards = [];   /* 各手を打つ前の盤の写し（絵に使う） */
+    this.turns = [];    /* 各手の手番 */
+    this.finished = false;
+  }
 
-    var passes = 0;
-    while (mi < moves.length) {
-      legal = OK.legalMoves(b, p);
-      if (legal.length === 0) {
-        /* 両方とも打てないのに手が残っている＝棋譜が壊れている。
-           無限に回らないよう、ここで止める（正しい棋譜では起きない）。 */
-        passes++;
-        if (passes >= 2) { break; }
-        p = OK.other(p);
-        continue;
-      }
-      passes = 0;
-      sq = moves[mi].sq;
-      if (moves[mi].player !== p) {
-        throw new Error('棋譜の手番が合わない ply=' + mi);
-      }
-      boards.push(OK.copyBoard(b));
-      turns.push(p);
+  /* どこまで進んだか（0〜1）＝画面の「しらべちゅう」の目もりに使う */
+  Judger.prototype.progress = function () {
+    if (this.moves.length === 0) { return 1; }
+    return this.mi / this.moves.length;
+  };
 
-      /* 上限を使い切ったら、そこから先の手は採点しない（画面を止めないため）。
-         採点した範囲の中で いちばん損の大きい手を出す。 */
-      if (p === childColor && legal.length >= 2 && spentMs < JUDGE_MS_CAP) {
-        empties = 64 - OK.discCount(b);
-        nBefore = OK.getNodes();
-        if (empties <= JUDGE_END_EMPTIES) {
-          phase = 'end';
-          /* 1手ぶんの上限も置く＝重い局面1つで上限を大きく飛び越さないため。
-             上限に当たった手は採点しない（悪手として扱わない）。 */
-          var snap = OK.copyBoard(b), gaveUp = false;
-          OK.setBudget(END_MOVE_BUDGET);
-          OK.resetNodes();
-          nBefore = 0;          /* 数え直したので、この手の起点も0に合わせる */
-          try {
-            best = OK.bestMoveEnd(b, p).value;
-          } catch (e2) {
-            OK.clearBudget();
-            if (e2 !== OK.BUDGET_STOP) { throw e2; }
-            for (var ri = 0; ri < 64; ri++) { b[ri] = snap[ri]; }
-            gaveUp = true;
-          }
-          if (gaveUp) {
-            OKB.lastCost.end += END_MOVE_BUDGET;
-            OK.applyMove(b, sq, p);
-            p = OK.other(p);
-            mi++;
-            continue;
-          }
-          OK.clearBudget();
-          /* 中盤と同じく、まず「しきい値ぶん損をしているか」だけを安く調べる */
-          if (OK.moveValueAtMostEnd(b, p, sq, best - END_LOSS_MIN)) {
-            played = OK.valueOfMoveEnd(b, p, sq);
-          } else {
-            played = best;
-          }
-          OKB.lastCost.end += OK.getNodes() - nBefore;
-        } else {
-          phase = 'mid';
-          best = OK.bestMoveMid(b, p, JUDGE_DEPTH).value;
-          /* まず「しきい値ぶん損をしているか」だけを安く調べ、
-             損をしている手だけ、値そのものを出し直す（重い読みを減らすため） */
-          if (OK.moveValueAtMostMid(b, p, sq, JUDGE_DEPTH, best - MID_LOSS_MIN)) {
-            played = OK.valueOfMoveMid(b, p, sq, JUDGE_DEPTH);
-          } else {
-            played = best;   /* 悪手ではない＝損0として扱う */
-          }
-          OKB.lastCost.mid += OK.getNodes() - nBefore;
-        }
-        spentMs = OKB.lastCost.mid / IPAD_MID_NPS * 1000
-                + OKB.lastCost.end / IPAD_END_NPS * 1000;
-        if (spentMs >= JUDGE_MS_CAP && OKB.lastCappedAt < 0) { OKB.lastCappedAt = mi; }
-        loss = best - played;
-        if (loss >= (phase === 'end' ? END_LOSS_MIN : MID_LOSS_MIN)) {
-          blunders.push({
-            ply: mi, sq: sq, loss: loss, phase: phase,
-            /* しきい値で割った値＝中盤と終盤の損を同じものさしで比べるため */
-            ratio: loss / (phase === 'end' ? END_LOSS_MIN : MID_LOSS_MIN),
-            legalCount: legal.length, flips: OK.countFlips(b, sq, p)
-          });
-        }
-      }
-      OK.applyMove(b, sq, p);
-      p = OK.other(p);
-      mi++;
+  /* 途中でやめる（画面を離れたとき）＝読みの見方を対局用へ戻す */
+  Judger.prototype.cancel = function () {
+    if (!this.finished) {
+      this.finished = true;
+      OK.setMidTerminalAsEval(false);
     }
+  };
 
+  Judger.prototype.step = function () {
+    var moves = this.moves, childColor = this.childColor;
+    var b = this.b, p = this.p;
+    var legal, sq, empties, best, played, loss, phase, nBefore;
+
+    if (this.finished) { return true; }
+    if (this.mi >= moves.length) { return this.wrapUp(); }
+
+    legal = OK.legalMoves(b, p);
+    if (legal.length === 0) {
+      /* 両方とも打てないのに手が残っている＝棋譜が壊れている。
+         無限に回らないよう、ここで止める（正しい棋譜では起きない）。 */
+      this.passes++;
+      if (this.passes >= 2) { return this.wrapUp(); }
+      this.p = OK.other(p);
+      return false;
+    }
+    this.passes = 0;
+    sq = moves[this.mi].sq;
+    if (moves[this.mi].player !== p) {
+      /* 文はローマ字で書く＝画面の文字に漢字を1字も出さないため（判定述語P7）。
+         これは作り手向けの合図であって、子どもには見せない文である。 */
+      throw new Error('kifu no teban ga awanai ply=' + this.mi);
+    }
+    this.boards.push(OK.copyBoard(b));
+    this.turns.push(p);
+
+    /* 上限を使い切ったら、そこから先の手は採点しない（画面を止めないため）。
+       採点した範囲の中で いちばん損の大きい手を出す。 */
+    if (p === childColor && legal.length >= 2 && this.spentMs < JUDGE_MS_CAP) {
+      empties = 64 - OK.discCount(b);
+      nBefore = OK.getNodes();
+      if (empties <= JUDGE_END_EMPTIES) {
+        phase = 'end';
+        /* 1手ぶんの上限も置く＝重い局面1つで上限を大きく飛び越さないため。
+           上限に当たった手は採点しない（悪手として扱わない）。 */
+        var snap = OK.copyBoard(b), gaveUp = false;
+        OK.setBudget(END_MOVE_BUDGET);
+        OK.resetNodes();
+        nBefore = 0;          /* 数え直したので、この手の起点も0に合わせる */
+        try {
+          best = OK.bestMoveEnd(b, p).value;
+        } catch (e2) {
+          OK.clearBudget();
+          if (e2 !== OK.BUDGET_STOP) { throw e2; }
+          for (var ri = 0; ri < 64; ri++) { b[ri] = snap[ri]; }
+          gaveUp = true;
+        }
+        if (gaveUp) {
+          OKB.lastCost.end += END_MOVE_BUDGET;
+          OK.applyMove(b, sq, p);
+          this.p = OK.other(p);
+          this.mi++;
+          return false;
+        }
+        OK.clearBudget();
+        /* 中盤と同じく、まず「しきい値ぶん損をしているか」だけを安く調べる */
+        if (OK.moveValueAtMostEnd(b, p, sq, best - END_LOSS_MIN)) {
+          played = OK.valueOfMoveEnd(b, p, sq);
+        } else {
+          played = best;
+        }
+        OKB.lastCost.end += OK.getNodes() - nBefore;
+      } else {
+        phase = 'mid';
+        best = OK.bestMoveMid(b, p, JUDGE_DEPTH).value;
+        /* まず「しきい値ぶん損をしているか」だけを安く調べ、
+           損をしている手だけ、値そのものを出し直す（重い読みを減らすため） */
+        if (OK.moveValueAtMostMid(b, p, sq, JUDGE_DEPTH, best - MID_LOSS_MIN)) {
+          played = OK.valueOfMoveMid(b, p, sq, JUDGE_DEPTH);
+        } else {
+          played = best;   /* 悪手ではない＝損0として扱う */
+        }
+        OKB.lastCost.mid += OK.getNodes() - nBefore;
+      }
+      this.spentMs = OKB.lastCost.mid / IPAD_MID_NPS * 1000
+                   + OKB.lastCost.end / IPAD_END_NPS * 1000;
+      if (this.spentMs >= JUDGE_MS_CAP && OKB.lastCappedAt < 0) {
+        OKB.lastCappedAt = this.mi;
+      }
+      loss = best - played;
+      if (loss >= (phase === 'end' ? END_LOSS_MIN : MID_LOSS_MIN)) {
+        this.blunders.push({
+          ply: this.mi, sq: sq, loss: loss, phase: phase,
+          /* しきい値で割った値＝中盤と終盤の損を同じものさしで比べるため */
+          ratio: loss / (phase === 'end' ? END_LOSS_MIN : MID_LOSS_MIN),
+          legalCount: legal.length, flips: OK.countFlips(b, sq, p)
+        });
+      }
+    }
+    OK.applyMove(b, sq, p);
+    this.p = OK.other(p);
+    this.mi++;
+    return false;
+  };
+
+  Judger.prototype.wrapUp = function () {
+    this.finished = true;
     OK.setMidTerminalAsEval(false);   /* 採点はここまで＝対局用の見方へ戻す */
-    if (blunders.length === 0) { return { blunders: [], worst: null }; }
+    return true;
+  };
 
-    var i, worst = blunders[0];
+  /* ================= 1局を採点する =================
+     moves ＝ playGame が返す [{sq, player}]／ childColor ＝ OK.BLACK か OK.WHITE
+     戻り値＝ { blunders:[…], worst:{…}|null } */
+  Judger.prototype.result = function () {
+    var blunders = this.blunders, i, worst;
+    if (blunders.length === 0) { return { blunders: [], worst: null }; }
+    worst = blunders[0];
     for (i = 1; i < blunders.length; i++) {
       if (blunders[i].ratio > worst.ratio) { worst = blunders[i]; }
     }
-    worst.type = nameType(worst, boards, turns, moves, childColor);
-    worst.boardBefore = boards[worst.ply];
-    worst.oppCorner = cornerTakenAfter(moves, worst.ply, childColor);
+    worst.type = nameType(worst, this.boards, this.turns, this.moves, this.childColor);
+    worst.boardBefore = this.boards[worst.ply];
+    worst.oppCorner = cornerTakenAfter(this.moves, worst.ply, this.childColor);
     return { blunders: blunders, worst: worst };
+  };
+
+  /* 画面から使う入口＝1局ぶんの「採点係」を作る */
+  OKB.makeJudger = function (moves, childColor) { return new Judger(moves, childColor); };
+
+  /* Macの試験台本から使う入口＝止めずに最後まで採点する */
+  OKB.judge = function (moves, childColor) {
+    var j = new Judger(moves, childColor);
+    while (!j.step()) { /* 終わるまで回す */ }
+    return j.result();
   };
 
   /* その手のあと4手いないに、相手がかどを取ったか（絵に印を付けるため） */

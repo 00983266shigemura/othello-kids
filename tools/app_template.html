@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>つよくなるオセロ</title>
+<style>
+  /* いろ＝赤と緑を「意味の区別」に使わない（設計書4.9章）。
+     ばん＝緑青 ／ ちゅうい＝橙＋！ ／ かち＝青＋✓ ／ まけ＝紫＋…
+     ばんと いしの いろは、暗い画面設定でも変えない＝オセロの くろ・しろ が入れ替わると
+     ゲームそのものが読めなくなるため。変えるのは まわりの 紙と 文字だけ。 */
+  :root{
+    color-scheme: light dark;
+    --ground:#fbfaf7; --card:#ffffff; --card2:#f2f4f6; --locked:#f1f1ef;
+    --ink:#1b1b1b; --ink-soft:#55606b; --line:#d6d8dc;
+    --ao:#0072B2; --ryokuao:#009E73; --ryokuao-dark:#00654a;
+    --daidai:#E69F00; --daidai-ink:#8a5a00; --murasaki:#CC79A7; --mizu:#56B4E9;
+    --daidai-bg:#fdf3e2; --ao-bg:#eaf3fa;
+    --nashi:#9aa5ae; --on-accent:#ffffff;
+    --kuro:#141414; --shiro:#fdfdfb;
+    --press:rgba(255,255,255,0.22); --veil:rgba(20,20,20,0.55);
+    --sheen-light:rgba(255,255,255,0.18); --sheen-dark:rgba(0,0,0,0.20);
+    --track:#e6e6e2;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --ground:#14191f; --card:#1c232b; --card2:#232c36; --locked:#232830;
+      --ink:#e8edf2; --ink-soft:#a7b4c0; --line:#38434e;
+      --ao:#56B4E9; --daidai:#f2b544; --daidai-ink:#f2b544; --murasaki:#e9a3c8;
+      --daidai-bg:#3d3010; --ao-bg:#12354a;
+      --nashi:#5b6672; --on-accent:#10151a;
+      --track:#2b333c;
+      /* ここから下の6つは わざと 明るい画面と同じ値にしてある。
+         オセロの ばん と いし の いろを 暗い画面で入れ替えると、
+         くろ と しろ が どちらか 分からなくなり、ゲームそのものが読めなくなるため。
+         （機械の検査が「再定義されていない」と言うので、同じ値を明に書いて意図を残す） */
+      --ryokuao:#009E73; --kuro:#141414; --shiro:#fdfdfb; --mizu:#56B4E9;
+      --press:rgba(255,255,255,0.22); --veil:rgba(20,20,20,0.55);
+    }
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0; padding:0;}
+  body{
+    background:var(--ground); color:var(--ink);
+    font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
+    font-size:20px; line-height:1.7;
+    -webkit-text-size-adjust:100%;
+    -webkit-user-select:none; user-select:none;
+    -webkit-tap-highlight-color:rgba(0,0,0,0);
+  }
+  .screen{padding:10px 14px 24px;}
+  h1{font-size:26px; margin:0; padding:0;}
+  h2{font-size:22px; margin:6px 0;}
+  h3{font-size:19px; margin:14px 0 4px; border-left:8px solid var(--ao); padding-left:8px;}
+  p{margin:6px 0;}
+  button{
+    font-family:inherit; font-size:20px; -webkit-appearance:none; appearance:none;
+    border:0; border-radius:10px; padding:12px 18px;
+    color:var(--on-accent); background:var(--ao);
+    cursor:pointer; min-height:56px;
+  }
+  button.sub{background:var(--nashi);}
+
+  /* ---- あたま ---- */
+  .head{overflow:hidden; padding-bottom:4px;}
+  .head h1{float:left;}
+  #grown-btn{float:right; font-size:15px; min-height:0; padding:6px 12px; background:var(--nashi);}
+  .help{clear:both; color:var(--ink-soft); font-size:16px; margin:2px 0 10px;}
+
+  /* ---- れべるの ちず ---- */
+  #map-grid{overflow:hidden;}
+  .lv{
+    float:left; width:19%; margin:0 0.5% 8px; padding:8px 4px; text-align:center;
+    background:var(--card); border:3px solid var(--line); border-radius:12px;
+  }
+  .lv.open{border-color:var(--ryokuao); cursor:pointer;}
+  .lv.done{background:var(--ao-bg); border-color:var(--ao);}
+  .lv.locked{color:var(--nashi); background:var(--locked);}
+  .lv-no{font-size:22px; font-weight:bold;}
+  .lv-name{font-size:15px; line-height:1.3; min-height:2.6em;}
+  .lv-marks{font-size:18px;}
+  .lv-marks .m{display:inline-block; width:1.4em; color:var(--nashi);}
+  .lv-marks .m.on{color:var(--ao); font-weight:bold;}
+  #map-stamps{clear:both; padding-top:8px;}
+  .stamp-title{font-size:16px; color:var(--ink-soft);}
+  .stamp{
+    display:inline-block; margin:3px 6px 3px 0; padding:3px 10px; font-size:16px;
+    color:var(--daidai-ink);
+    background:var(--daidai-bg); border:1px solid var(--daidai); border-radius:20px;
+  }
+  .stamp.none{background:none; border:0; color:var(--ink-soft);}
+
+  /* ---- ばん ---- */
+  #scr-game{overflow:hidden;}
+  /* 余白を持たない入れもの＝ここの はば を測って ばん の大きさを決める（ui.js の layout） */
+  #game-row{overflow:hidden; padding:0; margin:0;}
+  #board-wrap{position:relative; margin:0 12px 10px 0;}
+  #board{position:relative; background:var(--ryokuao); border:4px solid var(--ryokuao-dark);
+         border-radius:6px;}
+  .cell{position:absolute; border:1px solid var(--ryokuao-dark);}
+  .cell.press{background:var(--press);}
+  .st{
+    width:82%; height:82%; margin:9%; border-radius:50%; background:transparent;
+    -webkit-transition:background-color 0.12s linear; transition:background-color 0.12s linear;
+  }
+  .st.b{background:var(--kuro); box-shadow:inset 0 -3px 5px var(--sheen-light);}
+  .st.w{background:var(--shiro); box-shadow:inset 0 -3px 5px var(--sheen-dark);}
+  .st.put{-webkit-animation:pop 0.22s ease-out; animation:pop 0.22s ease-out;}
+  .st.flip{-webkit-animation:flip 0.2s ease-out; animation:flip 0.2s ease-out;}
+  @-webkit-keyframes pop{from{-webkit-transform:scale(0.3);}to{-webkit-transform:scale(1);}}
+  @keyframes pop{from{transform:scale(0.3);}to{transform:scale(1);}}
+  @-webkit-keyframes flip{from{-webkit-transform:scaleX(0.1);}to{-webkit-transform:scaleX(1);}}
+  @keyframes flip{from{transform:scaleX(0.1);}to{transform:scaleX(1);}}
+  .cell.shake{-webkit-animation:shake 0.34s; animation:shake 0.34s;}
+  @-webkit-keyframes shake{
+    0%,100%{-webkit-transform:translateX(0);}
+    25%{-webkit-transform:translateX(-5px);}
+    75%{-webkit-transform:translateX(5px);}
+  }
+  @keyframes shake{
+    0%,100%{transform:translateX(0);}
+    25%{transform:translateX(-5px);}
+    75%{transform:translateX(5px);}
+  }
+
+  /* ---- よこの しらせ ---- */
+  #side{padding:0;}
+  .turn{font-size:23px; font-weight:bold; padding:8px 10px; border-radius:10px;
+        background:var(--ao-bg); color:var(--ao);}
+  .turn.ai{background:var(--daidai-bg); color:var(--daidai-ink);}
+  .cnt{margin:10px 0;}
+  .cnt-label{font-size:16px; color:var(--ink-soft);}
+  .cnt-row{line-height:0; padding:2px 0;}
+  /* 石の列＝ふちを くろ にも つける。暗い画面では くろい 石が 紙と 同じ色になって
+     見えなくなるため（数だけでなく 長さ でも 比べられるようにする・しげ裁定Q4） */
+  .dot{display:inline-block; width:11px; height:11px; margin:1px; border-radius:50%;
+       border:1px solid var(--line);}
+  .dot.b{background:var(--kuro);}
+  .dot.w{background:var(--shiro);}
+  .cnt-num{font-size:17px; color:var(--ink-soft);}
+  .msg{margin:10px 0; padding:10px 12px; border-radius:10px; font-size:19px;
+       background:var(--ao-bg); color:var(--ao);}
+  .msg.warn{background:var(--daidai-bg); color:var(--daidai-ink); border:2px solid var(--daidai);}
+  #lecture{margin:10px 0; padding:10px 12px; border:2px solid var(--daidai);
+           background:var(--daidai-bg); border-radius:10px;}
+  #lecture-text{color:var(--daidai-ink); font-weight:bold;}
+  #lecture-how{font-size:16px; color:var(--daidai-ink);}
+  #rule-strip{padding:6px 0; line-height:0;}
+  .rs{display:inline-block; width:30px; height:30px; margin:2px; border-radius:50%;
+      border:2px solid var(--ryokuao-dark); background:var(--ryokuao);}
+  .rs.b{background:var(--kuro);}
+  .rs.w{background:var(--shiro);}
+  #give-up{background:var(--nashi); font-size:17px; min-height:0; padding:10px 14px;}
+
+  /* ---- けっか ---- */
+  .res-head{font-size:30px; font-weight:bold; margin:4px 0 8px;}
+  .res-head.win{color:var(--ao);}
+  .res-head.lose{color:var(--murasaki);}
+  .res-head.draw{color:var(--ink-soft);}
+  #res-counts{overflow:hidden;}
+  #res-counts .cnt{float:left; margin-right:28px;}
+  #res-praise{clear:both; font-size:20px; padding:8px 12px; background:var(--ao-bg);
+              color:var(--ao); border-radius:10px; display:inline-block;}
+  #res-judging{margin:12px 0;}
+  #judge-track{height:14px; background:var(--track); border-radius:7px; overflow:hidden;}
+  #judge-bar{height:14px; width:0; background:var(--mizu);}
+  #res-reason{margin:12px 0; padding:10px 14px; border:2px solid var(--daidai);
+              background:var(--daidai-bg); border-radius:12px; color:var(--ink);}
+  #res-mini{width:232px; line-height:0; background:var(--ryokuao);
+            border:3px solid var(--ryokuao-dark); border-radius:4px; margin:6px 0;}
+  .mc{display:inline-block; width:27px; height:27px; border:1px solid var(--ryokuao-dark);
+      position:relative; vertical-align:top;}
+  .mc.b:after,.mc.w:after{
+    content:''; position:absolute; left:14%; top:14%; width:72%; height:72%; border-radius:50%;
+  }
+  .mc.b:after{background:var(--kuro);}
+  .mc.w:after{background:var(--shiro);}
+  .mc.mark{background:var(--daidai);}
+  .mc.taken{background:var(--murasaki);}
+  .bang{position:absolute; left:0; top:0; width:100%; height:100%; line-height:25px;
+        text-align:center; font-size:17px; font-weight:bold; color:var(--on-accent); z-index:2;}
+  #res-why{font-size:21px; font-weight:bold;}
+  #res-next{font-size:19px;}
+  #res-unlock{font-size:22px; font-weight:bold; color:var(--ao); margin:10px 0;}
+  #res-again{margin-right:12px;}
+
+  /* ---- かみふぶき ---- */
+  #confetti{position:fixed; left:0; top:0; width:100%; height:100%; pointer-events:none; z-index:40;}
+  .cf{position:absolute; top:-20px; width:10px; height:16px; border-radius:2px;
+      -webkit-animation:fall 2.2s linear; animation:fall 2.2s linear;}
+  @-webkit-keyframes fall{from{-webkit-transform:translateY(0) rotate(0);}
+    to{-webkit-transform:translateY(100vh) rotate(420deg);}}
+  @keyframes fall{from{transform:translateY(0) rotate(0);}
+    to{transform:translateY(100vh) rotate(420deg);}}
+
+  /* ---- まど（いろえらび・たしざん・おうちのひと） ---- */
+  .veil{position:fixed; left:0; top:0; width:100%; height:100%;
+        background:var(--veil); z-index:50; overflow:auto;}
+  .box{background:var(--card); color:var(--ink); max-width:560px; margin:8% auto;
+       padding:18px 20px; border-radius:14px;}
+  .box.wide{max-width:760px; margin:3% auto;}
+  .box button{margin:6px 8px 6px 0; display:block; width:100%;}
+  .box.wide button{display:inline-block; width:auto;}
+  #lock-input{font-size:26px; width:140px; padding:8px; border:2px solid var(--line);
+              border-radius:8px; background:var(--card); color:var(--ink);}
+  #lock-ok{display:inline-block; width:auto;}
+  #lock-q{font-size:28px;}
+  #lock-ng{color:var(--murasaki); font-weight:bold;}
+  .gtbl{border-collapse:collapse; width:100%; font-size:17px; margin:4px 0 10px;}
+  .gtbl th,.gtbl td{border:1px solid var(--line); padding:4px 8px; text-align:left;}
+  .gtbl th{background:var(--card2); white-space:nowrap;}
+  .voice{background:var(--ao-bg); color:var(--ao); padding:8px 12px; border-radius:10px;}
+  .ver{color:var(--ink-soft); font-size:15px;}
+  #fatal{padding:24px; color:var(--murasaki);}
+</style>
+</head>
+<body>
+
+<!-- ① れべるの ちず -->
+<div id="scr-map" class="screen">
+  <div class="head">
+    <h1 id="app-name">つよくなるオセロ</h1>
+    <button id="grown-btn">おうちのひと</button>
+  </div>
+  <p id="map-title" class="help"></p>
+  <p id="map-help" class="help"></p>
+  <div id="map-grid"></div>
+  <div id="map-stamps"></div>
+</div>
+
+<!-- ② たいきょく -->
+<div id="scr-game" class="screen" style="display:none;">
+ <div id="game-row">
+  <div id="board-wrap"><div id="board"></div></div>
+  <div id="side">
+    <div id="turn" class="turn"></div>
+    <div id="count-you" class="cnt"></div>
+    <div id="count-ai" class="cnt"></div>
+    <div id="msg" class="msg" style="display:none;"></div>
+    <div id="lecture" style="display:none;">
+      <p id="lecture-text"></p>
+      <div id="rule-strip"></div>
+      <p id="lecture-how"></p>
+    </div>
+    <button id="give-up" style="display:none;"></button>
+  </div>
+ </div>
+</div>
+
+<!-- ③ けっか -->
+<div id="scr-result" class="screen" style="display:none;">
+  <div id="res-head" class="res-head"></div>
+  <div id="res-counts"></div>
+  <p id="res-praise"></p>
+  <div id="res-judging" style="display:none;">
+    <p id="judge-text"></p>
+    <div id="judge-track"><div id="judge-bar"></div></div>
+  </div>
+  <div id="res-reason" style="display:none;">
+    <p id="res-reason-title" class="help"></p>
+    <div id="res-mini"></div>
+    <p id="res-why"></p>
+    <p id="res-next-title" class="help"></p>
+    <p id="res-next"></p>
+  </div>
+  <div id="res-unlock"></div>
+  <p>
+    <button id="res-again"></button>
+    <button id="res-back" class="sub"></button>
+  </p>
+</div>
+
+<!-- いろを えらぶ まど -->
+<div id="pick" class="veil" style="display:none;">
+  <div class="box">
+    <h2 id="pick-title"></h2>
+    <button id="pick-black"></button>
+    <button id="pick-white"></button>
+    <button id="pick-back" class="sub"></button>
+  </div>
+</div>
+
+<!-- たしざんの かぎ（おうちのひと用） -->
+<div id="lock" class="veil" style="display:none;">
+  <div class="box">
+    <h2 id="lock-title"></h2>
+    <p id="lock-q"></p>
+    <p><input id="lock-input" type="tel"> <button id="lock-ok">OK</button></p>
+    <p id="lock-ng"></p>
+    <button id="lock-close" class="sub"></button>
+  </div>
+</div>
+
+<!-- おうちのひと の ページ -->
+<div id="grown" class="veil" style="display:none;">
+  <div class="box wide">
+    <h2 id="grown-title"></h2>
+    <p>
+      <button id="g-sound"></button>
+      <button id="g-openall" class="sub"></button>
+      <button id="g-wipe" class="sub"></button>
+    </p>
+    <div id="grown-body"></div>
+    <button id="grown-close" class="sub"></button>
+  </div>
+</div>
+
+<!-- きろくを けす かくにん -->
+<div id="wipe" class="veil" style="display:none;">
+  <div class="box">
+    <p id="wipe-ask"></p>
+    <button id="wipe-yes"></button>
+    <button id="wipe-no" class="sub"></button>
+  </div>
+</div>
+
+<div id="confetti" style="display:none;"></div>
+
+<div id="fatal" style="display:none;">
+  <h2 id="fatal-title"></h2>
+  <p id="fatal-body"></p>
+</div>
+
+<script>
+/*__CORE__*/
+</script>
+<script>
+/*__AI__*/
+</script>
+<script>
+/*__BLUNDER__*/
+</script>
+<script>
+/*__RULES__*/
+</script>
+<script>
+/*__TEXT__*/
+</script>
+<script>
+/*__UI__*/
+</script>
+<script>
+/*__SILENCE__*/
+(function () {
+  'use strict';
+  /* 読み込みで止まったときに白い画面にしない（設計書4.10章） */
+  window.onerror = function () {
+    var box = document.getElementById('fatal');
+    if (!box) { return false; }
+    box.style.display = '';
+    var t = document.getElementById('fatal-title'), b = document.getElementById('fatal-body');
+    if (t) { t.innerHTML = ''; t.appendChild(document.createTextNode('ごめんなさい。うまく うごきませんでした')); }
+    if (b) { b.innerHTML = ''; b.appendChild(document.createTextNode('いちど とじて、もういちど ひらいて みてください')); }
+    return false;
+  };
+  OKUI.start();
+})();
+</script>
+</body>
+</html>

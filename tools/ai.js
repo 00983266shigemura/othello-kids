@@ -163,32 +163,6 @@ var OKAI = {};
   }
   OKAI.bestMoveEndBudgeted = bestMoveEndBudgeted;
 
-  /* ---- 反復深化＋読む局面の上限。上限に当たったら1つ前のふかさの手を返す ---- */
-  function bestMoveBudgeted(b, p, maxDepth, budget) {
-    var snapshot = OK.copyBoard(b);
-    var best = -1, d, r, reached = 0, t0 = OK.now();
-    OK.setBudget(budget);
-    OK.resetNodes();
-    try {
-      for (d = 1; d <= maxDepth; d++) {
-        /* 時間の安全弁（設計書4.4・4.10章）＝段の指定は局面の数のままにしつつ、
-           端末が思ったより遅かったときのために、次の深さへ進む前に時計を見る。
-           ふつうは節点予算のほうが先に効くので、ここは効かない。 */
-        if (d > 1 && (OK.now() - t0) > TIME_GUARD_MS) { break; }
-        r = OK.bestMoveMid(b, p, d);
-        if (r.move >= 0) { best = r.move; reached = d; }
-      }
-    } catch (e) {
-      if (e !== OK.BUDGET_STOP) { OK.clearBudget(); throw e; }
-      /* 途中でやめた＝盤が読みの途中の形で残っているので写しから戻す */
-      var i;
-      for (i = 0; i < 64; i++) { b[i] = snapshot[i]; }
-    }
-    OK.clearBudget();
-    return { move: best, depth: reached, nodes: OK.getNodes() };
-  }
-  OKAI.bestMoveBudgeted = bestMoveBudgeted;
-
   /* ================= 1手を選ぶ（対局で呼ぶ入口） =================
      b＝盤 / p＝手番 / cfg＝段の設定 / rnd＝決まった乱数
      戻り値＝置くマス（0〜63）。置ける所が無ければ -1。 */
@@ -196,48 +170,131 @@ var OKAI = {};
      終盤をあきらめて中盤の読みへ落ちた手は両方に数が入る＝時間の見積りに使う。 */
   OKAI.lastCost = { end: 0, mid: 0 };
 
-  OKAI.chooseMove = function (b, p, cfg, rnd) {
-    OKAI.lastCost = { end: 0, mid: 0 };
-    var moves = OK.legalMoves(b, p);
-    if (moves.length === 0) { return -1; }
-    if (moves.length === 1) { return moves[0]; }
+  /* ---- 途中で止められる形（工程2・判定述語P9の後半「画面が固まらない」） ----
+     step() を1回呼ぶと「ひとかたまり」だけ読み、まだ決まっていなければ false を返す。
+     かたまりの大きさ＝終盤の完全読み1回（上限150,000局面＝実機で約0.9秒）か、
+     反復深化のふかさ1つぶん。そのあいだに画面は setTimeout(0) で息をつげる。
+     打ち手を決める道すじはこの1本だけにした＝下の chooseMove（いままでの呼び方）は、
+     これを最後まで回すだけの薄い皮。Macの自己対戦と画面のアプリが別物にならない。 */
+  function Chooser(b, p, cfg, rnd) {
+    this.b = b; this.p = p; this.cfg = cfg; this.rnd = rnd;
+    this.phase = 'init';
+    this.move = -1;
+    this.moves = null;
+    this.depth = 0;
+    this.best = -1;
+    this.spentMs = 0;
+    this.snapshot = null;
+  }
 
-    var empties = 64 - OK.discCount(b);
-    var i, r;
+  Chooser.prototype.done = function (sq) {
+    this.move = sq;
+    this.phase = 'done';
+    return true;
+  };
 
-    /* 先読みの段＝でたらめを打つかどうかは、1手につき1回だけ引く。
-       （以前は終盤でもう1回引いていたため、eps の意味が終盤だけ違っていた＝査読で判明） */
-    if (cfg.kind === 'search' && cfg.eps && rnd() < cfg.eps) {
-      return moves[Math.floor(rnd() * moves.length)];
+  /* 反復深化を打ち切って、いままでで一番よい手を返す */
+  Chooser.prototype.endMid = function () {
+    OKAI.lastCost.mid = OK.getNodes();
+    return this.done(this.best >= 0 ? this.best : this.moves[0]);
+  };
+
+  Chooser.prototype.step = function () {
+    var cfg = this.cfg, b = this.b, p = this.p, rnd = this.rnd;
+    var moves, empties, i, r, cs, t0;
+
+    if (this.phase === 'init') {
+      OKAI.lastCost = { end: 0, mid: 0 };
+      moves = OK.legalMoves(b, p);
+      this.moves = moves;
+      if (moves.length === 0) { return this.done(-1); }
+      if (moves.length === 1) { return this.done(moves[0]); }
+
+      empties = 64 - OK.discCount(b);
+
+      /* 先読みの段＝でたらめを打つかどうかは、1手につき1回だけ引く。
+         （以前は終盤でもう1回引いていたため、eps の意味が終盤だけ違っていた＝査読で判明） */
+      if (cfg.kind === 'search' && cfg.eps && rnd() < cfg.eps) {
+        return this.done(moves[Math.floor(rnd() * moves.length)]);
+      }
+      /* おわりの完全読み＝あきマスが少なくなったら最後まで読む。
+         読む局面が上限を超えたら あきらめて、中盤の読みへ落ちる（時間を守るため） */
+      if (cfg.kind === 'search' && cfg.endEmpties && empties <= cfg.endEmpties) {
+        this.phase = 'end';
+        return false;
+      }
+      this.phase = (cfg.kind === 'random') ? 'random' : 'mid';
+      return false;
     }
 
-    /* おわりの完全読み＝あきマスが少なくなったら最後まで読む。
-       読む局面が上限を超えたら あきらめて、下の中盤の読みへ落ちる（時間を守るため） */
-    if (cfg.kind === 'search' && cfg.endEmpties && empties <= cfg.endEmpties) {
+    if (this.phase === 'end') {
       r = bestMoveEndBudgeted(b, p, cfg.endBudget || END_BUDGET);
       OKAI.lastCost.end = r.nodes;
-      if (r.move >= 0) { return r.move; }
+      if (r.move >= 0) { return this.done(r.move); }
+      this.phase = 'mid';
+      return false;
     }
 
-    if (cfg.kind === 'random') {
+    if (this.phase === 'random') {
+      moves = this.moves;
       /* かどが取れるなら、決めた確率で取る */
       if (cfg.cornerP) {
-        var cs = [];
+        cs = [];
         for (i = 0; i < moves.length; i++) {
           if (isCorner(moves[i])) { cs.push(moves[i]); }
         }
         if (cs.length > 0 && rnd() < cfg.cornerP) {
-          return cs[Math.floor(rnd() * cs.length)];
+          return this.done(cs[Math.floor(rnd() * cs.length)]);
         }
       }
       /* わざと一番わるい手を打つ（一番よわい段を作るため） */
-      if (cfg.bad && rnd() < cfg.bad) { return worstMove(b, p, moves, cfg.badDepth); }
-      return moves[Math.floor(rnd() * moves.length)];
+      if (cfg.bad && rnd() < cfg.bad) {
+        return this.done(worstMove(b, p, moves, cfg.badDepth));
+      }
+      return this.done(moves[Math.floor(rnd() * moves.length)]);
     }
 
-    r = bestMoveBudgeted(b, p, cfg.depth, cfg.budget || MID_BUDGET);
-    OKAI.lastCost.mid = r.nodes;
-    return r.move >= 0 ? r.move : moves[0];
+    /* mid＝反復深化＋読む局面の上限。1回の step で ふかさ1つぶんだけ読む。
+       上限に当たったら1つ前のふかさの手を返す */
+    if (this.snapshot === null) {
+      this.snapshot = OK.copyBoard(b);
+      this.depth = 0;
+      this.best = -1;
+      this.spentMs = 0;
+      OK.resetNodes();
+    }
+    this.depth++;
+    /* 時間の安全弁（設計書4.4・4.10章）＝段の指定は局面の数のままにしつつ、
+       端末が思ったより遅かったときのために、次の深さへ進む前に時計を見る。
+       ふつうは節点予算のほうが先に効くので、ここは効かない。
+       数えるのは読みに使った時間だけ＝息をついだ時間は入れない（分割しても同じ所で止まる）。 */
+    if (this.depth > 1 && this.spentMs > TIME_GUARD_MS) { return this.endMid(); }
+    if (this.depth > cfg.depth) { return this.endMid(); }
+    OK.setBudget(cfg.budget || MID_BUDGET);
+    t0 = OK.now();
+    try {
+      r = OK.bestMoveMid(b, p, this.depth);
+      if (r.move >= 0) { this.best = r.move; }
+    } catch (e) {
+      OK.clearBudget();
+      if (e !== OK.BUDGET_STOP) { throw e; }
+      /* 途中でやめた＝盤が読みの途中の形で残っているので写しから戻す */
+      restore(b, this.snapshot);
+      return this.endMid();
+    }
+    OK.clearBudget();
+    this.spentMs += OK.now() - t0;
+    return false;
+  };
+
+  /* 画面から使う入口＝1手ぶんの「読み係」を作る */
+  OKAI.makeChooser = function (b, p, cfg, rnd) { return new Chooser(b, p, cfg, rnd); };
+
+  /* Macの測定台本から使う入口＝止めずに最後まで読む */
+  OKAI.chooseMove = function (b, p, cfg, rnd) {
+    var c = new Chooser(b, p, cfg, rnd);
+    while (!c.step()) { /* 決まるまで回す */ }
+    return c.move;
   };
 
   /* ================= 子ども代理（6歳の打ちかたの見立て・設計書P3(b)） ================= */
