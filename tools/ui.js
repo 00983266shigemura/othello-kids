@@ -281,13 +281,14 @@ var OKUI = {};
 
   /* ================= メッセージ（文は2秒で消す） ================= */
   var msgTimer = null;
-  function say(s, kind) {
+  /* keep＝消さずに残す（いちばん困っている場面の声かけ用・しげ裁定2026-09-22） */
+  function say(s, kind, keep) {
     var m = el('msg');
     setText(m, s);
     m.className = 'msg' + (kind ? ' ' + kind : '');
     show(m, s !== '');
     if (msgTimer) { clearTimeout(msgTimer); msgTimer = null; }
-    if (s !== '') {
+    if (s !== '' && !keep) {
       msgTimer = setTimeout(function () { show(m, false); }, 2000);
     }
   }
@@ -488,6 +489,7 @@ var OKUI = {};
     S.missCount = 0;
     show(el('lecture'), false);
     show(el('give-up'), false);
+    say('');      /* 消さずに残していた声かけを、置けたところで下げる */
     doMove(sq);
   }
   OKUI.tapCell = tapCell;
@@ -503,7 +505,9 @@ var OKUI = {};
       startRuleAnim();
     }
     if (stage >= 2) {
-      say(OKT.game.together, 'warn');
+      /* この声かけだけは消さない＝2秒で消えると、やめるボタンだけが理由なく残る
+         （しげ裁定2026-09-22「ぜんぶ推奨で」） */
+      say(OKT.game.together, 'warn', true);
       setText(el('give-up'), OKT.game.quit);
       show(el('give-up'), true);
     }

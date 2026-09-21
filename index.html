@@ -1760,7 +1760,8 @@ var OKT = {};
 
   /* ---- れべるの ちず ---- */
   OKT.map = {
-    title: 'きょうは どの あいてと たたかう？',
+    /* 「きょうは」＝日がわりで相手が変わると読める（しげ裁定2026-09-22） */
+    title: 'どの あいてと たたかう？',
     help: 'くろでも しろでも かつと つぎの あいてが ひらくよ',
     /* 「まだ」だけだと あいての 名前に 見えるので、文にした（査読2026-09-21） */
     locked: 'まだ あそべない',
@@ -1790,8 +1791,8 @@ var OKT = {};
     together: 'むずかしいね。いっしょに さがそう',
     quit: 'やめて ちずに もどる',
     passYou: 'おける ところが ないよ。パス！',
-    passAi: 'あいても おける ところが ない。パス！',
-    thinking: 'かんがえちゅう'
+    passAi: 'あいても おける ところが ない。パス！'
+    /* 2026-09-22＝使っていない thinking を消した。相手の手番の表示は aiTurn が持つ */
   };
 
   /* ---- けっか ---- */
@@ -1803,14 +1804,18 @@ var OKT = {};
     again: 'もういっかい',
     back: 'ちずに もどる',
     unlocked: 'つぎの あいてが ひらいた！',
-    needOther: 'もういっぽうの いろでも かつと つぎが ひらくよ',
+    /* 「もういっぽう」＝「もう（すでに）＋いっぽう」と読まれうる。色の名前で言う
+       （しげ裁定2026-09-22） */
+    needOther: 'くろでも しろでも かつと つぎが ひらくよ',
     drawNote: 'ひきわけでは つぎは ひらかないよ',
-    reasonTitle: 'ここが わかれめ',
+    /* 「わかれめ」＝お別れに読める。負けた直後なのでやめた（しげ裁定2026-09-22） */
+    reasonTitle: 'ここを みて みよう',
     /* 小さい ばん の しるしの いみ＝「✕」に せつめいが 無かった（査読2026-09-21） */
     miniNote: '！＝きみが おいた ところ',
     miniNoteTaken: '！＝きみが おいた ところ　✕＝あいてに とられた かど',
     nextTitle: 'つぎは こうしよう',
-    stampGot: 'できた こと が ふえた',
+    /* 2026-09-22 しげ裁定＝スタンプが増えた知らせは出さない（承認の文で足りる）。
+       使っていない stampGot を消した */
     /* やり方の承認＝行動の事実を1つだけ。人格のことばは使わない（設計書4.5章） */
     praise: {
       corner: 'かどを とったね',
@@ -2166,13 +2171,14 @@ var OKUI = {};
 
   /* ================= メッセージ（文は2秒で消す） ================= */
   var msgTimer = null;
-  function say(s, kind) {
+  /* keep＝消さずに残す（いちばん困っている場面の声かけ用・しげ裁定2026-09-22） */
+  function say(s, kind, keep) {
     var m = el('msg');
     setText(m, s);
     m.className = 'msg' + (kind ? ' ' + kind : '');
     show(m, s !== '');
     if (msgTimer) { clearTimeout(msgTimer); msgTimer = null; }
-    if (s !== '') {
+    if (s !== '' && !keep) {
       msgTimer = setTimeout(function () { show(m, false); }, 2000);
     }
   }
@@ -2373,6 +2379,7 @@ var OKUI = {};
     S.missCount = 0;
     show(el('lecture'), false);
     show(el('give-up'), false);
+    say('');      /* 消さずに残していた声かけを、置けたところで下げる */
     doMove(sq);
   }
   OKUI.tapCell = tapCell;
@@ -2388,7 +2395,9 @@ var OKUI = {};
       startRuleAnim();
     }
     if (stage >= 2) {
-      say(OKT.game.together, 'warn');
+      /* この声かけだけは消さない＝2秒で消えると、やめるボタンだけが理由なく残る
+         （しげ裁定2026-09-22「ぜんぶ推奨で」） */
+      say(OKT.game.together, 'warn', true);
       setText(el('give-up'), OKT.game.quit);
       show(el('give-up'), true);
     }
