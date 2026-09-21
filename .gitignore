@@ -26,3 +26,6 @@ tools/behavior_before.json
 tools/behavior_after.json
 tools/behavior_before.err
 tools/behavior_after.err
+
+# 台本の実行ログ（CCが読む。公開には要らない）
+logs/
