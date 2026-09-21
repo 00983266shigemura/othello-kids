@@ -28,7 +28,7 @@ REPO_DIR="/Users/shigemurasatoshi/dev/othello-kids"
 ORIGIN_URL="https://github.com/00983266shigemura/othello-kids.git"
 PAGES_URL="https://00983266shigemura.github.io/othello-kids/"
 
-print "== 1/5 記録ずみの中身と部品が一致するかを機械で見る =="
+print "== 1/7 記録ずみの中身と部品が一致するかを機械で見る =="
 /usr/bin/python3 "${REPO_DIR}/tools/build_app.py" > /dev/null
 if [ $? -ne 0 ]; then
   print "組み立てに失敗しました。何も公開していません。CCへ知らせてください。"
@@ -49,7 +49,7 @@ if [ -n "$DIRTY" ]; then
 fi
 print "一致しています（正常）"
 
-print "== 2/5 公開先の登録を確かめる =="
+print "== 2/7 公開先の登録を確かめる =="
 if "$GIT" -C "$REPO_DIR" remote get-url origin > /dev/null 2>&1; then
   NOW=$("$GIT" -C "$REPO_DIR" remote get-url origin)
   print "登録ずみ = ${NOW}"
@@ -68,7 +68,27 @@ else
   print "登録しました = ${ORIGIN_URL}"
 fi
 
-print "== 3/5 公開へ反映（push） =="
+print "== 3/7 取り込みの途中で止まっていないか確認 =="
+if [ -d "$REPO_DIR/.git/rebase-merge" ] || [ -d "$REPO_DIR/.git/rebase-apply" ]; then
+  print "取り込みが途中で止まっています。CCへ知らせてください。何もせず中止します。"
+  exit 1
+fi
+print "止まっていません（正常）"
+
+print "== 4/7 公開先の分を先に取り込む =="
+if [ -z "$("$GIT" -C "$REPO_DIR" ls-remote --heads origin main 2>/dev/null)" ]; then
+  print "公開先にはまだ何もありません＝取り込みは要りません"
+else
+  "$GIT" -C "$REPO_DIR" pull --rebase origin main
+  if [ $? -ne 0 ]; then
+    print "取り込みでぶつかりました。安全のため元の状態へ戻します。"
+    "$GIT" -C "$REPO_DIR" rebase --abort
+    print "元へ戻しました。何も反映していません。CCへ知らせてください。"
+    exit 1
+  fi
+fi
+
+print "== 5/7 公開へ反映（push） =="
 "$GIT" -C "$REPO_DIR" push -u origin main
 if [ $? -ne 0 ]; then
   print ""
@@ -82,7 +102,7 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-print "== 4/5 反映されたか確かめる =="
+print "== 6/7 反映されたか確かめる =="
 "$GIT" -C "$REPO_DIR" fetch origin main
 LOCAL=$("$GIT" -C "$REPO_DIR" rev-parse HEAD)
 REMOTE=$("$GIT" -C "$REPO_DIR" rev-parse origin/main)
@@ -93,11 +113,11 @@ if [ "$LOCAL" != "$REMOTE" ]; then
   exit 1
 fi
 
-print "== 5/5 iPadで開く場所 =="
+print "== 7/7 iPadで開く場所 =="
 print "${PAGES_URL}"
 print ""
-print "※ この場所が出るまで、GitHub側で1〜2分かかることがあります。"
-print "※ 最初の1回だけ、GitHubの Settings → Pages で「main / (root)」を選ぶ必要があります。"
+print "※ 新しい中身に入れ替わるまで、GitHub側で1〜2分かかることがあります。"
+print "※ iPadは version.txt を見て自分で新しい版へ移ります（アドレスの打ち直しは要りません）。"
 
 print "== 完了：合格 =="
 exit 0
