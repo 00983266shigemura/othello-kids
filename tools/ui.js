@@ -15,7 +15,7 @@ var OKUI = {};
 
   /* このファイルを直したら この数字を +1 する。version.txt にも同じ数字が書かれる
      （build_app.py が自動で書く）＝古いファイルを持っている端末が取り直せる。 */
-  OKUI.APP_VERSION = 3;
+  OKUI.APP_VERSION = 4;
 
   /* まけた わけの しらべ を、何ミリ秒ぶん まとめて 進めてから 息をつぐか。
      0 にすると かたまりは いちばん小さくなるが、60手ぶん 待ち時間が積み上がる。
@@ -394,7 +394,11 @@ var OKUI = {};
     /* 種＝いま の 時こく。同じ相手でも毎回ちがう将棋になる */
     S.rnd = OKAI.makeRnd(((new Date()).getTime() % 2147483000) + 7);
     show(el('lecture'), false);
-    show(el('give-up'), false);
+    /* 「ちずに もどる」は たいきょくちゅう ずっと 出しておく（しげ指示2026-09-22）。
+       押すと すぐには もどらず、quit の ききかえし を はさむ */
+    setText(el('give-up'), S.duo ? OKT.game.quitDuo : OKT.game.quit);
+    show(el('give-up'), true);
+    show(el('quit'), false);
     say('');
     showScreen('game');
     renderBoard();
@@ -518,7 +522,6 @@ var OKUI = {};
     }
     S.missCount = 0;
     show(el('lecture'), false);
-    show(el('give-up'), false);
     say('');      /* 消さずに残していた声かけを、置けたところで下げる */
     doMove(sq);
   }
@@ -535,11 +538,9 @@ var OKUI = {};
       startRuleAnim();
     }
     if (stage >= 2) {
-      /* この声かけだけは消さない＝2秒で消えると、やめるボタンだけが理由なく残る
-         （しげ裁定2026-09-22「ぜんぶ推奨で」） */
+      /* この声かけだけは消さない（しげ裁定2026-09-22「ぜんぶ推奨で」）。
+         「ちずに もどる」は たいきょく の あいだ ずっと 出ているので ここでは さわらない */
       say(OKT.game.together, 'warn', true);
-      setText(el('give-up'), S.duo ? OKT.game.quitDuo : OKT.game.quit);
-      show(el('give-up'), true);
     }
   }
 
@@ -1017,10 +1018,20 @@ var OKUI = {};
     };
     el('pick-back').onclick = function () { show(el('pick'), false); };
 
+    /* 「ちずに もどる」＝まちがって 押したときの ために 1回 聞きかえす。
+       押すと その局は すてる（記録に のこさない）ので、取り消せないため */
     el('give-up').onclick = function () {
+      setText(el('quit-ask'), OKT.game.quitAsk);
+      setText(el('quit-yes'), OKT.game.quitYes);
+      setText(el('quit-no'), OKT.game.quitNo);
+      show(el('quit'), true);
+    };
+    el('quit-no').onclick = function () { show(el('quit'), false); };
+    el('quit-yes').onclick = function () {
+      show(el('quit'), false);
       clearTimers();
       stopRuleAnim();
-      showScreen(S.duo ? 'mode' : 'map');   /* その局は すてる（記録に のこさない） */
+      showScreen(S.duo ? 'mode' : 'map');
     };
     el('res-again').onclick = function () {
       startGame(S.level, S.childColor, S.duo);

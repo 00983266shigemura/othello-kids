@@ -193,6 +193,35 @@ is('　　ひらいた れべるの数が 1（れべる1だけ）', OKR.openCoun
 NODES['res-back'].onclick();
 is('　　ふたりの あとは はじめの がめん へ もどる', S.screen, 'mode');
 
+/* ================= ⑨ たいきょくちゅうの「ちずに もどる」 ================= */
+OKUI.startGame(1, BLACK, false);
+pumpTimers();
+isTrue('⑨はじめから ずっと 出ている', NODES['give-up'].style.display !== 'none');
+is('　　ことばは ちずに もどる', NODES['give-up'].text(), OKT.game.quit);
+/* 1手 打っても 消えない（前は 打つと 消えていた） */
+OKUI.tapCell(OK.legalMoves(S.board, BLACK)[0]);
+pumpTimers();
+isTrue('　　1手 打っても 消えない', NODES['give-up'].style.display !== 'none');
+/* 押すと すぐには もどらず、ききかえし が出る */
+NODES['give-up'].onclick();
+isTrue('　　押すと ききかえし が出る', NODES.quit.style.display !== 'none');
+is('　　たいきょくは まだ つづいている', S.screen, 'game');
+NODES['quit-no'].onclick();
+is('　　つづける を押すと たいきょくに もどる', S.screen, 'game');
+isTrue('　　ききかえし は しまわれる', NODES.quit.style.display === 'none');
+NODES['give-up'].onclick();
+NODES['quit-yes'].onclick();
+is('　　やめて もどる を押すと ちずへ', S.screen, 'map');
+isTrue('　　やめた局は 記録に のこらない', S.save.games.length === 0);
+
+/* ふたりの ときは はじめの がめん へ */
+OKUI.startGame(1, BLACK, true);
+pumpTimers();
+is('　　ふたりの ときの ことば', NODES['give-up'].text(), OKT.game.quitDuo);
+NODES['give-up'].onclick();
+NODES['quit-yes'].onclick();
+is('　　ふたりの ときは はじめの がめん へ', S.screen, 'mode');
+
 /* ================= ⑧ ひとりで あそぶ が こわれていないか ================= */
 aiKaisu = 0;
 OKUI.startGame(1, BLACK, false);
