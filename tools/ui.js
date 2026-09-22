@@ -15,7 +15,7 @@ var OKUI = {};
 
   /* このファイルを直したら この数字を +1 する。version.txt にも同じ数字が書かれる
      （build_app.py が自動で書く）＝古いファイルを持っている端末が取り直せる。 */
-  OKUI.APP_VERSION = 2;
+  OKUI.APP_VERSION = 3;
 
   /* まけた わけの しらべ を、何ミリ秒ぶん まとめて 進めてから 息をつぐか。
      0 にすると かたまりは いちばん小さくなるが、60手ぶん 待ち時間が積み上がる。
@@ -57,10 +57,11 @@ var OKUI = {};
 
   /* ================= いまの ようす ================= */
   var S = {
-    screen: 'map',
+    screen: 'mode',
     save: null,
     level: 1,
     childColor: BLACK,
+    duo: false,        /* ふたりで あそぶ＝相手も人が打つ。記録にも れべるにも ひびかない */
     board: null,
     player: BLACK,
     moves: [],
@@ -166,7 +167,7 @@ var OKUI = {};
   OKUI.SND = SND;
 
   /* ================= 画面の 切りかえ ================= */
-  var SCREENS = ['map', 'game', 'result'];
+  var SCREENS = ['mode', 'map', 'game', 'result'];
   function showScreen(name) {
     var i;
     S.screen = name;
@@ -257,6 +258,12 @@ var OKUI = {};
       if (S.board[i] === BLACK) { nb++; }
       else if (S.board[i] === WHITE) { nw++; }
     }
+    if (S.duo) {
+      /* ふたりのときは「きみ・あいて」が だれを指すか 決められない＝色だけで出す */
+      drawCount(el('count-you'), nb, BLACK, '');
+      drawCount(el('count-ai'), nw, WHITE, '');
+      return;
+    }
     drawCount(el('count-you'), S.childColor === BLACK ? nb : nw,
       S.childColor, OKT.game.you);
     drawCount(el('count-ai'), S.childColor === BLACK ? nw : nb,
@@ -267,7 +274,8 @@ var OKUI = {};
     var i, row, d;
     while (box.firstChild) { box.removeChild(box.firstChild); }
     d = mk('div', 'cnt-label');
-    setText(d, label + ' ' + (color === BLACK ? OKT.game.black : OKT.game.white));
+    setText(d, (label ? label + ' ' : '')
+      + (color === BLACK ? OKT.game.black : OKT.game.white));
     box.appendChild(d);
     row = mk('div', 'cnt-row');
     for (i = 0; i < n; i++) {
@@ -293,9 +301,20 @@ var OKUI = {};
     }
   }
 
+  /* ================= はじめの がめん＝あそびかたを えらぶ ================= */
+  function buildMode() {
+    setText(el('mode-help'), OKT.mode.help);
+    setText(el('mode-solo'), OKT.mode.solo);
+    setText(el('mode-solo-note'), OKT.mode.soloNote);
+    setText(el('mode-duo'), OKT.mode.duo);
+    setText(el('mode-duo-note'), OKT.mode.duoNote);
+    setText(el('mode-enter-how'), OKT.grown.enterHow);
+  }
+
   /* ================= れべるの ちず ================= */
   function buildMap() {
     var grid = el('map-grid'), i, cell, no, nm, marks, mb, mw, cfg, open, done;
+    setText(el('map-back'), OKT.mode.back);
     setText(el('map-title'), OKT.map.title);
     setText(el('map-help'), OKT.map.help);
     setText(el('map-enter-how'), OKT.grown.enterHow);
@@ -359,8 +378,9 @@ var OKUI = {};
   }
 
   /* ================= たいきょく ================= */
-  function startGame(level, color) {
+  function startGame(level, color, duo) {
     clearTimers();
+    S.duo = !!duo;
     S.level = level;
     S.childColor = color;
     S.board = OK.initBoard();
@@ -386,6 +406,12 @@ var OKUI = {};
 
   function turnLabel() {
     var t = el('turn');
+    if (S.duo) {
+      setText(t, (S.player === BLACK ? OKT.game.black : OKT.game.white)
+        + OKT.game.turnSuffix);
+      t.className = 'turn you';
+      return;
+    }
     if (S.player === S.childColor) {
       setText(t, OKT.game.yourTurn + '（'
         + (S.childColor === BLACK ? OKT.game.black : OKT.game.white) + '）');
@@ -406,7 +432,9 @@ var OKUI = {};
          出さない（査読2026-09-21）。盤が うまった ときも ここを通る */
       if (OK.legalMoves(S.board, OK.other(S.player)).length === 0) { endGame(); return; }
       S.passedLast = true;
-      say(S.player === S.childColor ? OKT.game.passYou : OKT.game.passAi, 'warn');
+      say(S.duo
+        ? ((S.player === BLACK ? OKT.game.black : OKT.game.white) + OKT.game.passSuffix)
+        : (S.player === S.childColor ? OKT.game.passYou : OKT.game.passAi), 'warn');
       S.busy = true;
       later(function () {
         S.busy = false;
@@ -416,7 +444,8 @@ var OKUI = {};
       return;
     }
     S.passedLast = false;
-    if (S.player === S.childColor) { S.busy = false; return; }
+    /* ふたりのときは どちらの手番でも 人が押す＝相手の読みは走らせない */
+    if (S.duo || S.player === S.childColor) { S.busy = false; return; }
     aiThink();
   }
 
@@ -471,14 +500,15 @@ var OKUI = {};
 
   /* ---- 子が ばん を 押したとき（設計書4.2章の表そのまま） ---- */
   function tapCell(sq) {
-    if (S.busy || S.screen !== 'game' || S.player !== S.childColor) { return; }
+    if (S.busy || S.screen !== 'game') { return; }
+    if (!S.duo && S.player !== S.childColor) { return; }
     if (S.board[sq] !== EMPTY) {
       shake(sq);
       SND.deny();
       say(OKT.game.occupied, 'warn');
       return;
     }
-    if (OK.countFlips(S.board, sq, S.childColor) === 0) {
+    if (OK.countFlips(S.board, sq, S.player) === 0) {
       shake(sq);
       SND.deny();
       say(OKT.game.noFlip, 'warn');
@@ -508,7 +538,7 @@ var OKUI = {};
       /* この声かけだけは消さない＝2秒で消えると、やめるボタンだけが理由なく残る
          （しげ裁定2026-09-22「ぜんぶ推奨で」） */
       say(OKT.game.together, 'warn', true);
-      setText(el('give-up'), OKT.game.quit);
+      setText(el('give-up'), S.duo ? OKT.game.quitDuo : OKT.game.quit);
       show(el('give-up'), true);
     }
   }
@@ -557,6 +587,13 @@ var OKUI = {};
     S.result = { nb: nb, nw: nw, mine: mine, theirs: theirs, win: win, lose: lose };
     showResultHead();
     showScreen('result');
+    /* ふたりのときは まけた わけ を しらべない＝
+       どちらの色で しらべるかを 決められないうえ、記録にも のこさないため */
+    if (S.duo) {
+      finishResult(null);
+      if (nb === nw) { SND.draw(); } else { SND.win(); confetti(); }
+      return;
+    }
     if (lose) {
       SND.lose();
       startJudging();
@@ -568,28 +605,41 @@ var OKUI = {};
   }
 
   function showResultHead() {
-    var r = S.result;
-    setText(el('res-head'), r.win ? OKT.result.win : (r.lose ? OKT.result.lose : OKT.result.draw));
-    el('res-head').className = 'res-head ' + (r.win ? 'win' : (r.lose ? 'lose' : 'draw'));
-    var box = el('res-counts');
+    var r = S.result, box, kachi;
+    if (S.duo) {
+      kachi = r.nb === r.nw ? null : (r.nb > r.nw ? BLACK : WHITE);
+      setText(el('res-head'), kachi === null ? OKT.result.draw
+        : ((kachi === BLACK ? OKT.game.black : OKT.game.white) + OKT.result.winSuffix));
+      el('res-head').className = 'res-head ' + (kachi === null ? 'draw' : 'win');
+    } else {
+      setText(el('res-head'), r.win ? OKT.result.win : (r.lose ? OKT.result.lose : OKT.result.draw));
+      el('res-head').className = 'res-head ' + (r.win ? 'win' : (r.lose ? 'lose' : 'draw'));
+    }
+    box = el('res-counts');
     while (box.firstChild) { box.removeChild(box.firstChild); }
-    drawCount(box.appendChild(mk('div', 'cnt')), r.mine, S.childColor, OKT.game.you);
-    drawCount(box.appendChild(mk('div', 'cnt')), r.theirs,
-      S.childColor === BLACK ? WHITE : BLACK, OKT.game.ai);
-    /* やり方の承認＝行動の事実を1つだけ（設計書4.5章） */
-    var got = OKR.stampsOf(S.moves, S.childColor), pick = 'last', i;
+    if (S.duo) {
+      drawCount(box.appendChild(mk('div', 'cnt')), r.nb, BLACK, '');
+      drawCount(box.appendChild(mk('div', 'cnt')), r.nw, WHITE, '');
+    } else {
+      drawCount(box.appendChild(mk('div', 'cnt')), r.mine, S.childColor, OKT.game.you);
+      drawCount(box.appendChild(mk('div', 'cnt')), r.theirs,
+        S.childColor === BLACK ? WHITE : BLACK, OKT.game.ai);
+    }
+    /* やり方の承認＝行動の事実を1つだけ（設計書4.5章）。
+       ふたりのときは どちらの手を ほめるか 決められないので 出さない */
+    var got = S.duo ? [] : OKR.stampsOf(S.moves, S.childColor), pick = 'last', i;
     for (i = 0; i < got.length; i++) {
       if (got[i] === 'corner') { pick = 'corner'; break; }
       if (got[i] === 'pass') { pick = 'pass'; }
       else if (got[i] === 'edge' && pick === 'last') { pick = 'edge'; }
     }
     S.gotStamps = got;
-    setText(el('res-praise'), OKT.result.praise[pick]);
+    setText(el('res-praise'), S.duo ? '' : OKT.result.praise[pick]);
     show(el('res-reason'), false);
     show(el('res-judging'), false);
     setText(el('res-unlock'), '');
     setText(el('res-again'), OKT.result.again);
-    setText(el('res-back'), OKT.result.back);
+    setText(el('res-back'), S.duo ? OKT.result.backDuo : OKT.result.back);
   }
 
   /* ---- まけた わけ を しらべる＝棋譜を1手ずつ。あいだに息をつぐ（判定述語P9） ---- */
@@ -636,6 +686,14 @@ var OKUI = {};
       setText(el('res-next-title'), '');
       show(el('res-mini'), false);
       show(el('res-reason'), true);
+    }
+
+    /* ふたりのときは 記録に のこさない＝自分どうしで かたせて
+       れべるを ひらけてしまうと、梯子の意味が なくなるため */
+    if (S.duo) {
+      setText(el('res-saveng'), '');
+      setText(el('res-unlock'), '');
+      return;
     }
 
     if (r.win) { opened = OKR.markWin(S.save, S.level, S.childColor); }
@@ -861,7 +919,7 @@ var OKUI = {};
       }
       /* あそんでいる さいちゅうに 取り直すと 局が消えるので、ちずに いるときだけ
          取り直す（査読2026-09-21）。対局中なら 次に ちずへ もどった ときに 取り直す */
-      if (S.screen !== 'map') { return; }
+      if (S.screen !== 'map' && S.screen !== 'mode') { return; }
       try { sessionStorage.setItem(UPD_KEY, v + ':' + now); } catch (e4) { /* 無くても進む */ }
       location.replace('./?v=' + v);
     };
@@ -962,18 +1020,23 @@ var OKUI = {};
     el('give-up').onclick = function () {
       clearTimers();
       stopRuleAnim();
-      showScreen('map');   /* その局は すてる（記録に のこさない） */
+      showScreen(S.duo ? 'mode' : 'map');   /* その局は すてる（記録に のこさない） */
     };
-    el('res-again').onclick = function () { startGame(S.level, S.childColor); };
+    el('res-again').onclick = function () {
+      startGame(S.level, S.childColor, S.duo);
+    };
     el('res-back').onclick = function () {
       clearTimers();
       if (S.judger) { S.judger.cancel(); S.judger = null; }
-      showScreen('map');
+      showScreen(S.duo ? 'mode' : 'map');
     };
 
+    /* ---- はじめの がめん＝あそびかたを えらぶ ---- */
+    el('mode-solo').onclick = function () { showScreen('map'); };
+    el('mode-duo').onclick = function () { startGame(S.level, BLACK, true); };
+    el('map-back').onclick = function () { showScreen('mode'); };
+
     /* おうちのひと＝画面のすみを3秒 長おし → たしざん */
-    var gb = el('grown-btn');
-    setText(gb, OKT.grown.enter);
     function startPress() {
       if (pressTimer) { return; }
       pressTimer = setTimeout(function () { pressTimer = null; askLock(); }, 3000);
@@ -981,15 +1044,22 @@ var OKUI = {};
     function endPress() {
       if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; }
     }
-    gb.onmousedown = startPress;
-    gb.onmouseup = endPress;
-    gb.onmouseout = endPress;
-    gb.ontouchstart = function (ev) {
-      startPress();
-      if (ev.preventDefault) { ev.preventDefault(); }
-    };
-    gb.ontouchend = endPress;
-    gb.ontouchcancel = endPress;
+    /* ちず と はじめの がめん の どちらからでも 入れるように、同じ仕掛けを2つに掛ける */
+    function bindGrown(gb) {
+      if (!gb) { return; }
+      setText(gb, OKT.grown.enter);
+      gb.onmousedown = startPress;
+      gb.onmouseup = endPress;
+      gb.onmouseout = endPress;
+      gb.ontouchstart = function (ev) {
+        startPress();
+        if (ev.preventDefault) { ev.preventDefault(); }
+      };
+      gb.ontouchend = endPress;
+      gb.ontouchcancel = endPress;
+    }
+    bindGrown(el('grown-btn'));
+    bindGrown(el('mode-grown'));
 
     el('lock-ok').onclick = function () {
       if (parseInt(el('lock-input').value, 10) === lockAns) { openGrown(); }
@@ -1037,10 +1107,12 @@ var OKUI = {};
     try {
       S.save = OKR.load(store());
       setText(el('app-name'), OKT.appName);
+      setText(el('mode-name'), OKT.appName);
+      buildMode();
       buildBoard();
       buildMap();
       bind();
-      showScreen('map');
+      showScreen('mode');
       layout();
       tidyUrl();
       checkUpdate();

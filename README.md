@@ -2,6 +2,10 @@
 
 しげの息子（6歳）が、2012年のiPad（iOS 10.3.3・Safari 10.1相当）で遊ぶオセロ学習アプリ。
 
+最初の画面で「ひとりで あそぶ」（レベル1〜20の相手と戦う）と
+「ふたりで あそぶ」（同じiPadで交代しながら人どうしで打つ）を選ぶ。
+ふたりの対局は記録に残さない＝レベルは開かない。
+
 - 目的＝息子がオセロを通じて知的に成長すること
 - 設計の正本＝vault `30_generated/reports/othello_kids_design_20260921.html`
 - 実機の速さ＝vault `30_generated/reports/othello_kids_speed_20260921.html`
@@ -37,6 +41,7 @@ tools/               中身（部品）と、Macで測る・試すための道�
 | `tools/ui.js` | 画面・そうさ・おと。相手の読みと採点を setTimeout(0) で少しずつ進める |
 | `tools/app_template.html` | HTMLの骨と見た目（CSS）。部品を差し込む穴が開いている |
 | `tools/make_icon.py` | ホーム画面の絵を作る唯一の道具。色はテンプレートと同じ名札を使う |
+| `tools/test_ui_duo.js` | 画面とそうさの試験（擬似のDOMを持つ・アプリには入らない） |
 
 古いSafariで動く書き方（ES5）だけで書く。`let` `const` アロー関数 テンプレート文字列 `?.` `??` を
 1文字でも混ぜるとファイル全体が動かない（実測）。組み立てのたびに機械で検査している。
@@ -65,6 +70,12 @@ python3 /Users/shigemurasatoshi/dev/othello-kids/tools/make_icon.py
 
 ```bash
 python3 /Users/shigemurasatoshi/dev/othello-kids/tools/check_text.py
+```
+
+画面とそうさの試験（「ふたりで あそぶ」と「ひとりで あそぶ」を擬似画面で1局ずつ通す）。
+
+```bash
+/System/Library/Frameworks/JavaScriptCore.framework/Versions/A/Helpers/jsc /Users/shigemurasatoshi/dev/othello-kids/tools/test_ui_duo.js
 ```
 
 記録ときまりの試験（判定述語P2・P1の道すじ）。

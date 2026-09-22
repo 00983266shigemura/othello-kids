@@ -73,6 +73,17 @@
   #grown-btn{float:right; font-size:15px; min-height:0; padding:6px 12px; background:var(--nashi);}
   .help{clear:both; color:var(--ink-soft); font-size:16px; margin:2px 0 10px;}
   .help.small{font-size:14px;}
+  #map-back,#mode-back{float:left; font-size:15px; min-height:0; padding:6px 12px;
+    margin-right:10px; background:var(--nashi);}
+
+  /* ---- はじめの がめん＝あそびかたを えらぶ ---- */
+  #mode-pick{clear:both;}
+  #mode-pick button{
+    display:block; width:100%; margin:14px 0 0; padding:20px 18px;
+    font-size:26px; text-align:left; min-height:0;
+  }
+  #mode-pick button.sub{background:var(--ryokuao);}
+  .mode-note{color:var(--ink-soft); font-size:16px; margin:6px 0 0; padding:0 4px;}
 
   /* ---- れべるの ちず ---- */
   #map-grid{overflow:hidden;}
@@ -227,12 +238,29 @@
 </head>
 <body>
 
+<!-- ⓪ はじめの がめん＝あそびかたを えらぶ -->
+<div id="scr-mode" class="screen">
+  <div class="head">
+    <h1 id="mode-name">つよくなるオセロ</h1>
+    <button id="mode-grown">おうちのひと</button>
+  </div>
+  <p id="mode-enter-how" class="help small"></p>
+  <p id="mode-help" class="help"></p>
+  <div id="mode-pick">
+    <button id="mode-solo"></button>
+    <p id="mode-solo-note" class="mode-note"></p>
+    <button id="mode-duo" class="sub"></button>
+    <p id="mode-duo-note" class="mode-note"></p>
+  </div>
+</div>
+
 <!-- ① れべるの ちず -->
-<div id="scr-map" class="screen">
+<div id="scr-map" class="screen" style="display:none;">
   <div class="head">
     <h1 id="app-name">つよくなるオセロ</h1>
     <button id="grown-btn">おうちのひと</button>
   </div>
+  <p><button id="map-back" class="sub"></button></p>
   <p id="map-title" class="help"></p>
   <p id="map-help" class="help"></p>
   <p id="map-enter-how" class="help small"></p>

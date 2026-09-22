@@ -43,16 +43,34 @@ SEN_W = 5                       # ます目の線の太さ（180のとき）
 ISHI_R = 31                     # いしの 半径（180のとき）
 
 
+def kado_marumi(n, han, kado=5.0, kazu=720):
+    """iOSがアイコンを切り抜く形（角が連続して丸い四角）に近い輪郭の点を返す。
+    半径ではなく「べき乗の四角」で近似する＝kado が大きいほど角ばる。
+    半径だけで丸めた四角にすると、iOSの切り抜きと曲がり方がずれて
+    角のところで枠が消える（2026-09-22 しげ実機指摘）。"""
+    import math
+    mid = n / 2.0
+    ten = []
+    for i in range(kazu):
+        t = 2.0 * math.pi * i / kazu
+        c, s = math.cos(t), math.sin(t)
+        x = math.copysign(abs(c) ** (2.0 / kado), c)
+        y = math.copysign(abs(s) ** (2.0 / kado), s)
+        ten.append((mid + x * han, mid + y * han))
+    return ten
+
+
 def draw():
     n = SIZE * SS
-    im = Image.new('RGB', (n, n), BAN)
-    d = ImageDraw.Draw(im)
-
     waku = WAKU_W * SS
     sen = SEN_W * SS
 
-    # ばんの ふち
-    d.rectangle([0, 0, n - 1, n - 1], outline=WAKU, width=waku)
+    # ばんの ふち＝外側は iOS の切り抜きそのものに任せる。
+    # 下地を ふちの色で塗り、その内側に 同じ形で ひとまわり小さい ばん を置く＝
+    # ふちの外の曲がり方は アイコンの形と必ず一致する。
+    im = Image.new('RGB', (n, n), WAKU)
+    d = ImageDraw.Draw(im)
+    d.polygon(kado_marumi(n, n / 2.0 - waku), fill=BAN)
 
     # ます目の線（まん中に たて1本・よこ1本＝2×2の ます）
     mid = n // 2
