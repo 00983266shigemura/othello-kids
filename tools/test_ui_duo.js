@@ -104,11 +104,20 @@ var window = {                                   /* eslint-disable-line no-unuse
     },
     setItem: function (k, v) { STORE[k] = String(v); },
     removeItem: function (k) { delete STORE[k]; }
+  },
+  /* 端末へ しまう しくみ（Application Cache）の にせもの＝⑩で 新しい版を しまい終えた合図を出す */
+  applicationCache: {
+    handlers: {},
+    swapped: 0,
+    addEventListener: function (name, fn) { this.handlers[name] = fn; },
+    swapCache: function () { this.swapped++; }
   }
   /* AudioContext も XMLHttpRequest も history も置かない＝
      どれも「無ければ静かに あきらめる」書き方になっていることを ここで一緒に確かめる */
 };
-var sessionStorage = null;                       /* eslint-disable-line no-unused-vars */
+var RELOADS = 0;
+var location = { search: '', pathname: '/', reload: function () { RELOADS++; } };  /* eslint-disable-line no-unused-vars */
+var sessionStorage = null;                      /* eslint-disable-line no-unused-vars */
 
 /* ================= 中身を読みこむ ================= */
 load('tools/core.js');
@@ -242,6 +251,21 @@ isTrue('　　相手の読みが走った', aiKaisu > 0);
 isTrue('　　1局が おわった', S.screen === 'result');
 is('　　きろくに 1局 のこる', S.save.games.length, 1);
 isTrue('　　端末に 保存された', STORE[OKR.KEY] !== undefined);
+
+/* ================= ⑩ 新しい版は たいきょく中に 入れかえない（はんすう5・つうしんなしで あそぶ） ================= */
+var AC = window.applicationCache;
+isTrue('⑩しまい終えた合図を 聞いている', typeof AC.handlers.updateready === 'function');
+OKUI.startGame(1, BLACK, false);
+pumpTimers();
+RELOADS = 0;
+AC.handlers.updateready();
+is('　　合図で 新しい版へ 入れかえる', AC.swapped, 1);
+is('　　たいきょく中は よみなおさない', RELOADS, 0);
+NODES['give-up'].onclick();
+NODES['quit-yes'].onclick();
+is('　　ちずに もどったら よみなおす', RELOADS, 1);
+NODES['map-back'].onclick();
+is('　　よみなおしは 1回だけ', RELOADS, 1);
 
 print('');
 print('とおった = ' + ok + ' / ' + (ok + ng));

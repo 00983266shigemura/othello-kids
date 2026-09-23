@@ -21,6 +21,7 @@
 index.html           アプリ本体（1枚で完結）。build_app.py が組み立てる＝手で直さない
 icon.png             ホーム画面の絵（180×180・透明なし）。make_icon.py が作る＝手で置き換えない
 version.txt          版数。index.html の中の APP_VERSION と同じ数字（自動更新の合図）
+offline.appcache     通信なしで遊ぶために iPad へしまうファイルの一覧。build_app.py が作る＝手で直さない
 push.zsh             公開へ反映する台本。しげが1行で実行する
 hayasa/index.html    工程0.5「はやさ はかり」＝実機の速さを1回測るページ（役目は済み）
 tools/               中身（部品）と、Macで測る・試すための道具
@@ -28,6 +29,14 @@ tools/               中身（部品）と、Macで測る・試すための道�
 
 **`index.html` を直接いじらない。** 部品を直して `python3 tools/build_app.py` で組み立て直す。
 手で直すと、Macの試験台本（部品を読む）と実機のページ（組み立て済み）が別物になる。
+
+## 通信なしで遊ぶ（版5から）
+
+iOS 10 には Service Worker が無い（iOS 11.3 から）ので、Application Cache を使う。
+`offline.appcache` に書いた `./`・`index.html`・`icon.png` を iPad がしまう。
+`version.txt` はしまわない＝新しい版が出たかを毎回通信で見るため。
+一覧にはページと絵の md5 が入る＝中身が1バイトでも変われば iPad がしまい直す。
+新しい版をしまい終えても、入れかえるのは ちず か はじめの画面にいるときだけ。
 
 ## 実機へ載るファイル（アプリの中身）
 

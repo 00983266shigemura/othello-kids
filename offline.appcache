@@ -1,0 +1,12 @@
+CACHE MANIFEST
+# つよくなるオセロ はんすう 5
+# index.html md5 de53ea1c9239caac5d36b0d7218216dc
+# icon.png md5 8db97b8f970bbe87d0963b618cd9f776
+
+CACHE:
+./
+index.html
+icon.png
+
+NETWORK:
+*

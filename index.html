@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="ja">
+<!-- manifest＝つうしんが なくても あそべるように、端末へ しまう ファイルの一覧（build_app.py が作る） -->
+<html lang="ja" manifest="offline.appcache">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
@@ -1970,7 +1971,7 @@ var OKUI = {};
 
   /* このファイルを直したら この数字を +1 する。version.txt にも同じ数字が書かれる
      （build_app.py が自動で書く）＝古いファイルを持っている端末が取り直せる。 */
-  OKUI.APP_VERSION = 4;
+  OKUI.APP_VERSION = 5;
 
   /* まけた わけの しらべ を、何ミリ秒ぶん まとめて 進めてから 息をつぐか。
      0 にすると かたまりは いちばん小さくなるが、60手ぶん 待ち時間が積み上がる。
@@ -2130,6 +2131,7 @@ var OKUI = {};
       show(el('scr-' + SCREENS[i]), SCREENS[i] === name);
     }
     window.scrollTo(0, 0);
+    reloadIfIdle();
   }
 
   /* ================= 大きさを その場で 決める =================
@@ -2882,6 +2884,28 @@ var OKUI = {};
     try { x.send(null); } catch (e5) { /* 通信できない置き方でも あそべる */ }
   }
 
+  /* ================= つうしんが なくても あそべる（はんすう5・2026-09-23 しげ指示） =================
+     古いiPad（iOS 10）には 新しい しくみ（Service Worker）が無いので、Application Cache
+     （offline.appcache に書いた ファイルを 端末に しまう しくみ）を使う。
+     新しい版を しまい終えたら、ちず か はじめの画面に いるときだけ 入れかえる
+     （たいきょく中に 入れかえると 局が消えるため＝checkUpdate と同じ きまり）。 */
+  var cacheReady = false;
+  function reloadIfIdle() {
+    if (!cacheReady) { return; }
+    if (S.screen !== 'map' && S.screen !== 'mode') { return; }
+    cacheReady = false;
+    location.reload();
+  }
+  function watchCache() {
+    var ac = window.applicationCache;
+    if (!ac || !ac.addEventListener) { return; }
+    ac.addEventListener('updateready', function () {
+      try { ac.swapCache(); } catch (e) { /* 入れかえは つぎに ひらいたときに おきる */ }
+      cacheReady = true;
+      reloadIfIdle();
+    }, false);
+  }
+
   /* ================= 押したときの 受けとり ================= */
   function sqFromEvent(ev) {
     var t = ev.target, n = 0;
@@ -3081,6 +3105,7 @@ var OKUI = {};
       showScreen('mode');
       layout();
       tidyUrl();
+      watchCache();
       checkUpdate();
       setInterval(checkUpdate, 300000);
     } catch (e) {

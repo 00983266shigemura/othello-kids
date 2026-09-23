@@ -10,13 +10,14 @@
   「テストで音を鳴らさない」（2026-09-16 しげ指示）を忘れようがない。
 
 使い方 ＝
-  python3 tools/build_app.py                      ← 本番の index.html と version.txt
+  python3 tools/build_app.py                      ← 本番の index.html と version.txt と offline.appcache
   python3 tools/build_app.py --silent _test.html  ← 音の鳴らない複製（試験・目視用）
   python3 tools/build_app.py --selftest           ← 無音化の目印の検査そのものを試す
 
 終了コード ＝ 0（できた） / 1（できなかった）
 """
 import argparse
+import hashlib
 import os
 import re
 import subprocess
@@ -27,6 +28,14 @@ REPO = os.path.dirname(HERE)
 TPL = os.path.join(HERE, 'app_template.html')
 OUT = os.path.join(REPO, 'index.html')
 VER = os.path.join(REPO, 'version.txt')
+MANIFEST = os.path.join(REPO, 'offline.appcache')
+ICON = os.path.join(REPO, 'icon.png')
+
+# 端末へ しまう ファイル（2026-09-23 しげ指示「インターネット接続がなくても使えるようにして」）。
+# iOS 10 には Service Worker が無い（iOS 11.3 から）ので Application Cache を使う。
+# version.txt は しまわない＝新しい版が出たかを いつも 通信で 見に行くため（NETWORK: *）。
+# './' を はっきり書く＝ホーム画面から ひらく場所そのものを、どの道で来ても しまうため。
+CACHED = ['./', 'index.html', 'icon.png']
 
 # 差し込む順＝先に読ませないと動かない順（core が いちばん先）
 PARTS = [
@@ -119,6 +128,26 @@ def verify_silence(html):
     return ''
 
 
+def md5(data):
+    return hashlib.md5(data).hexdigest()
+
+
+def write_manifest(html, ver):
+    """offline.appcache を作る。中身の md5 を書き込む＝ページか絵が1バイトでも変われば
+    この一覧も変わり、iPad が新しい版を しまい直す（版の数字を上げ忘れても取り残されない）"""
+    with open(ICON, 'rb') as fp:
+        icon = fp.read()
+    body = ['CACHE MANIFEST',
+            '# つよくなるオセロ はんすう %d' % ver,
+            '# index.html md5 %s' % md5(html.encode('utf-8')),
+            '# icon.png md5 %s' % md5(icon),
+            '',
+            'CACHE:'] + CACHED + ['', 'NETWORK:', '*', '']
+    with open(MANIFEST, 'w', encoding='utf-8', newline='\n') as fp:
+        fp.write('\n'.join(body))
+    print('しまう一覧 ＝ %s（%s）' % (MANIFEST, ' '.join(CACHED)))
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--silent', metavar='ファイル', default=None,
@@ -156,6 +185,7 @@ def main():
         fp.write(html)
     with open(VER, 'w', encoding='utf-8') as fp:
         fp.write('%d\n' % ver)
+    write_manifest(html, ver)
     print('できました ＝ %s（%d バイト）' % (OUT, len(html.encode('utf-8'))))
     print('はんすう ＝ %d（%s に書きました）' % (ver, VER))
 
