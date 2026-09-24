@@ -3,7 +3,7 @@
    core.js を先に load すること。
 
    ここに置くもの＝レベルの開きかた（判定述語P2）・端末内の保存・できたことスタンプ・
-   置けないマスを押したときの段階（判定述語P1）。
+   置けないマスを押したあとの「たしかめ」の判定・はじめの1かいで おけた わりあい。
    画面の組み立て（ui.js）と分けてあるのは、ここだけを jsc で試験できるようにするため。 */
 
 var OKR = {};
@@ -28,6 +28,7 @@ var OKR = {};
       won: {},        /* won[レベル] = { black: true/false, white: true/false } */
       stamps: {},     /* stamps[しるしの名] = 回数 */
       games: [],      /* 終わった対局の記録（新しい順・50局まで） */
+      weeks: {},      /* weeks[しゅうの はじめ YYYYMMDD] = { ft, tn }（はじめの1かいで おけた わりあい） */
       sound: true,
       openAll: false  /* おうちのひと画面で「ぜんぶ ひらく」を押したか */
     };
@@ -62,6 +63,15 @@ var OKR = {};
       }
     }
     base.stamps = clean;
+    clean = {};
+    if (typeof base.weeks !== 'object') { base.weeks = {}; }
+    for (kk in base.weeks) {
+      if (base.weeks.hasOwnProperty(kk) && base.weeks[kk]
+          && base.weeks[kk].tn > 0 && base.weeks[kk].ft >= 0) {
+        clean[kk] = { ft: Math.floor(base.weeks[kk].ft), tn: Math.floor(base.weeks[kk].tn) };
+      }
+    }
+    base.weeks = clean;
     for (i = 0; i < base.games.length; i++) {
       if (base.games[i] && typeof base.games[i] === 'object') { arr.push(base.games[i]); }
     }
@@ -198,16 +208,65 @@ var OKR = {};
     return out;
   };
 
-  /* ================= 置けないマスを つづけて押したとき（2026-09-24 しげ指示） =================
-     「置けない場所を3回連続で選ぶと、自動で負け」。押すたびに イエローカードが 1まい たまる。
-     置けない所＝石のある所も、はさめない所も 数える（しげの ことば「置けない場所」のまま）。
-     置ける所に 置いたら 0に もどる（「連続」）。場所は ぜったいに 示さない（しげ裁定Q1＝A案）。
-     もとの 3回で ルールの絵・6回で「いっしょに さがそう」（判定述語P1）は、この しじで おきかえた */
-  OKR.FOUL_LIMIT = 3;
-  /* あと何かいで まけか。0＝もう まけ */
-  OKR.foulLeft = function (missCount) {
-    var n = OKR.FOUL_LIMIT - missCount;
-    return n > 0 ? n : 0;
+  /* ================= たしかめ（2026-09-24 しげ裁定「Cで」） =================
+     はさめない所を押したら、その手番だけ「おく所 → はさむ じぶんの いし」の2だんで置く。
+     ねらい＝当てずっぽうを止めるだけでなく、はさめるかを たしかめる手順そのものを練習させる
+     （評価の正本＝vault 30_generated/reports/othello_kids_foul_eval_20260924.html）。
+     石のある所を押したのは数えない＝指の ずれ（うっかり）を 考えの まちがいと 分けるため。
+     場所は ぜったいに 示さない（しげ裁定Q1＝A案）。
+     もとの 3回で ルールの絵・6回で「いっしょに さがそう」（判定述語P1）は、この裁定で おきかえた。
+
+     anchorOk＝p が sq に置いたとき、anchor の じぶんの いしで あいての いしを はさめるか。
+     sq から anchor へ まっすぐ（たて・よこ・ななめ）で、あいだが ぜんぶ あいての いし＝はさめる */
+  OKR.anchorOk = function (b, sq, p, anchor) {
+    var opp = p === 1 ? 2 : 1;
+    var r0 = Math.floor(sq / 8), c0 = sq % 8, r1 = Math.floor(anchor / 8), c1 = anchor % 8;
+    var dr = r1 - r0, dc = c1 - c0, n, sr, sc, i;
+    if (b[sq] !== 0 || b[anchor] !== p) { return false; }
+    if (!(dr === 0 || dc === 0 || Math.abs(dr) === Math.abs(dc))) { return false; }
+    n = Math.max(Math.abs(dr), Math.abs(dc));
+    if (n < 2) { return false; }   /* となり どうし＝あいだに あいての いしが 無い */
+    sr = dr / n; sc = dc / n;
+    for (i = 1; i < n; i++) {
+      if (b[(r0 + sr * i) * 8 + (c0 + sc * i)] !== opp) { return false; }
+    }
+    return true;
+  };
+
+  /* ================= はじめの 1かいで おけた わりあい（しゅうごと） =================
+     学習が 伸びたかを 見る ものさし（評価の正本 第5章）。
+     1局ごとの記録（50局まで）とは べつに、しゅうごとの 合計だけを のこす＝何か月でも 追える。
+     しゅうの はじめ＝げつようび（端末の じこく） */
+  function weekKey(t) {
+    var d = new Date(t), back = (d.getDay() + 6) % 7;
+    d = new Date(d.getFullYear(), d.getMonth(), d.getDate() - back);
+    return d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
+  }
+  OKR.weekKey = weekKey;
+  OKR.MAX_WEEKS = 12;
+
+  /* ft＝はさめない所を1回も押さずに置けた手の数 ／ tn＝置いた手の数 */
+  OKR.addFirstTry = function (s, t, ft, tn) {
+    var k = String(weekKey(t)), w;
+    if (!(tn > 0)) { return; }
+    w = s.weeks[k] || { ft: 0, tn: 0 };
+    w.ft += ft;
+    w.tn += tn;
+    s.weeks[k] = w;
+  };
+
+  /* 新しい しゅう から MAX_WEEKS ぶん。{ m: 月, d: 日, pct: 0〜100, tn: 手の数 } */
+  OKR.weekRows = function (s) {
+    var keys = [], k, i, out = [], w, n;
+    for (k in s.weeks) { if (s.weeks.hasOwnProperty(k)) { keys.push(parseInt(k, 10)); } }
+    keys.sort(function (a, b) { return b - a; });
+    for (i = 0; i < keys.length && i < OKR.MAX_WEEKS; i++) {
+      w = s.weeks[String(keys[i])];
+      n = keys[i];
+      out.push({ m: Math.floor(n / 100) % 100, d: n % 100,
+                 pct: Math.round(w.ft * 100 / w.tn), tn: w.tn });
+    }
+    return out;
   };
 })();
 

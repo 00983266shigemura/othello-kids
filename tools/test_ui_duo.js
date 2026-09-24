@@ -252,7 +252,7 @@ isTrue('　　1局が おわった', S.screen === 'result');
 is('　　きろくに 1局 のこる', S.save.games.length, 1);
 isTrue('　　端末に 保存された', STORE[OKR.KEY] !== undefined);
 
-/* ================= ⑪ イエローカード（はんすう6・2026-09-24 しげ指示） ================= */
+/* ================= ⑪ たしかめ（はんすう7・2026-09-24 しげ裁定「Cで」） ================= */
 function hasamenai() {        /* 石が無くて はさめない マスを1つ さがす */
   var i;
   for (i = 0; i < 64; i++) {
@@ -260,66 +260,103 @@ function hasamenai() {        /* 石が無くて はさめない マスを1つ �
   }
   return -1;
 }
-function onCards(id) {
-  var row = NODES[id], i, n = 0;
-  for (i = 0; i < row.childNodes.length; i++) {
-    if (row.childNodes[i].className.indexOf(' on') >= 0) { n++; }
+function anchorOf(sq, want) { /* want=true→はさめる じぶんの いし／false→はさめない じぶんの いし */
+  var i;
+  for (i = 0; i < 64; i++) {
+    if (S.board[i] === S.player && OKR.anchorOk(S.board, sq, S.player, i) === want) { return i; }
   }
-  return n + '/' + row.childNodes.length;
+  return -1;
 }
+function aitenoIshi() {
+  var i;
+  for (i = 0; i < 64; i++) { if (S.board[i] === OK.other(S.player)) { return i; } }
+  return -1;
+}
+function cards() { return NODES['foul-cards'].childNodes.length; }
+function isTarget(sq) { return S.cells[sq].className.indexOf('target') >= 0; }
+
 STORE = {};
 S.save = OKR.load(window.localStorage);
 OKUI.startGame(1, BLACK, false);
 pumpTimers();
 isTrue('⑪はじめは カードの わくが 出ていない', NODES.foul.style.display === 'none');
+OKUI.tapCell(27);            /* まんなか＝石が ある所 */
+is('　　石の ある所は カードを ふやさない（うっかり）', [cards(), S.check], [0, false]);
 OKUI.tapCell(hasamenai());
-is('　　はさめない所 1かいめ＝カード 1まい', onCards('foul-cards'), '1/3');
-is('　　1かいめの ことば', NODES['foul-text'].text(), 'あと2かい おけないところを タップしたら まけだよ');
-isTrue('　　ルールの絵も 1かいめ から 出る', NODES.lecture.style.display !== 'none');
-OKUI.tapCell(27);            /* まんなか＝石が ある所も 数える */
-is('　　石の ある所 2かいめ＝カード 2まい', onCards('foul-cards'), '2/3');
-is('　　2かいめの ことば', NODES['foul-text'].text(), 'あと1かい おけないところを タップしたら まけだよ');
-OKUI.tapCell(OK.legalMoves(S.board, BLACK)[0]);
+is('　　はさめない所＝カード 1まい・たしかめ に 入る', [cards(), S.check], [1, true]);
+is('　　たしかめの せつめい', NODES['foul-text'].text(), OKT.game.checkHow);
+isTrue('　　ルールの絵も 出る', NODES.lecture.style.display !== 'none');
+var mokuhyo = OK.legalMoves(S.board, BLACK)[0], tesu = S.moves.length;
+OKUI.tapCell(mokuhyo);
+is('　　置ける所を 押しても すぐには 置かない', S.moves.length, tesu);
+isTrue('　　えらんだ マスに しるし', isTarget(mokuhyo));
+is('　　どの いしで はさむ？ と きく', NODES.msg.text(), OKT.game.checkAsk);
+OKUI.tapCell(aitenoIshi());
+is('　　あいての いしを 押したら「じぶんの いしを」・カードは ふえない', [NODES.msg.text(), cards()], [OKT.game.checkOwn, 1]);
+var dame = anchorOf(mokuhyo, false);
+isTrue('　　（はさめない じぶんの いしが ある 局面）', dame >= 0);
+OKUI.tapCell(dame);
+is('　　ちがう いし＝おけない・カード 2まい', [S.moves.length, cards(), NODES.msg.text()], [tesu, 2, OKT.game.checkWrong]);
+isTrue('　　えらんだ マスは そのまま', isTarget(mokuhyo));
+OKUI.tapCell(anchorOf(mokuhyo, true));
+is('　　ただしい いし＝その マスに おける', S.moves[S.moves.length - 1] !== undefined && S.board[mokuhyo], BLACK);
+is('　　おいたら カード 0・たしかめ おわり・しるし きえる', [cards(), S.check, isTarget(mokuhyo), NODES.foul.style.display],
+  [0, false, false, 'none']);
 pumpTimers();
-isTrue('　　置ける所に 置いたら カードは 0に もどる', S.missCount === 0 && NODES.foul.style.display === 'none');
 while (S.player !== BLACK || S.busy) { if (pumpTimers(1) === 0) { break; } }
-OKUI.tapCell(hasamenai());
-OKUI.tapCell(27);
-OKUI.tapCell(hasamenai());
-is('　　3かいめ＝カード 3まい', onCards('foul-cards'), '3/3');
-is('　　3まい そろった ことば', NODES['foul-text'].text(), OKT.game.foulOut);
-is('　　そろった あとも まだ たいきょくの 画面（見せてから うつる）', S.screen, 'game');
-OKUI.tapCell(OK.legalMoves(S.board, BLACK)[0] === undefined ? 0 : OK.legalMoves(S.board, BLACK)[0]);
-is('　　そろった あとは 押しても 打てない', S.moves.length, 2);
-pumpTimers();
-is('　　石の数に かかわらず まけ', [S.screen, S.result.lose, S.result.win], ['result', true, false]);
-isTrue('　　けっかに カード 3まいと わけ', NODES['res-foul'].style.display !== 'none'
-  && onCards('res-foul-cards') === '3/3' && NODES['res-foul-text'].text() === OKT.result.foulLine);
-is('　　まけた わけの しらべは 走らない', [NODES['res-reason'].style.display, S.judger], ['none', null]);
-is('　　ほめる文は 出さない', NODES['res-praise'].text(), '');
-is('　　きろくの わけ は foul', S.save.games[0].reason, 'foul');
-is('　　きろくは まけ', S.save.games[0].res, 'l');
+var tesu2 = S.moves.length;
+OKUI.tapCell(OK.legalMoves(S.board, BLACK)[0]);
+is('　　つぎの 手番は ふつうに 1かいで おける', S.moves.length, tesu2 + 1);
 
-/* ふたりの ときは カードが たまった色の まけ（石の数では きめない） */
+/* さいごまで うって、きろくに はじめの1かいで おけた 数が のこる */
+var te = 0;
+while (S.screen === 'game' && te < 200) {
+  var jibun = OK.legalMoves(S.board, S.childColor);
+  if (S.player !== S.childColor || S.busy || jibun.length === 0) {
+    if (pumpTimers(1) === 0) { break; }
+    continue;
+  }
+  OKUI.tapCell(jibun[0]);
+  pumpTimers();
+  te++;
+}
+is('　　たしかめが あっても 1局 さいごまで うてる', S.screen, 'result');
+var rec = S.save.games[0];
+isTrue('　　きろく＝はじめの1かいで おけた 手は 1つ すくない', rec.tn >= 3 && rec.ft === rec.tn - 1);
+var rows = OKR.weekRows(S.save);
+is('　　しゅうごとの わりあいにも のる', [rows.length, rows[0].tn], [1, rec.tn]);
+isTrue('　　まけても かっても カードで けっかは かわらない（foul の わけは つかない）', rec.reason !== 'foul');
+
+/* おうちのひと画面（3びょう長おし→たしざん）に しゅうごとの わりあいが 出る */
+NODES['grown-btn'].onmousedown();
+pumpTimers();
+var shiki = NODES['lock-q'].text().split(' ');
+NODES['lock-input'].value = String(parseInt(shiki[0], 10) + parseInt(shiki[2], 10));
+NODES['lock-ok'].onclick();
+var gtext = NODES['grown-body'].text();
+isTrue('　　おうちのひと画面に わりあいの 見出し', gtext.indexOf(OKT.grown.firstTitle) >= 0);
+isTrue('　　この しゅうの わりあいと 手の数', gtext.indexOf(rows[0].m + '/' + rows[0].d + ' ' + OKT.grown.firstWeek) >= 0
+  && gtext.indexOf(rows[0].pct + '%') >= 0 && gtext.indexOf(rows[0].tn + ' ' + OKT.grown.firstMoves) >= 0);
+NODES['grown-close'].onclick();
+
+/* ふたりの ときも たしかめ は 同じ。記録には のこさない */
 OKUI.startGame(1, BLACK, true);
 pumpTimers();
-OKUI.tapCell(hasamenai()); OKUI.tapCell(27); OKUI.tapCell(hasamenai());
+OKUI.tapCell(hasamenai());
+mokuhyo = OK.legalMoves(S.board, BLACK)[0];
+OKUI.tapCell(mokuhyo);
+OKUI.tapCell(anchorOf(mokuhyo, true));
+is('　　ふたり＝たしかめて おける', S.board[mokuhyo], BLACK);
 pumpTimers();
-is('　　ふたり＝くろが 3まい→しろの かち', NODES['res-head'].text(), OKT.game.white + OKT.result.winSuffix);
-is('　　ふたり＝どちらの色か 書く', NODES['res-foul-text'].text(), OKT.game.black + OKT.result.foulDuoSuffix + OKT.result.foulLine);
-is('　　ふたりは きろくに のこさない', S.save.games.length, 1);
-
-/* とちゅうで やめたら まけに ならない */
-OKUI.startGame(1, BLACK, false);
-pumpTimers();
-OKUI.tapCell(hasamenai()); OKUI.tapCell(27); OKUI.tapCell(hasamenai());
+is('　　ふたり＝つぎは しろの ばん・カード 0', [S.player, cards()], [WHITE, 0]);
 NODES['give-up'].onclick();
 NODES['quit-yes'].onclick();
-pumpTimers();
-is('　　3まい そろった すぐあとに やめたら ちずの まま', [S.screen, S.save.games.length], ['map', 1]);
+is('　　ふたりは きろくに のこさない', S.save.games.length, 1);
+
+/* おうちのひと画面に わりあいの 表が 出る */
 OKUI.startGame(1, BLACK, false);
 pumpTimers();
-isTrue('　　つぎの局では カードは 0から', S.missCount === 0 && S.foul === 0 && NODES.foul.style.display === 'none');
+isTrue('　　つぎの局では たしかめ なし・カード 0', S.missCount === 0 && S.check === false && S.target === -1);
 NODES['give-up'].onclick();
 NODES['quit-yes'].onclick();
 
