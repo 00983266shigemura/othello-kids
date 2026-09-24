@@ -166,26 +166,27 @@
   .dot.b{background:var(--kuro);}
   .dot.w{background:var(--shiro);}
   .cnt-num{font-size:17px; color:var(--ink-soft);}
-  .msg{margin:10px 0; padding:10px 12px; border-radius:10px; font-size:19px;
-       background:var(--ao-bg); color:var(--ao);}
-  .msg.warn{background:var(--daidai-bg); color:var(--daidai-ink); border:2px solid var(--daidai);}
   /* 保存できないときの ひとこと（けっかの画面。空のときは 場所を とらない） */
   .saveng:empty{display:none;}
   .saveng{margin:10px 0; padding:8px 12px; border-radius:10px; font-size:17px;
           background:var(--daidai-bg); color:var(--daidai-ink); border:2px solid var(--daidai);}
-  #lecture{margin:10px 0; padding:10px 12px; border:2px solid var(--daidai);
-           background:var(--daidai-bg); border-radius:10px;}
-  #lecture-text{color:var(--daidai-ink); font-weight:bold;}
-  #lecture-how{font-size:16px; color:var(--daidai-ink);}
+  /* ---- 盤の上の ふきだし（2026-09-24 しげ指示「警告は 盤に かぶせて出す」） ----
+     押したマスの 反対がわ（.high＝上・.low＝下）に出す。指は とおす＝下の マスも 押せる */
+  .pop{position:absolute; left:10px; right:10px; z-index:5; pointer-events:none;
+       background:var(--card); color:var(--ink); border:4px solid var(--daidai);
+       border-radius:14px; padding:10px 16px;
+       box-shadow:0 4px 16px rgba(0,0,0,0.35);}
+  .pop.high{top:10px;}
+  .pop.low{bottom:10px;}
+  #pop-text{font-size:26px; font-weight:bold; color:var(--daidai-ink); margin:2px 0;}
+  #pop-how{font-size:19px; margin:4px 0 0;}
+  #pop-how:empty{display:none;}
   #rule-strip{padding:6px 0; line-height:0;}
   .rs{display:inline-block; width:30px; height:30px; margin:2px; border-radius:50%;
       border:2px solid var(--ryokuao-dark); background:var(--ryokuao);}
   .rs.b{background:var(--kuro);}
   .rs.w{background:var(--shiro);}
   /* ---- イエローカード（2026-09-24 しげ指示） ---- */
-  #foul{margin:10px 0; padding:8px 12px; border:2px solid var(--daidai);
-        background:var(--daidai-bg); border-radius:10px;}
-  #foul-text{color:var(--daidai-ink); font-weight:bold; font-size:18px;}
   .ycards{line-height:0; padding:4px 0;}
   /* まだの カード＝点線の わく だけ。たまった カード＝きいろ＋こい ふち＋「！」＋すこし かたむける */
   .ycard{display:inline-block; width:30px; height:42px; margin:0 8px 0 0; border-radius:4px;
@@ -246,11 +247,6 @@
   .box.wide{max-width:760px; margin:3% auto;}
   .box button{margin:6px 8px 6px 0; display:block; width:100%;}
   .box.wide button{display:inline-block; width:auto;}
-  #lock-input{font-size:26px; width:140px; padding:8px; border:2px solid var(--line);
-              border-radius:8px; background:var(--card); color:var(--ink);}
-  #lock-ok{display:inline-block; width:auto;}
-  #lock-q{font-size:28px;}
-  #lock-ng{color:var(--murasaki); font-weight:bold;}
   .gtbl{border-collapse:collapse; width:100%; font-size:17px; margin:4px 0 10px;}
   .gtbl th,.gtbl td{border:1px solid var(--line); padding:4px 8px; text-align:left;}
   .gtbl th{background:var(--card2); white-space:nowrap;}
@@ -275,6 +271,8 @@
     <button id="mode-duo" class="sub"></button>
     <p id="mode-duo-note" class="mode-note"></p>
   </div>
+  <!-- 版の目じるし（大人が見る）。子の じゃまに ならない よう いちばん下に置く -->
+  <p id="mode-ver" class="ver"></p>
 </div>
 
 <!-- ① れべるの ちず -->
@@ -294,21 +292,19 @@
 <!-- ② たいきょく -->
 <div id="scr-game" class="screen" style="display:none;">
  <div id="game-row">
-  <div id="board-wrap"><div id="board"></div></div>
+  <div id="board-wrap"><div id="board"></div>
+    <!-- 盤の上の ふきだし（しらせ・イエローカード・ルールの絵）。指は とおす -->
+    <div id="pop" class="pop high" style="display:none;">
+      <div id="foul-cards" class="ycards"></div>
+      <p id="pop-text"></p>
+      <div id="rule-strip"></div>
+      <p id="pop-how"></p>
+    </div>
+  </div>
   <div id="side">
     <div id="turn" class="turn"></div>
     <div id="count-you" class="cnt"></div>
     <div id="count-ai" class="cnt"></div>
-    <div id="msg" class="msg" style="display:none;"></div>
-    <div id="foul" style="display:none;">
-      <div id="foul-cards" class="ycards"></div>
-      <p id="foul-text"></p>
-    </div>
-    <div id="lecture" style="display:none;">
-      <p id="lecture-text"></p>
-      <div id="rule-strip"></div>
-      <p id="lecture-how"></p>
-    </div>
     <button id="give-up" style="display:none;"></button>
   </div>
  </div>
@@ -346,17 +342,6 @@
     <button id="pick-black"></button>
     <button id="pick-white"></button>
     <button id="pick-back" class="sub"></button>
-  </div>
-</div>
-
-<!-- たしざんの かぎ（おうちのひと用） -->
-<div id="lock" class="veil" style="display:none;">
-  <div class="box">
-    <h2 id="lock-title"></h2>
-    <p id="lock-q"></p>
-    <p><input id="lock-input" type="tel"> <button id="lock-ok">OK</button></p>
-    <p id="lock-ng"></p>
-    <button id="lock-close" class="sub"></button>
   </div>
 </div>
 
@@ -1929,7 +1914,7 @@ var OKT = {};
     lectureHow: 'じぶんの いしで あいての いしを はさむと ひっくりかえる',
     /* たしかめ（2026-09-24 しげ裁定「Cで」）。はさめない所を押すと カードが1まい ふえ、
        その手番は「おく所 → はさむ じぶんの いし」の じゅんで 押す。まけには しない */
-    checkHow: 'たしかめよう。おく ところ → はさむ じぶんの いし の じゅんに おしてね',
+    checkHow: 'おく ところ → はさむ じぶんの いし の じゅんに おしてね',
     checkAsk: 'どの いしで はさむ？ じぶんの いしを おしてね',
     checkWrong: 'その いしでは はさめないよ',
     checkOwn: 'じぶんの いしを おしてね',
@@ -1982,64 +1967,83 @@ var OKT = {};
     }
   };
 
-  /* ---- おうちのひと（大人むけ・ここも漢字は使わない＝判定述語P7） ---- */
-  OKT.grown = {
-    enter: 'おうちのひと',
+  /* ---- おうちのひと の いりぐち（子の画面に出る＝ひらがな のまま） ---- */
+  OKT.entry = {
+    btn: 'おうちのひと',
     /* 3びょう ながおし でしか 開かないことを 画面にも書く（査読2026-09-21） */
-    enterHow: '「おうちのひと」は 3びょう おす',
-    lockTitle: 'たしざんを といてください',
-    lockNg: 'ちがいます',
-    close: 'とじる',
-    title: 'おうちのひと の ページ',
-    /* いまの ようす＋おしたら どうなるか、の両方を書く
-       （もとは「おとを ならす」だけで、いまの ようす なのか おした けっか なのか
-         読み分けられなかった＝査読2026-09-21） */
-    soundOn: 'いま おとは なる（おすと ならなく なる）',
-    soundOff: 'いま おとは ならない（おすと なる）',
-    openAll: 'すべての れべるを ひらく',
-    openAllNote: 'おすと かたないでも ぜんぶ えらべる ように なります',
-    openAllDone: 'すべて ひらきました',
-    wipe: 'きろくを ぜんぶ けす',
-    wipeAsk: 'きろくを けしますか？ もとには もどせません',
-    wipeYes: 'けす',
+    how: '「おうちのひと」は 3びょう おす',
+    /* 版の目じるし（はじめの画面のすみ・大人が見る）。2026-09-24 しげ指示「v◯でよい」 */
+    ver: 'v'
+  };
+
+  /*ADULT_TEXT_BEGIN*/
+  /* ---- おうちのひと の 管理画面（大人向け）＝漢字を使う（2026-09-24 しげ指示
+     「管理画面は普通に漢字も使って大人向けにして」）。子の画面には出ない。
+     check_text.py は この BEGIN〜END の区間だけ 漢字を許す＝子の文が ここへ まぎれない よう、
+     子に見せる文は ぜったいに ここへ 置かない ---- */
+  OKT.grown = {
+    close: '閉じる',
+    title: '保護者の管理画面',
+    soundOn: '音：オン（押すとオフ）',
+    soundOff: '音：オフ（押すとオン）',
+    openAll: '全レベルを開放する',
+    openAllNote: '勝たなくても、すべてのレベルを選べるようになります',
+    openAllDone: '全レベル開放済み',
+    wipe: '記録をすべて消去',
+    wipeAsk: '記録をすべて消去しますか？ 元に戻せません',
+    wipeYes: '消去する',
     wipeNo: 'やめる',
-    wipeDone: 'きろくを けしました',
-    gamesTitle: 'あそんだ きろく（あたらしい じゅん・50きょくまで）',
-    gamesNone: 'まだ きろくが ありません',
-    /* 「まけた わけ」の表が 空のときは、記録の有無ではなく 負けの有無を書く
-       （もとは「まだ きろくが ありません」を 使い回していた＝査読2026-09-21） */
-    reasonsNone: 'まだ まけた わけは ありません',
-    reasonsTitle: 'まけた わけの かいすう',
-    /* 版6（3まいで まけ）で のこった 記録の わけ の なまえ。いまは もう つかない */
-    foulName: 'イエローカード 3まい',
-    /* はじめの 1かいで おけた わりあい（評価の正本 第5章） */
-    firstTitle: 'はじめの 1かいで おけた わりあい（しゅうごと）',
-    firstNote: 'はさめない ところを おさずに おけた てが どれだけ あるか。ふえると たしかめる ちからが のびています',
-    firstNone: 'まだ きろくが ありません',
-    firstWeek: 'の しゅう',
-    firstMoves: 'て',
-    stampsTitle: 'できた こと の かいすう',
-    voiceTitle: 'きょうの こえかけ',
-    colBlack: 'くろ',
-    colWhite: 'しろ',
-    colWin: 'かち',
-    colLose: 'まけ',
-    colDraw: 'ひきわけ',
-    versionLabel: 'はんすう',
+    wipeDone: '記録を消去しました',
+    firstTitle: '1回目のタップで置けた割合（週ごと）',
+    firstNote: '挟めない場所を押さずに置けた手の割合です。上がっていけば、置く前に確かめる力が伸びています。',
+    firstNone: 'まだ記録がありません',
+    firstWeek: 'の週',
+    firstMoves: '手',
+    voiceTitle: '今日の声かけの案',
+    reasonsTitle: '負けた理由の回数',
+    reasonsNone: 'まだ負けた記録がありません',
+    /* 負けた理由の名前（子の結果画面の文は blunder.js が持つ＝そちらは ひらがな） */
+    reasonNames: {
+      noCorner: '角を取れる手を逃した',
+      nextToCorner: '角の隣に打ち、角を取られた',
+      nextToCornerSafe: '空いている角の隣に打った',
+      gaveCorner: '相手に角を渡した',
+      lostMobility: '打てる場所が減った',
+      tookTooMany: '序盤に石を取りすぎた',
+      endCount: '終盤で損をした',
+      none: '損をした一手（型なし）',
+      foul: 'イエローカード3枚（v6の記録）'
+    },
+    stampsTitle: 'できたことの回数',
+    stampNames: {
+      corner: '角を取った',
+      edge: '辺を使った',
+      pass: '相手をパスさせた',
+      last: '最後まで自分で打った'
+    },
+    gamesTitle: '対局の記録（新しい順・最大50局）',
+    gamesNone: 'まだ記録がありません',
+    levelWord: 'レベル',
+    colBlack: '黒',
+    colWhite: '白',
+    colWin: '勝ち',
+    colLose: '負け',
+    colDraw: '引き分け',
     /* 負け理由ごとの、大人への声かけの案（設計書4.5章の大人向けの補足） */
     voice: {
-      noCorner: 'どこに おけば かどが とれたか、いっしょに さがして みてください',
-      nextToCorner: 'かどの となりに おくと どうなるか、きいて みてください',
-      nextToCornerSafe: 'かどの となりは あぶない、と いっしょに たしかめて ください',
-      gaveCorner: 'あいてに かどを わたさない てを、いっしょに さがして みてください',
-      lostMobility: 'おける ばしょが へると どうなるか、はなして みてください',
-      tookTooMany: 'さいしょは すこしだけ とる、を いっしょに ためして みてください',
-      endCount: 'さいごの すうてを、ゆっくり かぞえて みてください',
-      none: 'どこが わかれめだったか、いっしょに ばんを みて みてください',
-      foul: 'はさめる ところの さがしかたを、いっしょに たしかめて ください',
-      noLose: 'まけた きろくが まだ ありません'
+      noCorner: 'どこに置けば角が取れたか、一緒に探してみてください',
+      nextToCorner: '角の隣に置くとどうなるか、聞いてみてください',
+      nextToCornerSafe: '角の隣は危ない、と一緒に確かめてください',
+      gaveCorner: '相手に角を渡さない手を、一緒に探してみてください',
+      lostMobility: '置ける場所が減るとどうなるか、話してみてください',
+      tookTooMany: '最初は少しだけ取る、を一緒に試してみてください',
+      endCount: '最後の数手を、ゆっくり数えてみてください',
+      none: 'どこが分かれ目だったか、一緒に盤を見てみてください',
+      foul: '挟める場所の探し方を、一緒に確かめてください',
+      noLose: '負けた記録がまだありません'
     }
   };
+  /*ADULT_TEXT_END*/
 
   /* ---- こまったとき（白い画面にしないための文・設計書4.10章） ---- */
   OKT.error = {
@@ -2071,7 +2075,7 @@ var OKUI = {};
 
   /* このファイルを直したら この数字を +1 する。version.txt にも同じ数字が書かれる
      （build_app.py が自動で書く）＝古いファイルを持っている端末が取り直せる。 */
-  OKUI.APP_VERSION = 7;
+  OKUI.APP_VERSION = 8;
 
   /* まけた わけの しらべ を、何ミリ秒ぶん まとめて 進めてから 息をつぐか。
      0 にすると かたまりは いちばん小さくなるが、60手ぶん 待ち時間が積み上がる。
@@ -2348,18 +2352,34 @@ var OKUI = {};
     box.appendChild(d);
   }
 
-  /* ================= メッセージ（文は2秒で消す） ================= */
-  var msgTimer = null;
-  /* keep＝消さずに残す（いちばん困っている場面の声かけ用・しげ裁定2026-09-22） */
-  function say(s, kind, keep) {
-    var m = el('msg');
-    setText(m, s);
-    m.className = 'msg' + (kind ? ' ' + kind : '');
-    show(m, s !== '');
-    if (msgTimer) { clearTimeout(msgTimer); msgTimer = null; }
-    if (s !== '' && !keep) {
-      msgTimer = setTimeout(function () { show(m, false); }, 2000);
+  /* ================= しらせ＝盤の上の ふきだし（2026-09-24 しげ指示） =================
+     「右の欄は たいきょく中 ほとんど 見ていない」（しげの観察）ので、しらせ・カード・
+     ルールの絵を ぜんぶ 盤の上に かぶせて出す。
+     sq＝押したマス。上半分を押したら 下に、下半分なら 上に出す＝見ている所を かくさない。
+     指は とおす（CSS の pointer-events:none）＝ふきだしの下の マスも そのまま押せる。
+     rule＝はさむ ルールの絵も出す。POP_MS で きえる（ずっと出すと 盤が 見えないため） */
+  OKUI.POP_MS = 3000;
+  var popTimer = null;
+  function say(s, kind, sq, rule) {
+    var p = el('pop'), low;
+    if (popTimer) { clearTimeout(popTimer); popTimer = null; }
+    drawCards();
+    if (s === '') {
+      show(p, false);
+      stopRuleAnim();
+      return;
     }
+    low = (typeof sq === 'number' && sq >= 0 && (sq >> 3) < 4);
+    p.className = 'pop' + (kind ? ' ' + kind : '') + (low ? ' low' : ' high');
+    setText(el('pop-text'), s);
+    show(el('rule-strip'), !!rule);
+    if (rule) { startRuleAnim(); } else { stopRuleAnim(); }
+    show(p, true);
+    popTimer = setTimeout(function () {
+      popTimer = null;
+      show(p, false);
+      stopRuleAnim();
+    }, OKUI.POP_MS);
   }
 
   /* ================= はじめの がめん＝あそびかたを えらぶ ================= */
@@ -2369,7 +2389,9 @@ var OKUI = {};
     setText(el('mode-solo-note'), OKT.mode.soloNote);
     setText(el('mode-duo'), OKT.mode.duo);
     setText(el('mode-duo-note'), OKT.mode.duoNote);
-    setText(el('mode-enter-how'), OKT.grown.enterHow);
+    setText(el('mode-enter-how'), OKT.entry.how);
+    /* 版の目じるし（大人が見る・2026-09-24 しげ指示「トップ画面に出す」「v◯でよい」） */
+    setText(el('mode-ver'), OKT.entry.ver + OKUI.APP_VERSION);
   }
 
   /* ================= れべるの ちず ================= */
@@ -2378,7 +2400,7 @@ var OKUI = {};
     setText(el('map-back'), OKT.mode.back);
     setText(el('map-title'), OKT.map.title);
     setText(el('map-help'), OKT.map.help);
-    setText(el('map-enter-how'), OKT.grown.enterHow);
+    setText(el('map-enter-how'), OKT.entry.how);
     while (grid.firstChild) { grid.removeChild(grid.firstChild); }
     for (i = 1; i <= OKR.LEVELS; i++) {
       cfg = OKAI.cfgOf(i);
@@ -2458,8 +2480,6 @@ var OKUI = {};
     if (S.judger) { S.judger.cancel(); S.judger = null; }
     /* 種＝いま の 時こく。同じ相手でも毎回ちがう将棋になる */
     S.rnd = OKAI.makeRnd(((new Date()).getTime() % 2147483000) + 7);
-    show(el('lecture'), false);
-    drawCards();
     /* 「ちずに もどる」は たいきょくちゅう ずっと 出しておく（しげ指示2026-09-22）。
        押すと すぐには もどらず、quit の ききかえし を はさむ */
     setText(el('give-up'), S.duo ? OKT.game.quitDuo : OKT.game.quit);
@@ -2581,31 +2601,30 @@ var OKUI = {};
       }
       shake(sq);
       SND.deny();
-      say(OKT.game.checkWrong, 'warn');
-      addCard();
+      S.missCount++;
+      say(OKT.game.checkWrong, 'warn', sq);
       return;
     }
     /* 石のある所＝指の ずれ（うっかり）が多い。カードは ふやさない（評価の正本 第3章） */
     if (cell !== EMPTY) {
       shake(sq);
       SND.deny();
-      say((S.check && S.target >= 0) ? OKT.game.checkOwn : OKT.game.occupied, 'warn');
+      say((S.check && S.target >= 0) ? OKT.game.checkOwn : OKT.game.occupied, 'warn', sq);
       return;
     }
     if (OK.countFlips(S.board, sq, S.player) === 0) {
       shake(sq);
       SND.deny();
-      say(OKT.game.noFlip, 'warn');
-      applyLecture();
       setTarget(-1);
       S.check = true;
-      addCard();
+      S.missCount++;
+      say(OKT.game.noFlip, 'warn', sq, true);
       return;
     }
     /* たしかめ中は すぐ置かず、はさむ いしを 聞く */
     if (S.check) {
       setTarget(sq);
-      say(OKT.game.checkAsk, 'warn', true);
+      say(OKT.game.checkAsk, 'warn', sq);
       return;
     }
     place(sq);
@@ -2618,9 +2637,7 @@ var OKUI = {};
     S.missCount = 0;
     S.check = false;
     setTarget(-1);
-    drawCards();
-    show(el('lecture'), false);
-    say('');      /* 消さずに残していた声かけを、置けたところで下げる */
+    say('');      /* 出ていた ふきだしを、置けたところで下げる */
     doMove(sq);
   }
 
@@ -2632,26 +2649,15 @@ var OKUI = {};
     if (sq >= 0 && S.cells[sq]) { addClass(S.cells[sq], 'target'); }
   }
 
-  /* はさめない所を押したら ルールの絵を 1回めから 出す。
-     どちらでも 置ける場所は ぜったいに 示さない（しげ裁定Q1＝A案） */
-  function applyLecture() {
-    setText(el('lecture-text'), OKT.game.lecture);
-    setText(el('lecture-how'), OKT.game.lectureHow);
-    show(el('lecture'), true);
-    startRuleAnim();
-  }
-
-  /* ---- イエローカード＝この手番の まちがいの 見える化。まけには しない（しげ裁定「Cで」） ---- */
-  function addCard() {
-    S.missCount++;
-    drawCards();
-  }
+  /* ---- イエローカード＝この手番の まちがいの 見える化。まけには しない（しげ裁定「Cで」）。
+     ふきだしの中に出す。たしかめ中は 押す じゅんばんも そえる。
+     どちらでも 置ける場所は ぜったいに 示さない（しげ裁定Q1＝A案） ---- */
   function drawCards() {
     var row = el('foul-cards'), i;
     while (row.firstChild) { row.removeChild(row.firstChild); }
     for (i = 0; i < S.missCount; i++) { row.appendChild(mk('span', 'ycard on')); }
-    setText(el('foul-text'), OKT.game.checkHow);
-    show(el('foul'), S.missCount > 0);
+    show(row, S.missCount > 0);
+    setText(el('pop-how'), S.check ? OKT.game.checkHow : '');
   }
 
   /* ルールの絵＝よこ1れつで「くろ・しろ・あき」に置くと返る、小さな うごき */
@@ -2882,22 +2888,11 @@ var OKUI = {};
     later(function () { show(box, false); }, 2600);
   }
 
-  /* ================= おうちのひと（大人むけ） ================= */
-  var lockAns = 0, pressTimer = null;
-
-  function askLock() {
-    var a = 3 + Math.floor(Math.random() * 7), b = 4 + Math.floor(Math.random() * 6);
-    lockAns = a + b;
-    setText(el('lock-q'), a + ' + ' + b + ' = ?');
-    setText(el('lock-title'), OKT.grown.lockTitle);
-    setText(el('lock-close'), OKT.grown.close);
-    el('lock-input').value = '';
-    setText(el('lock-ng'), '');
-    show(el('lock'), true);
-  }
+  /* ================= おうちのひと（大人むけ） =================
+     3びょう 長おし だけで 開く（たしざんの かぎは 2026-09-24 しげ指示で やめた） */
+  var pressTimer = null;
 
   function openGrown() {
-    show(el('lock'), false);
     buildGrown();
     show(el('grown'), true);
   }
@@ -2955,9 +2950,8 @@ var OKUI = {};
       if (!counts.hasOwnProperty(k)) { continue; }
       any = true;
       tr = mk('tr', null);
-      name = (k === 'foul') ? OKT.grown.foulName
-        : ((OKB.TYPES[k] && OKB.TYPES[k].name) ? OKB.TYPES[k].name : k);
-      appendCell(tr, 'th', name === '' ? OKB.TYPES.none.why : name);
+      name = OKT.grown.reasonNames[k] || k;
+      appendCell(tr, 'th', name);
       appendCell(tr, 'td', String(counts[k]));
       tbl.appendChild(tr);
     }
@@ -2974,7 +2968,7 @@ var OKUI = {};
     tbl = mk('table', 'gtbl');
     for (i = 0; i < OKR.STAMPS.length; i++) {
       tr = mk('tr', null);
-      appendCell(tr, 'th', OKR.STAMPS[i].name);
+      appendCell(tr, 'th', OKT.grown.stampNames[OKR.STAMPS[i].key] || OKR.STAMPS[i].name);
       appendCell(tr, 'td', String(S.save.stamps[OKR.STAMPS[i].key] || 0));
       tbl.appendChild(tr);
     }
@@ -2994,24 +2988,19 @@ var OKUI = {};
         g = S.save.games[i];
         if (!g) { continue; }   /* 壊れた記録が混じっていても 落ちない（査読2026-09-21） */
         tr = mk('tr', null);
-        appendCell(tr, 'td', OKT.map.levelWord + ' ' + g.lv);
+        appendCell(tr, 'td', OKT.grown.levelWord + ' ' + g.lv);
         appendCell(tr, 'td', g.color === 'b' ? OKT.grown.colBlack : OKT.grown.colWhite);
         appendCell(tr, 'td', g.res === 'w' ? OKT.grown.colWin
           : (g.res === 'l' ? OKT.grown.colLose : OKT.grown.colDraw));
         appendCell(tr, 'td', g.mine + ' - ' + g.theirs);
         /* 型の名前が無い「ここは そんを した」も、上の表と同じ言い方で出す
            （上の表は文、この表は空白、と食い違っていた＝査読2026-09-21） */
-        appendCell(tr, 'td', g.reason === 'foul' ? OKT.grown.foulName
-          : (g.reason && OKB.TYPES[g.reason]
-            ? (OKB.TYPES[g.reason].name || OKB.TYPES[g.reason].why) : ''));
+        appendCell(tr, 'td', g.reason ? (OKT.grown.reasonNames[g.reason] || '') : '');
         tbl.appendChild(tr);
       }
       box.appendChild(tbl);
     }
 
-    d = mk('p', 'ver');
-    setText(d, OKT.grown.versionLabel + ' ' + OKUI.APP_VERSION);
-    box.appendChild(d);
   }
 
   function appendCell(tr, tag, s) {
@@ -3210,7 +3199,7 @@ var OKUI = {};
     /* おうちのひと＝画面のすみを3秒 長おし → たしざん */
     function startPress() {
       if (pressTimer) { return; }
-      pressTimer = setTimeout(function () { pressTimer = null; askLock(); }, 3000);
+      pressTimer = setTimeout(function () { pressTimer = null; openGrown(); }, 3000);
     }
     function endPress() {
       if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; }
@@ -3218,7 +3207,7 @@ var OKUI = {};
     /* ちず と はじめの がめん の どちらからでも 入れるように、同じ仕掛けを2つに掛ける */
     function bindGrown(gb) {
       if (!gb) { return; }
-      setText(gb, OKT.grown.enter);
+      setText(gb, OKT.entry.btn);
       gb.onmousedown = startPress;
       gb.onmouseup = endPress;
       gb.onmouseout = endPress;
@@ -3232,11 +3221,6 @@ var OKUI = {};
     bindGrown(el('grown-btn'));
     bindGrown(el('mode-grown'));
 
-    el('lock-ok').onclick = function () {
-      if (parseInt(el('lock-input').value, 10) === lockAns) { openGrown(); }
-      else { setText(el('lock-ng'), OKT.grown.lockNg); }
-    };
-    el('lock-close').onclick = function () { show(el('lock'), false); };
     el('grown-close').onclick = function () { show(el('grown'), false); };
 
     el('g-sound').onclick = function () {

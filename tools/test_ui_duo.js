@@ -279,28 +279,34 @@ STORE = {};
 S.save = OKR.load(window.localStorage);
 OKUI.startGame(1, BLACK, false);
 pumpTimers();
-isTrue('⑪はじめは カードの わくが 出ていない', NODES.foul.style.display === 'none');
+isTrue('⑪はじめは ふきだしが 出ていない', NODES.pop.style.display === 'none');
 OKUI.tapCell(27);            /* まんなか＝石が ある所 */
 is('　　石の ある所は カードを ふやさない（うっかり）', [cards(), S.check], [0, false]);
-OKUI.tapCell(hasamenai());
+var hasamiSq = hasamenai(), hasamiRow = hasamiSq >> 3;
+OKUI.tapCell(hasamiSq);
 is('　　はさめない所＝カード 1まい・たしかめ に 入る', [cards(), S.check], [1, true]);
-is('　　たしかめの せつめい', NODES['foul-text'].text(), OKT.game.checkHow);
-isTrue('　　ルールの絵も 出る', NODES.lecture.style.display !== 'none');
+is('　　たしかめの せつめい', NODES['pop-how'].text(), OKT.game.checkHow);
+isTrue('　　ルールの絵も ふきだしに 出る', NODES['rule-strip'].style.display !== 'none');
+is('　　盤の上の ふきだしに 出る・ことば', [NODES.pop.style.display, NODES['pop-text'].text()], ['', OKT.game.noFlip]);
+isTrue('　　押した マスの はんたいがわに 出る', NODES.pop.className.indexOf(hasamiRow < 4 ? 'low' : 'high') >= 0);
 var mokuhyo = OK.legalMoves(S.board, BLACK)[0], tesu = S.moves.length;
 OKUI.tapCell(mokuhyo);
 is('　　置ける所を 押しても すぐには 置かない', S.moves.length, tesu);
 isTrue('　　えらんだ マスに しるし', isTarget(mokuhyo));
-is('　　どの いしで はさむ？ と きく', NODES.msg.text(), OKT.game.checkAsk);
+is('　　どの いしで はさむ？ と きく', NODES['pop-text'].text(), OKT.game.checkAsk);
+isTrue('　　ルールの絵は ここでは 出さない', NODES['rule-strip'].style.display === 'none');
 OKUI.tapCell(aitenoIshi());
-is('　　あいての いしを 押したら「じぶんの いしを」・カードは ふえない', [NODES.msg.text(), cards()], [OKT.game.checkOwn, 1]);
+is('　　あいての いしを 押したら「じぶんの いしを」・カードは ふえない', [NODES['pop-text'].text(), cards()], [OKT.game.checkOwn, 1]);
 var dame = anchorOf(mokuhyo, false);
 isTrue('　　（はさめない じぶんの いしが ある 局面）', dame >= 0);
 OKUI.tapCell(dame);
-is('　　ちがう いし＝おけない・カード 2まい', [S.moves.length, cards(), NODES.msg.text()], [tesu, 2, OKT.game.checkWrong]);
+is('　　ちがう いし＝おけない・カード 2まい', [S.moves.length, cards(), NODES['pop-text'].text()], [tesu, 2, OKT.game.checkWrong]);
 isTrue('　　えらんだ マスは そのまま', isTarget(mokuhyo));
+pumpTimers();
+is('　　ふきだしは 時間で きえる（たしかめ と しるしは のこる）', [NODES.pop.style.display, S.check, isTarget(mokuhyo)], ['none', true, true]);
 OKUI.tapCell(anchorOf(mokuhyo, true));
 is('　　ただしい いし＝その マスに おける', S.moves[S.moves.length - 1] !== undefined && S.board[mokuhyo], BLACK);
-is('　　おいたら カード 0・たしかめ おわり・しるし きえる', [cards(), S.check, isTarget(mokuhyo), NODES.foul.style.display],
+is('　　おいたら カード 0・たしかめ おわり・しるし きえる', [cards(), S.check, isTarget(mokuhyo), NODES.pop.style.display],
   [0, false, false, 'none']);
 pumpTimers();
 while (S.player !== BLACK || S.busy) { if (pumpTimers(1) === 0) { break; } }
@@ -330,9 +336,7 @@ isTrue('　　まけても かっても カードで けっかは かわらな�
 /* おうちのひと画面（3びょう長おし→たしざん）に しゅうごとの わりあいが 出る */
 NODES['grown-btn'].onmousedown();
 pumpTimers();
-var shiki = NODES['lock-q'].text().split(' ');
-NODES['lock-input'].value = String(parseInt(shiki[0], 10) + parseInt(shiki[2], 10));
-NODES['lock-ok'].onclick();
+isTrue('　　3びょう 長おしだけで 開く（たしざん なし）', NODES.grown.style.display !== 'none');
 var gtext = NODES['grown-body'].text();
 isTrue('　　おうちのひと画面に わりあいの 見出し', gtext.indexOf(OKT.grown.firstTitle) >= 0);
 isTrue('　　この しゅうの わりあいと 手の数', gtext.indexOf(rows[0].m + '/' + rows[0].d + ' ' + OKT.grown.firstWeek) >= 0

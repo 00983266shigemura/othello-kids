@@ -15,7 +15,7 @@ var OKUI = {};
 
   /* このファイルを直したら この数字を +1 する。version.txt にも同じ数字が書かれる
      （build_app.py が自動で書く）＝古いファイルを持っている端末が取り直せる。 */
-  OKUI.APP_VERSION = 7;
+  OKUI.APP_VERSION = 8;
 
   /* まけた わけの しらべ を、何ミリ秒ぶん まとめて 進めてから 息をつぐか。
      0 にすると かたまりは いちばん小さくなるが、60手ぶん 待ち時間が積み上がる。
@@ -292,18 +292,34 @@ var OKUI = {};
     box.appendChild(d);
   }
 
-  /* ================= メッセージ（文は2秒で消す） ================= */
-  var msgTimer = null;
-  /* keep＝消さずに残す（いちばん困っている場面の声かけ用・しげ裁定2026-09-22） */
-  function say(s, kind, keep) {
-    var m = el('msg');
-    setText(m, s);
-    m.className = 'msg' + (kind ? ' ' + kind : '');
-    show(m, s !== '');
-    if (msgTimer) { clearTimeout(msgTimer); msgTimer = null; }
-    if (s !== '' && !keep) {
-      msgTimer = setTimeout(function () { show(m, false); }, 2000);
+  /* ================= しらせ＝盤の上の ふきだし（2026-09-24 しげ指示） =================
+     「右の欄は たいきょく中 ほとんど 見ていない」（しげの観察）ので、しらせ・カード・
+     ルールの絵を ぜんぶ 盤の上に かぶせて出す。
+     sq＝押したマス。上半分を押したら 下に、下半分なら 上に出す＝見ている所を かくさない。
+     指は とおす（CSS の pointer-events:none）＝ふきだしの下の マスも そのまま押せる。
+     rule＝はさむ ルールの絵も出す。POP_MS で きえる（ずっと出すと 盤が 見えないため） */
+  OKUI.POP_MS = 3000;
+  var popTimer = null;
+  function say(s, kind, sq, rule) {
+    var p = el('pop'), low;
+    if (popTimer) { clearTimeout(popTimer); popTimer = null; }
+    drawCards();
+    if (s === '') {
+      show(p, false);
+      stopRuleAnim();
+      return;
     }
+    low = (typeof sq === 'number' && sq >= 0 && (sq >> 3) < 4);
+    p.className = 'pop' + (kind ? ' ' + kind : '') + (low ? ' low' : ' high');
+    setText(el('pop-text'), s);
+    show(el('rule-strip'), !!rule);
+    if (rule) { startRuleAnim(); } else { stopRuleAnim(); }
+    show(p, true);
+    popTimer = setTimeout(function () {
+      popTimer = null;
+      show(p, false);
+      stopRuleAnim();
+    }, OKUI.POP_MS);
   }
 
   /* ================= はじめの がめん＝あそびかたを えらぶ ================= */
@@ -313,7 +329,9 @@ var OKUI = {};
     setText(el('mode-solo-note'), OKT.mode.soloNote);
     setText(el('mode-duo'), OKT.mode.duo);
     setText(el('mode-duo-note'), OKT.mode.duoNote);
-    setText(el('mode-enter-how'), OKT.grown.enterHow);
+    setText(el('mode-enter-how'), OKT.entry.how);
+    /* 版の目じるし（大人が見る・2026-09-24 しげ指示「トップ画面に出す」「v◯でよい」） */
+    setText(el('mode-ver'), OKT.entry.ver + OKUI.APP_VERSION);
   }
 
   /* ================= れべるの ちず ================= */
@@ -322,7 +340,7 @@ var OKUI = {};
     setText(el('map-back'), OKT.mode.back);
     setText(el('map-title'), OKT.map.title);
     setText(el('map-help'), OKT.map.help);
-    setText(el('map-enter-how'), OKT.grown.enterHow);
+    setText(el('map-enter-how'), OKT.entry.how);
     while (grid.firstChild) { grid.removeChild(grid.firstChild); }
     for (i = 1; i <= OKR.LEVELS; i++) {
       cfg = OKAI.cfgOf(i);
@@ -402,8 +420,6 @@ var OKUI = {};
     if (S.judger) { S.judger.cancel(); S.judger = null; }
     /* 種＝いま の 時こく。同じ相手でも毎回ちがう将棋になる */
     S.rnd = OKAI.makeRnd(((new Date()).getTime() % 2147483000) + 7);
-    show(el('lecture'), false);
-    drawCards();
     /* 「ちずに もどる」は たいきょくちゅう ずっと 出しておく（しげ指示2026-09-22）。
        押すと すぐには もどらず、quit の ききかえし を はさむ */
     setText(el('give-up'), S.duo ? OKT.game.quitDuo : OKT.game.quit);
@@ -525,31 +541,30 @@ var OKUI = {};
       }
       shake(sq);
       SND.deny();
-      say(OKT.game.checkWrong, 'warn');
-      addCard();
+      S.missCount++;
+      say(OKT.game.checkWrong, 'warn', sq);
       return;
     }
     /* 石のある所＝指の ずれ（うっかり）が多い。カードは ふやさない（評価の正本 第3章） */
     if (cell !== EMPTY) {
       shake(sq);
       SND.deny();
-      say((S.check && S.target >= 0) ? OKT.game.checkOwn : OKT.game.occupied, 'warn');
+      say((S.check && S.target >= 0) ? OKT.game.checkOwn : OKT.game.occupied, 'warn', sq);
       return;
     }
     if (OK.countFlips(S.board, sq, S.player) === 0) {
       shake(sq);
       SND.deny();
-      say(OKT.game.noFlip, 'warn');
-      applyLecture();
       setTarget(-1);
       S.check = true;
-      addCard();
+      S.missCount++;
+      say(OKT.game.noFlip, 'warn', sq, true);
       return;
     }
     /* たしかめ中は すぐ置かず、はさむ いしを 聞く */
     if (S.check) {
       setTarget(sq);
-      say(OKT.game.checkAsk, 'warn', true);
+      say(OKT.game.checkAsk, 'warn', sq);
       return;
     }
     place(sq);
@@ -562,9 +577,7 @@ var OKUI = {};
     S.missCount = 0;
     S.check = false;
     setTarget(-1);
-    drawCards();
-    show(el('lecture'), false);
-    say('');      /* 消さずに残していた声かけを、置けたところで下げる */
+    say('');      /* 出ていた ふきだしを、置けたところで下げる */
     doMove(sq);
   }
 
@@ -576,26 +589,15 @@ var OKUI = {};
     if (sq >= 0 && S.cells[sq]) { addClass(S.cells[sq], 'target'); }
   }
 
-  /* はさめない所を押したら ルールの絵を 1回めから 出す。
-     どちらでも 置ける場所は ぜったいに 示さない（しげ裁定Q1＝A案） */
-  function applyLecture() {
-    setText(el('lecture-text'), OKT.game.lecture);
-    setText(el('lecture-how'), OKT.game.lectureHow);
-    show(el('lecture'), true);
-    startRuleAnim();
-  }
-
-  /* ---- イエローカード＝この手番の まちがいの 見える化。まけには しない（しげ裁定「Cで」） ---- */
-  function addCard() {
-    S.missCount++;
-    drawCards();
-  }
+  /* ---- イエローカード＝この手番の まちがいの 見える化。まけには しない（しげ裁定「Cで」）。
+     ふきだしの中に出す。たしかめ中は 押す じゅんばんも そえる。
+     どちらでも 置ける場所は ぜったいに 示さない（しげ裁定Q1＝A案） ---- */
   function drawCards() {
     var row = el('foul-cards'), i;
     while (row.firstChild) { row.removeChild(row.firstChild); }
     for (i = 0; i < S.missCount; i++) { row.appendChild(mk('span', 'ycard on')); }
-    setText(el('foul-text'), OKT.game.checkHow);
-    show(el('foul'), S.missCount > 0);
+    show(row, S.missCount > 0);
+    setText(el('pop-how'), S.check ? OKT.game.checkHow : '');
   }
 
   /* ルールの絵＝よこ1れつで「くろ・しろ・あき」に置くと返る、小さな うごき */
@@ -826,22 +828,11 @@ var OKUI = {};
     later(function () { show(box, false); }, 2600);
   }
 
-  /* ================= おうちのひと（大人むけ） ================= */
-  var lockAns = 0, pressTimer = null;
-
-  function askLock() {
-    var a = 3 + Math.floor(Math.random() * 7), b = 4 + Math.floor(Math.random() * 6);
-    lockAns = a + b;
-    setText(el('lock-q'), a + ' + ' + b + ' = ?');
-    setText(el('lock-title'), OKT.grown.lockTitle);
-    setText(el('lock-close'), OKT.grown.close);
-    el('lock-input').value = '';
-    setText(el('lock-ng'), '');
-    show(el('lock'), true);
-  }
+  /* ================= おうちのひと（大人むけ） =================
+     3びょう 長おし だけで 開く（たしざんの かぎは 2026-09-24 しげ指示で やめた） */
+  var pressTimer = null;
 
   function openGrown() {
-    show(el('lock'), false);
     buildGrown();
     show(el('grown'), true);
   }
@@ -899,9 +890,8 @@ var OKUI = {};
       if (!counts.hasOwnProperty(k)) { continue; }
       any = true;
       tr = mk('tr', null);
-      name = (k === 'foul') ? OKT.grown.foulName
-        : ((OKB.TYPES[k] && OKB.TYPES[k].name) ? OKB.TYPES[k].name : k);
-      appendCell(tr, 'th', name === '' ? OKB.TYPES.none.why : name);
+      name = OKT.grown.reasonNames[k] || k;
+      appendCell(tr, 'th', name);
       appendCell(tr, 'td', String(counts[k]));
       tbl.appendChild(tr);
     }
@@ -918,7 +908,7 @@ var OKUI = {};
     tbl = mk('table', 'gtbl');
     for (i = 0; i < OKR.STAMPS.length; i++) {
       tr = mk('tr', null);
-      appendCell(tr, 'th', OKR.STAMPS[i].name);
+      appendCell(tr, 'th', OKT.grown.stampNames[OKR.STAMPS[i].key] || OKR.STAMPS[i].name);
       appendCell(tr, 'td', String(S.save.stamps[OKR.STAMPS[i].key] || 0));
       tbl.appendChild(tr);
     }
@@ -938,24 +928,19 @@ var OKUI = {};
         g = S.save.games[i];
         if (!g) { continue; }   /* 壊れた記録が混じっていても 落ちない（査読2026-09-21） */
         tr = mk('tr', null);
-        appendCell(tr, 'td', OKT.map.levelWord + ' ' + g.lv);
+        appendCell(tr, 'td', OKT.grown.levelWord + ' ' + g.lv);
         appendCell(tr, 'td', g.color === 'b' ? OKT.grown.colBlack : OKT.grown.colWhite);
         appendCell(tr, 'td', g.res === 'w' ? OKT.grown.colWin
           : (g.res === 'l' ? OKT.grown.colLose : OKT.grown.colDraw));
         appendCell(tr, 'td', g.mine + ' - ' + g.theirs);
         /* 型の名前が無い「ここは そんを した」も、上の表と同じ言い方で出す
            （上の表は文、この表は空白、と食い違っていた＝査読2026-09-21） */
-        appendCell(tr, 'td', g.reason === 'foul' ? OKT.grown.foulName
-          : (g.reason && OKB.TYPES[g.reason]
-            ? (OKB.TYPES[g.reason].name || OKB.TYPES[g.reason].why) : ''));
+        appendCell(tr, 'td', g.reason ? (OKT.grown.reasonNames[g.reason] || '') : '');
         tbl.appendChild(tr);
       }
       box.appendChild(tbl);
     }
 
-    d = mk('p', 'ver');
-    setText(d, OKT.grown.versionLabel + ' ' + OKUI.APP_VERSION);
-    box.appendChild(d);
   }
 
   function appendCell(tr, tag, s) {
@@ -1154,7 +1139,7 @@ var OKUI = {};
     /* おうちのひと＝画面のすみを3秒 長おし → たしざん */
     function startPress() {
       if (pressTimer) { return; }
-      pressTimer = setTimeout(function () { pressTimer = null; askLock(); }, 3000);
+      pressTimer = setTimeout(function () { pressTimer = null; openGrown(); }, 3000);
     }
     function endPress() {
       if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; }
@@ -1162,7 +1147,7 @@ var OKUI = {};
     /* ちず と はじめの がめん の どちらからでも 入れるように、同じ仕掛けを2つに掛ける */
     function bindGrown(gb) {
       if (!gb) { return; }
-      setText(gb, OKT.grown.enter);
+      setText(gb, OKT.entry.btn);
       gb.onmousedown = startPress;
       gb.onmouseup = endPress;
       gb.onmouseout = endPress;
@@ -1176,11 +1161,6 @@ var OKUI = {};
     bindGrown(el('grown-btn'));
     bindGrown(el('mode-grown'));
 
-    el('lock-ok').onclick = function () {
-      if (parseInt(el('lock-input').value, 10) === lockAns) { openGrown(); }
-      else { setText(el('lock-ng'), OKT.grown.lockNg); }
-    };
-    el('lock-close').onclick = function () { show(el('lock'), false); };
     el('grown-close').onclick = function () { show(el('grown'), false); };
 
     el('g-sound').onclick = function () {

@@ -76,6 +76,7 @@ python3 /Users/shigemurasatoshi/dev/othello-kids/tools/make_icon.py
 ```
 
 画面の文字に漢字が無いか・絵文字の世代（判定述語P7）。
+例外は大人向けの管理画面の文だけ（`text.js` の `ADULT_TEXT_BEGIN`〜`END` の1区間）。目じるしが1組ちょうどでないと不合格。
 
 ```bash
 python3 /Users/shigemurasatoshi/dev/othello-kids/tools/check_text.py

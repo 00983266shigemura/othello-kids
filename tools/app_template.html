@@ -166,26 +166,27 @@
   .dot.b{background:var(--kuro);}
   .dot.w{background:var(--shiro);}
   .cnt-num{font-size:17px; color:var(--ink-soft);}
-  .msg{margin:10px 0; padding:10px 12px; border-radius:10px; font-size:19px;
-       background:var(--ao-bg); color:var(--ao);}
-  .msg.warn{background:var(--daidai-bg); color:var(--daidai-ink); border:2px solid var(--daidai);}
   /* 保存できないときの ひとこと（けっかの画面。空のときは 場所を とらない） */
   .saveng:empty{display:none;}
   .saveng{margin:10px 0; padding:8px 12px; border-radius:10px; font-size:17px;
           background:var(--daidai-bg); color:var(--daidai-ink); border:2px solid var(--daidai);}
-  #lecture{margin:10px 0; padding:10px 12px; border:2px solid var(--daidai);
-           background:var(--daidai-bg); border-radius:10px;}
-  #lecture-text{color:var(--daidai-ink); font-weight:bold;}
-  #lecture-how{font-size:16px; color:var(--daidai-ink);}
+  /* ---- 盤の上の ふきだし（2026-09-24 しげ指示「警告は 盤に かぶせて出す」） ----
+     押したマスの 反対がわ（.high＝上・.low＝下）に出す。指は とおす＝下の マスも 押せる */
+  .pop{position:absolute; left:10px; right:10px; z-index:5; pointer-events:none;
+       background:var(--card); color:var(--ink); border:4px solid var(--daidai);
+       border-radius:14px; padding:10px 16px;
+       box-shadow:0 4px 16px rgba(0,0,0,0.35);}
+  .pop.high{top:10px;}
+  .pop.low{bottom:10px;}
+  #pop-text{font-size:26px; font-weight:bold; color:var(--daidai-ink); margin:2px 0;}
+  #pop-how{font-size:19px; margin:4px 0 0;}
+  #pop-how:empty{display:none;}
   #rule-strip{padding:6px 0; line-height:0;}
   .rs{display:inline-block; width:30px; height:30px; margin:2px; border-radius:50%;
       border:2px solid var(--ryokuao-dark); background:var(--ryokuao);}
   .rs.b{background:var(--kuro);}
   .rs.w{background:var(--shiro);}
   /* ---- イエローカード（2026-09-24 しげ指示） ---- */
-  #foul{margin:10px 0; padding:8px 12px; border:2px solid var(--daidai);
-        background:var(--daidai-bg); border-radius:10px;}
-  #foul-text{color:var(--daidai-ink); font-weight:bold; font-size:18px;}
   .ycards{line-height:0; padding:4px 0;}
   /* まだの カード＝点線の わく だけ。たまった カード＝きいろ＋こい ふち＋「！」＋すこし かたむける */
   .ycard{display:inline-block; width:30px; height:42px; margin:0 8px 0 0; border-radius:4px;
@@ -246,11 +247,6 @@
   .box.wide{max-width:760px; margin:3% auto;}
   .box button{margin:6px 8px 6px 0; display:block; width:100%;}
   .box.wide button{display:inline-block; width:auto;}
-  #lock-input{font-size:26px; width:140px; padding:8px; border:2px solid var(--line);
-              border-radius:8px; background:var(--card); color:var(--ink);}
-  #lock-ok{display:inline-block; width:auto;}
-  #lock-q{font-size:28px;}
-  #lock-ng{color:var(--murasaki); font-weight:bold;}
   .gtbl{border-collapse:collapse; width:100%; font-size:17px; margin:4px 0 10px;}
   .gtbl th,.gtbl td{border:1px solid var(--line); padding:4px 8px; text-align:left;}
   .gtbl th{background:var(--card2); white-space:nowrap;}
@@ -275,6 +271,8 @@
     <button id="mode-duo" class="sub"></button>
     <p id="mode-duo-note" class="mode-note"></p>
   </div>
+  <!-- 版の目じるし（大人が見る）。子の じゃまに ならない よう いちばん下に置く -->
+  <p id="mode-ver" class="ver"></p>
 </div>
 
 <!-- ① れべるの ちず -->
@@ -294,21 +292,19 @@
 <!-- ② たいきょく -->
 <div id="scr-game" class="screen" style="display:none;">
  <div id="game-row">
-  <div id="board-wrap"><div id="board"></div></div>
+  <div id="board-wrap"><div id="board"></div>
+    <!-- 盤の上の ふきだし（しらせ・イエローカード・ルールの絵）。指は とおす -->
+    <div id="pop" class="pop high" style="display:none;">
+      <div id="foul-cards" class="ycards"></div>
+      <p id="pop-text"></p>
+      <div id="rule-strip"></div>
+      <p id="pop-how"></p>
+    </div>
+  </div>
   <div id="side">
     <div id="turn" class="turn"></div>
     <div id="count-you" class="cnt"></div>
     <div id="count-ai" class="cnt"></div>
-    <div id="msg" class="msg" style="display:none;"></div>
-    <div id="foul" style="display:none;">
-      <div id="foul-cards" class="ycards"></div>
-      <p id="foul-text"></p>
-    </div>
-    <div id="lecture" style="display:none;">
-      <p id="lecture-text"></p>
-      <div id="rule-strip"></div>
-      <p id="lecture-how"></p>
-    </div>
     <button id="give-up" style="display:none;"></button>
   </div>
  </div>
@@ -346,17 +342,6 @@
     <button id="pick-black"></button>
     <button id="pick-white"></button>
     <button id="pick-back" class="sub"></button>
-  </div>
-</div>
-
-<!-- たしざんの かぎ（おうちのひと用） -->
-<div id="lock" class="veil" style="display:none;">
-  <div class="box">
-    <h2 id="lock-title"></h2>
-    <p id="lock-q"></p>
-    <p><input id="lock-input" type="tel"> <button id="lock-ok">OK</button></p>
-    <p id="lock-ng"></p>
-    <button id="lock-close" class="sub"></button>
   </div>
 </div>
 

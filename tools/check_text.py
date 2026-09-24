@@ -7,7 +7,8 @@
   この見かたなら、ことばを どこに書いても（text.js でも blunder.js でも ui.js でも）
   検査から もれない。
 
-①漢字ゼロ＝合格の条件（設計書4.7章・しげの要件「すべてひらがな・カタカナ」）
+①漢字ゼロ＝合格の条件（設計書4.7章・しげの要件「すべてひらがな・カタカナ」）。
+  例外＝大人向けの管理画面の文（text.js の ADULT_TEXT_BEGIN〜END の1区間だけ・2026-09-24 しげ指示）
 ②絵文字＝許した符号位置だけを通す（default-deny）。
   2012年のiPad（iOS 10.3.3）に無い世代の絵文字は 豆腐（字が無い印）になるため。
   おかえりクエストでの実測＝U+1F9F9（Unicode 11.0）が実機で豆腐になった。
@@ -25,6 +26,10 @@ REPO = os.path.dirname(HERE)
 
 # 漢字＝CJK統合漢字・拡張A・繰り返し記号
 KANJI = re.compile(u'[々〇〻㐀-䶿一-鿿豈-﫿]')
+
+# 大人向けの管理画面の文を はさむ 目じるし（text.js）
+ADULT_BEGIN = '/*ADULT_TEXT_BEGIN*/'
+ADULT_END = '/*ADULT_TEXT_END*/'
 
 # 許した符号位置だけを通す。世代は Unicode の版。実機で見えた実績をコメントに残す。
 ALLOW = {
@@ -94,6 +99,22 @@ def check(path):
     body = strip_comments(raw)
     lines = raw.splitlines()
 
+    # 大人向けの管理画面の文（text.js の ADULT_TEXT_BEGIN〜END）だけは 漢字を許す
+    # （2026-09-24 しげ指示「管理画面は普通に漢字も使って大人向けにして」）。
+    # 目じるしが 1組ちょうど でないときは 不合格＝区間が 子の文まで 広がる事故を 止める
+    nb, ne = raw.count(ADULT_BEGIN), raw.count(ADULT_END)
+    adult_bad = 0
+    adult_kanji = 0
+    if nb or ne:
+        a, b = raw.find(ADULT_BEGIN), raw.find(ADULT_END)
+        if nb != 1 or ne != 1 or b < a:
+            print('  ✕ 大人向けの区間の目じるしが 1組ちょうど ではありません（BEGIN %d・END %d）' % (nb, ne))
+            adult_bad = 1
+        else:
+            seg = body[a:b]
+            adult_kanji = len(KANJI.findall(seg))
+            body = body[:a] + KANJI.sub(u'＿', seg) + body[b:]
+
     kanji_hits, emoji_hits = [], []
     for m in KANJI.finditer(body):
         line = body.count('\n', 0, m.start()) + 1
@@ -112,7 +133,9 @@ def check(path):
         if len(kanji_hits) > 30:
             print('      …ほか %d件' % (len(kanji_hits) - 30))
     else:
-        print('  ✓ 漢字ゼロ')
+        print('  ✓ 漢字ゼロ（子の画面）')
+    if adult_kanji:
+        print('  ・ 大人向けの管理画面の区間＝漢字 %d字（検査の外）' % adult_kanji)
 
     if emoji_hits:
         print('  ✕ 表に無い絵文字が %d件' % len(emoji_hits))
@@ -134,7 +157,7 @@ def check(path):
         for t in longs[:5]:
             print('      %s…' % t)
 
-    return len(kanji_hits) + len(emoji_hits)
+    return len(kanji_hits) + len(emoji_hits) + adult_bad
 
 
 def main():
