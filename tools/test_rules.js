@@ -65,12 +65,11 @@ u.openAll = true;
 ok(OKR.openCount(u) === 20, 'おうちのひとが ひらけば ぜんぶ あそべる');
 
 /* ---- ② 置けない所を 押したときの 段階（P1の道すじ） ---- */
-ok(OKR.lectureStage(0) === 0, '0回＝文だけ');
-ok(OKR.lectureStage(2) === 0, '2回＝まだ 絵は 出さない');
-ok(OKR.lectureStage(3) === 1, '3回＝ルールの絵を 出す');
-ok(OKR.lectureStage(5) === 1, '5回＝まだ 絵まで');
-ok(OKR.lectureStage(6) === 2, '6回＝いっしょに さがそう');
-ok(OKR.lectureStage(40) === 2, '何回 押しても 段階は 2まで');
+ok(OKR.FOUL_LIMIT === 3, 'イエローカードは 3まいで まけ');
+ok(OKR.foulLeft(1) === 2, '1まい＝あと2かい');
+ok(OKR.foulLeft(2) === 1, '2まい＝あと1かい');
+ok(OKR.foulLeft(3) === 0, '3まい＝もう まけ');
+ok(OKR.foulLeft(9) === 0, 'なんまい でも 0より 下がらない');
 
 /* ---- ③ 端末内の保存 ---- */
 var st = new FakeStore();

@@ -15,7 +15,10 @@ var OKUI = {};
 
   /* このファイルを直したら この数字を +1 する。version.txt にも同じ数字が書かれる
      （build_app.py が自動で書く）＝古いファイルを持っている端末が取り直せる。 */
-  OKUI.APP_VERSION = 5;
+  OKUI.APP_VERSION = 6;
+
+  /* イエローカードが 3まい そろってから けっかの画面へ うつるまで（ミリ秒） */
+  OKUI.FOUL_WAIT_MS = 1500;
 
   /* まけた わけの しらべ を、何ミリ秒ぶん まとめて 進めてから 息をつぐか。
      0 にすると かたまりは いちばん小さくなるが、60手ぶん 待ち時間が積み上がる。
@@ -67,7 +70,8 @@ var OKUI = {};
     moves: [],
     passedLast: false,
     busy: false,       /* 石がひっくり返っている・相手が考えている＝押しても効かない */
-    missCount: 0,      /* はさめない所を つづけて押した回数（石のある所は数えない） */
+    missCount: 0,      /* 置けない所を つづけて押した回数＝イエローカードの まい数 */
+    foul: 0,           /* イエローカードが 3まい たまった 色（0＝たまっていない） */
     chooser: null,
     judger: null,
     rnd: null,
@@ -389,12 +393,14 @@ var OKUI = {};
     S.moves = [];
     S.passedLast = false;
     S.missCount = 0;
+    S.foul = 0;
     S.busy = false;
     S.chooser = null;
     if (S.judger) { S.judger.cancel(); S.judger = null; }
     /* 種＝いま の 時こく。同じ相手でも毎回ちがう将棋になる */
     S.rnd = OKAI.makeRnd(((new Date()).getTime() % 2147483000) + 7);
     show(el('lecture'), false);
+    drawFouls();
     /* 「ちずに もどる」は たいきょくちゅう ずっと 出しておく（しげ指示2026-09-22）。
        押すと すぐには もどらず、quit の ききかえし を はさむ */
     setText(el('give-up'), S.duo ? OKT.game.quitDuo : OKT.game.quit);
@@ -511,38 +517,58 @@ var OKUI = {};
       shake(sq);
       SND.deny();
       say(OKT.game.occupied, 'warn');
+      addFoul();
       return;
     }
     if (OK.countFlips(S.board, sq, S.player) === 0) {
       shake(sq);
       SND.deny();
       say(OKT.game.noFlip, 'warn');
-      S.missCount++;
       applyLecture();
+      addFoul();
       return;
     }
     S.missCount = 0;
+    drawFouls();
     show(el('lecture'), false);
     say('');      /* 消さずに残していた声かけを、置けたところで下げる */
     doMove(sq);
   }
   OKUI.tapCell = tapCell;
 
-  /* 3回つづけて はさめない所を押したら ルールの絵。6回で「いっしょに さがそう」。
+  /* はさめない所を押したら ルールの絵。3回で まけ に なったので 1回めから 出す
+     （もとは 3回め から＝2026-09-24 しげ指示で 3回めが まけ に なった）。
      どちらでも 置ける場所は ぜったいに 示さない（しげ裁定Q1＝A案） */
   function applyLecture() {
-    var stage = OKR.lectureStage(S.missCount);
-    if (stage >= 1) {
-      setText(el('lecture-text'), OKT.game.lecture);
-      setText(el('lecture-how'), OKT.game.lectureHow);
-      show(el('lecture'), true);
-      startRuleAnim();
+    setText(el('lecture-text'), OKT.game.lecture);
+    setText(el('lecture-how'), OKT.game.lectureHow);
+    show(el('lecture'), true);
+    startRuleAnim();
+  }
+
+  /* ---- イエローカード（2026-09-24 しげ指示）。3まい たまったら その局は まけ ---- */
+  function addFoul() {
+    S.missCount++;
+    drawFouls();
+    if (OKR.foulLeft(S.missCount) > 0) { return; }
+    /* 3まいめが ならんだのを 見せてから おわる。そのあいだは 押しても 効かない。
+       「ちずに もどる」で やめたときは clearTimers で この まちも 消える */
+    S.busy = true;
+    S.foul = S.player;
+    say('');
+    later(function () {
+      if (S.screen === 'game') { endGame(); }
+    }, OKUI.FOUL_WAIT_MS);
+  }
+  function drawFouls() {
+    var row = el('foul-cards'), i, left = OKR.foulLeft(S.missCount);
+    while (row.firstChild) { row.removeChild(row.firstChild); }
+    for (i = 0; i < OKR.FOUL_LIMIT; i++) {
+      row.appendChild(mk('span', 'ycard' + (i < S.missCount ? ' on' : '')));
     }
-    if (stage >= 2) {
-      /* この声かけだけは消さない（しげ裁定2026-09-22「ぜんぶ推奨で」）。
-         「ちずに もどる」は たいきょく の あいだ ずっと 出ているので ここでは さわらない */
-      say(OKT.game.together, 'warn', true);
-    }
+    setText(el('foul-text'), left > 0
+      ? (OKT.game.foulPre + left + OKT.game.foulPost) : OKT.game.foulOut);
+    show(el('foul'), S.missCount > 0);
   }
 
   /* ルールの絵＝よこ1れつで「くろ・しろ・あき」に置くと返る、小さな うごき */
@@ -586,7 +612,9 @@ var OKUI = {};
     theirs = S.childColor === BLACK ? nw : nb;
     win = mine > theirs;
     lose = mine < theirs;
-    S.result = { nb: nb, nw: nw, mine: mine, theirs: theirs, win: win, lose: lose };
+    /* イエローカード 3まい＝石の数に かかわらず その色の まけ */
+    if (S.foul) { win = S.foul !== S.childColor; lose = !win; }
+    S.result = { nb: nb, nw: nw, mine: mine, theirs: theirs, win: win, lose: lose, foul: S.foul };
     showResultHead();
     showScreen('result');
     /* ふたりのときは まけた わけ を しらべない＝
@@ -596,7 +624,11 @@ var OKUI = {};
       if (nb === nw) { SND.draw(); } else { SND.win(); confetti(); }
       return;
     }
-    if (lose) {
+    if (lose && S.foul) {
+      /* カードで おわった局は しらべない＝わけは もう はっきり しているため */
+      SND.lose();
+      finishResult({ foul: true });
+    } else if (lose) {
       SND.lose();
       startJudging();
     } else {
@@ -610,6 +642,7 @@ var OKUI = {};
     var r = S.result, box, kachi;
     if (S.duo) {
       kachi = r.nb === r.nw ? null : (r.nb > r.nw ? BLACK : WHITE);
+      if (r.foul) { kachi = r.foul === BLACK ? WHITE : BLACK; }
       setText(el('res-head'), kachi === null ? OKT.result.draw
         : ((kachi === BLACK ? OKT.game.black : OKT.game.white) + OKT.result.winSuffix));
       el('res-head').className = 'res-head ' + (kachi === null ? 'draw' : 'win');
@@ -636,12 +669,27 @@ var OKUI = {};
       else if (got[i] === 'edge' && pick === 'last') { pick = 'edge'; }
     }
     S.gotStamps = got;
-    setText(el('res-praise'), S.duo ? '' : OKT.result.praise[pick]);
+    /* カードで おわった局は ほめる文を 出さない＝「さいごまで じぶんで うったね」が うそに なるため */
+    setText(el('res-praise'), (S.duo || r.foul) ? '' : OKT.result.praise[pick]);
+    drawResultFoul();
     show(el('res-reason'), false);
     show(el('res-judging'), false);
     setText(el('res-unlock'), '');
     setText(el('res-again'), OKT.result.again);
     setText(el('res-back'), S.duo ? OKT.result.backDuo : OKT.result.back);
+  }
+
+  /* けっかの画面の イエローカード（3まい たまって おわった ときだけ） */
+  function drawResultFoul() {
+    var r = S.result, row = el('res-foul-cards'), i, who;
+    while (row.firstChild) { row.removeChild(row.firstChild); }
+    if (!r.foul) { show(el('res-foul'), false); return; }
+    for (i = 0; i < OKR.FOUL_LIMIT; i++) { row.appendChild(mk('span', 'ycard on')); }
+    who = S.duo
+      ? ((r.foul === BLACK ? OKT.game.black : OKT.game.white) + OKT.result.foulDuoSuffix) : '';
+    setText(el('res-foul-text'), who + OKT.result.foulLine);
+    setText(el('res-foul-next'), S.duo ? '' : OKT.result.foulNext);
+    show(el('res-foul'), true);
   }
 
   /* ---- まけた わけ を しらべる＝棋譜を1手ずつ。あいだに息をつぐ（判定述語P9） ---- */
@@ -681,7 +729,8 @@ var OKUI = {};
       setText(el('res-next-title'), OKT.result.nextTitle);
       drawMini(reason.board, reason.sq, reason.oppCorner);
       show(el('res-reason'), true);
-    } else if (reason) {
+    } else if (reason && !reason.foul) {
+      /* カードで おわった局は ここに 来ない＝わけは res-foul が 出している */
       setText(el('res-why'), OKB.NO_BLUNDER_TEXT);
       setText(el('res-next'), '');
       setText(el('res-reason-title'), '');
@@ -706,7 +755,8 @@ var OKUI = {};
       color: S.childColor === BLACK ? 'b' : 'w',
       res: r.win ? 'w' : (r.lose ? 'l' : 'd'),
       mine: r.mine, theirs: r.theirs,
-      reason: (reason && reason.hasReason) ? reason.type : ''
+      reason: (reason && reason.foul) ? 'foul'
+        : ((reason && reason.hasReason) ? reason.type : '')
     };
     OKR.addGame(S.save, rec);
     /* 保存できないことは 結果の画面に書く＝#msg は たいきょくの画面の中にあり、
@@ -820,7 +870,8 @@ var OKUI = {};
       if (!counts.hasOwnProperty(k)) { continue; }
       any = true;
       tr = mk('tr', null);
-      name = (OKB.TYPES[k] && OKB.TYPES[k].name) ? OKB.TYPES[k].name : k;
+      name = (k === 'foul') ? OKT.grown.foulName
+        : ((OKB.TYPES[k] && OKB.TYPES[k].name) ? OKB.TYPES[k].name : k);
       appendCell(tr, 'th', name === '' ? OKB.TYPES.none.why : name);
       appendCell(tr, 'td', String(counts[k]));
       tbl.appendChild(tr);
@@ -865,8 +916,9 @@ var OKUI = {};
         appendCell(tr, 'td', g.mine + ' - ' + g.theirs);
         /* 型の名前が無い「ここは そんを した」も、上の表と同じ言い方で出す
            （上の表は文、この表は空白、と食い違っていた＝査読2026-09-21） */
-        appendCell(tr, 'td', g.reason && OKB.TYPES[g.reason]
-          ? (OKB.TYPES[g.reason].name || OKB.TYPES[g.reason].why) : '');
+        appendCell(tr, 'td', g.reason === 'foul' ? OKT.grown.foulName
+          : (g.reason && OKB.TYPES[g.reason]
+            ? (OKB.TYPES[g.reason].name || OKB.TYPES[g.reason].why) : ''));
         tbl.appendChild(tr);
       }
       box.appendChild(tbl);

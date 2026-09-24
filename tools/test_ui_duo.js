@@ -252,6 +252,77 @@ isTrue('　　1局が おわった', S.screen === 'result');
 is('　　きろくに 1局 のこる', S.save.games.length, 1);
 isTrue('　　端末に 保存された', STORE[OKR.KEY] !== undefined);
 
+/* ================= ⑪ イエローカード（はんすう6・2026-09-24 しげ指示） ================= */
+function hasamenai() {        /* 石が無くて はさめない マスを1つ さがす */
+  var i;
+  for (i = 0; i < 64; i++) {
+    if (S.board[i] === OK.EMPTY && OK.countFlips(S.board, i, S.player) === 0) { return i; }
+  }
+  return -1;
+}
+function onCards(id) {
+  var row = NODES[id], i, n = 0;
+  for (i = 0; i < row.childNodes.length; i++) {
+    if (row.childNodes[i].className.indexOf(' on') >= 0) { n++; }
+  }
+  return n + '/' + row.childNodes.length;
+}
+STORE = {};
+S.save = OKR.load(window.localStorage);
+OKUI.startGame(1, BLACK, false);
+pumpTimers();
+isTrue('⑪はじめは カードの わくが 出ていない', NODES.foul.style.display === 'none');
+OKUI.tapCell(hasamenai());
+is('　　はさめない所 1かいめ＝カード 1まい', onCards('foul-cards'), '1/3');
+is('　　1かいめの ことば', NODES['foul-text'].text(), 'あと2かい おけないところを タップしたら まけだよ');
+isTrue('　　ルールの絵も 1かいめ から 出る', NODES.lecture.style.display !== 'none');
+OKUI.tapCell(27);            /* まんなか＝石が ある所も 数える */
+is('　　石の ある所 2かいめ＝カード 2まい', onCards('foul-cards'), '2/3');
+is('　　2かいめの ことば', NODES['foul-text'].text(), 'あと1かい おけないところを タップしたら まけだよ');
+OKUI.tapCell(OK.legalMoves(S.board, BLACK)[0]);
+pumpTimers();
+isTrue('　　置ける所に 置いたら カードは 0に もどる', S.missCount === 0 && NODES.foul.style.display === 'none');
+while (S.player !== BLACK || S.busy) { if (pumpTimers(1) === 0) { break; } }
+OKUI.tapCell(hasamenai());
+OKUI.tapCell(27);
+OKUI.tapCell(hasamenai());
+is('　　3かいめ＝カード 3まい', onCards('foul-cards'), '3/3');
+is('　　3まい そろった ことば', NODES['foul-text'].text(), OKT.game.foulOut);
+is('　　そろった あとも まだ たいきょくの 画面（見せてから うつる）', S.screen, 'game');
+OKUI.tapCell(OK.legalMoves(S.board, BLACK)[0] === undefined ? 0 : OK.legalMoves(S.board, BLACK)[0]);
+is('　　そろった あとは 押しても 打てない', S.moves.length, 2);
+pumpTimers();
+is('　　石の数に かかわらず まけ', [S.screen, S.result.lose, S.result.win], ['result', true, false]);
+isTrue('　　けっかに カード 3まいと わけ', NODES['res-foul'].style.display !== 'none'
+  && onCards('res-foul-cards') === '3/3' && NODES['res-foul-text'].text() === OKT.result.foulLine);
+is('　　まけた わけの しらべは 走らない', [NODES['res-reason'].style.display, S.judger], ['none', null]);
+is('　　ほめる文は 出さない', NODES['res-praise'].text(), '');
+is('　　きろくの わけ は foul', S.save.games[0].reason, 'foul');
+is('　　きろくは まけ', S.save.games[0].res, 'l');
+
+/* ふたりの ときは カードが たまった色の まけ（石の数では きめない） */
+OKUI.startGame(1, BLACK, true);
+pumpTimers();
+OKUI.tapCell(hasamenai()); OKUI.tapCell(27); OKUI.tapCell(hasamenai());
+pumpTimers();
+is('　　ふたり＝くろが 3まい→しろの かち', NODES['res-head'].text(), OKT.game.white + OKT.result.winSuffix);
+is('　　ふたり＝どちらの色か 書く', NODES['res-foul-text'].text(), OKT.game.black + OKT.result.foulDuoSuffix + OKT.result.foulLine);
+is('　　ふたりは きろくに のこさない', S.save.games.length, 1);
+
+/* とちゅうで やめたら まけに ならない */
+OKUI.startGame(1, BLACK, false);
+pumpTimers();
+OKUI.tapCell(hasamenai()); OKUI.tapCell(27); OKUI.tapCell(hasamenai());
+NODES['give-up'].onclick();
+NODES['quit-yes'].onclick();
+pumpTimers();
+is('　　3まい そろった すぐあとに やめたら ちずの まま', [S.screen, S.save.games.length], ['map', 1]);
+OKUI.startGame(1, BLACK, false);
+pumpTimers();
+isTrue('　　つぎの局では カードは 0から', S.missCount === 0 && S.foul === 0 && NODES.foul.style.display === 'none');
+NODES['give-up'].onclick();
+NODES['quit-yes'].onclick();
+
 /* ================= ⑩ 新しい版は たいきょく中に 入れかえない（はんすう5・つうしんなしで あそぶ） ================= */
 var AC = window.applicationCache;
 isTrue('⑩しまい終えた合図を 聞いている', typeof AC.handlers.updateready === 'function');
